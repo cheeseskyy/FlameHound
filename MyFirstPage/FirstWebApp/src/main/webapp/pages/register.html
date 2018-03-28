@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<head>
+<meta http-equiv="content-type"
+	content="application/xhtml+xml; charset=UTF-8" />
+<title>Register Page</title>
+</head>
+<body>
+
+<script type="text/javascript">
+function register(){
+	var userInfo = {"name": document.getElementById("name").value, 
+					"username": document.getElementById("username").value, 
+					"email": document.getElementById("email").value, 
+					"role": document.getElementById("role").value, 
+					"homeNumber": document.getElementById("homeNumber").value, 
+					"phoneNumber": document.getElementById("phoneNumber").value, 
+					"address": document.getElementById("address").value, 
+					"nif": document.getElementById("nif").value, 
+					"cc": document.getElementById("cc").value, 
+					"psw": document.getElementById("username").value,
+					"psw-repeat": document.getElementById("psw-repeat").value};
+	var JsonUserInfo = JSON.stringify(userInfo);
+	xhttp.open("POST", "https://adept-acronym-199216.appspot.com/rest/register/v3", true);
+	xhttp.setRequestHeader("Content-type", "application/json");
+	xhttp.send(jSonUserInfo);
+	alert("ola");
+	xhttp.onreadystatechange = function() {
+		alert(xhttp.status);
+   		if(xhttp.status == 200){
+   			alert("Succefull registration.")
+   	    	window.location.replace("https://adept-acronym-199216.appspot.com/homePage")
+   	    }
+   		if(xhttp.status == 400){
+   			alert("Invalid information, please fill the mandatory areas or username already exist.")
+   	    	window.location.replace("https://adept-acronym-199216.appspot.com/login");
+   		}
+   };
+}
+</script>
+
+
+
+<p>Please fill in this form to create an account.</p>
+
+	<label for="name"><b>Name</b></label>
+	<input type="text" placeholder="Enter Name" id="name" required>
+	<br>
+	
+	<label for="username"><b>Username</b></label>
+	<input type="text" placeholder="Enter Username" id="username" required>
+	<br>
+	
+    <label for="email"><b>Email</b></label>
+    <input type="text" placeholder="Enter Email" id="email" required>
+    <br>
+    
+    <label for="role"><b>Role</b></label>
+    <select id="role">
+    	<option value="USER">User</option>
+    	<option value="GBO">Gestor BackOffice</option>
+    	<option value="GS">Gestor Sistema</option>
+    	<option value="OPE">Operacional BackEnd</option>
+    </select>
+    <br>
+    
+    <label for="homeNumber"><b>Home Number</b></label>
+    <input type="text" placeholder="Enter Home Number" id="homeNumber">
+    <br>
+    
+    <label for="phoneNumber"><b>Phone Number</b></label>
+    <input type="text" placeholder="Enter Phone Number" id="phoneNUmber">
+    <br>
+    
+    <label for="address"><b>Address</b></label>
+    <input type="text" placeholder="Enter Andress" id="address" required>
+	<br>
+	
+    <label for="nif"><b>NIF</b></label>
+    <input type="text" placeholder="Enter NIF" id="nif">
+    <br>
+    
+    <label for="cc"><b>CC</b></label>
+    <input type="text" placeholder="Enter CC" id="cc">
+    <br>
+    
+    <label for="psw"><b>Password</b></label>
+    <input type="password" placeholder="Enter Password" id="psw" required>
+	<br>
+	
+    <label for="psw-repeat"><b>Repeat Password</b></label>
+    <input type="password" placeholder="Repeat Password" id="psw-repeat" required>
+	<br>
+	
+	<button type="button" onclick="register()">Submit</button>
+	<br>
+</body>

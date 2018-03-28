@@ -8,17 +8,26 @@
 <div class="login-page">
     <form class="login-form">
     <script>
-	function sendLogin() {
-		var username = document.getElementById("username").value;
-		var password = document.getElementById("password").value;
-	    xhr = new XMLHttpRequest();
-	   // var url = "/rest/l";
-	   xhr.open("POST", "https://my-first-project-196314.appspot.com/rest/login/l", true);
-    	    xhr.setRequestHeader("Content-type", "application/json");
-    	    var data = JSON.stringify({"username":username,"password":password});
-    	    xhr.send(data);
-  		var text = xhr.response;
-	}
+    
+    function login() {
+    	var usernameV = document.getElementById("un").value;
+    	var passwordV = document.getElementById("pw").value;
+    	var jSObj = {"username":usernameV , "password":passwordV};
+    	var jSonObj = JSON.stringify(jSObj);
+    	var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://promising-env-198215.appspot.com/rest/login/l", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = function() {
+        	 if(xhttp.status == 200){
+        	    	window.location.replace("https://promising-env-198215.appspot.com/home")
+        	    }
+        	if(xhttp.status == 403){
+        		 alert("Passowrd ou username incorreto");
+        		 window.location.replace("https://promising-env-198215.appspot.com")
+        	 }
+        };
+    }
 	
 	</script>
       <input type="text" placeholder="username" id="username"/>
