@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,8 +24,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -41,7 +38,8 @@ import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
-
+import com.google.api.client.util.store.DataStore;
+import org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
@@ -49,50 +47,50 @@ import pt.unl.fct.di.apdc.firstwebapp.util.LoginData;
 
 @Path("/login")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-
 public class LoginResource extends HttpServlet {
+
 	/**
-	 * A Logger object
+	 * 
 	 */
-	
+	/**
+	 * A logger object.
+	 */
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-	private static final Gson g = new Gson();
 
 	public LoginResource() {
-	}
-	
+	} // Nothing to be done here...
 
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		RequestDispatcher r = request.getRequestDispatcher("HtmlPages/loginPage.html");
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException , ServletException{
+		RequestDispatcher r = request.getRequestDispatcher("pages/login.html");
 		r.forward(request, response);
 	}
-	
+
 	@POST
 	@Path("/l")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response doLogin(LoginData data) {
-		System.out.println("Hey");
 		LOG.fine("Attempt to login user: " + data.username);
-		if (data.username.equals("Lopes") && data.password.equals("picanha")) {
+
+		if (data.username.equals("jleitao") && data.password.equals("password")) {
 			AuthToken token = new AuthToken(data.username);
-			System.out.println("Success");
+			LOG.info("User '" + data.username + "' logged in sucessfully.");
 			return Response.ok(g.toJson(token)).build();
 		}
-		LOG.warning("Failed to login username: " + data.username);
-		System.out.println("Failed");
+		LOG.warning("Failed login attempt for username: " + data.username);
 		return Response.status(Status.FORBIDDEN).entity(g.toJson("Incorrect username or password.")).build();
 	}
-	
 
 	@GET
 	@Path("/{username}")
 	public Response checkUsernameAvailable(@PathParam("username") String username) {
-		if (!username.equals("Lopes"))
+		if (!username.equals("jleitao")) {
 			return Response.ok().entity(g.toJson(false)).build();
-		else
+		} else {
 			return Response.ok().entity(g.toJson(true)).build();
+		}
 	}
 
 	@POST
@@ -119,7 +117,6 @@ public class LoginResource extends HttpServlet {
 		}
 	}
 
-	
 	@POST
 	@Path("/v2")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -188,7 +185,6 @@ public class LoginResource extends HttpServlet {
 				txn.rollback();
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
-			
 		}
 
 	}

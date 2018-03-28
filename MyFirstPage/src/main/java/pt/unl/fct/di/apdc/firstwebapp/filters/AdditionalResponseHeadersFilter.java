@@ -8,15 +8,15 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-public class AdditionalResponseHeadersFilter implements ContainerResponseFilter{
+public class AdditionalResponseHeadersFilter implements ContainerResponseFilter {
 
 	public AdditionalResponseHeadersFilter() {}
-	
+
 	@Override
-	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
+			throws IOException {
 		responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
 		responseContext.getHeaders().add("Access-Control-Allow-Headers", "Content-Type, X-Requested-With");
-		
 	}
 
 }
