@@ -16,7 +16,7 @@ import javax.ws.rs.core.Response;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
-import com.google.appengine.repackaged.com.google.gson.Gson;
+import com.google.gson.Gson;
 
 @Path("/utils")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")

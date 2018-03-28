@@ -16,8 +16,8 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.repackaged.com.google.gson.Gson;
-import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUtils;
+import com.google.gson.Gson;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import pt.unl.fct.di.apdc.firstwebapp.util.LoginData;
 import pt.unl.fct.di.apdc.firstwebapp.util.RegisterData;
@@ -37,7 +37,7 @@ public class RegisterResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public Response doRegistration(LoginData data) {
 		Entity user = new Entity("User", data.username);
-		user.setProperty("user_pwd", DigestUtils.sha512Hex(data.password));
+		user.setProperty("user_pwd", DigestUtils.shaHex(data.password));
 		user.setUnindexedProperty("user_creation_time", new Date());
 		datastore.put(user);
 		LOG.info("User registered " + data.username);

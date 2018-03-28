@@ -9,19 +9,25 @@
     <form class="login-form">
     <script>
 	function sendLogin() {
-		var username = document.getElementByName("username");
-		var password = document.getElementByName("password");
+		var username = document.getElementByID("username");
+		var password = document.getElementByID("password");
 	    xhr = new XMLHttpRequest();
-	    var url = "/rest/l";
-	    xhr.open("POST", "http://localhost:8080/rest/login/l", true);
-	    xhr.setRequestHeader("Content-type", "application/json");
-	    var data = JSON.stringify({"username":username,"password":password});
-	    xhr.send(data);
+	    xhr.open("POST", "https://myfirstwebapp47343.appspot.com/rest/login/l", true);
+	   // var url = "/rest/l";
+	   alert("Ola2");
+	    xhttp.onreadystatechange = function() {
+    	if (this.readyState == 4 && this.status == 200) {
+    	    xhr.setRequestHeader("Content-type", "application/json");
+    	    var data = JSON.stringify({"username":username,"password":password});
+    	    xhr.send(data);
+    	}
+  		};
+  		alert(xhr.response);
 	}
 	
 	</script>
-      <input type="text" placeholder="username" name = "username"/>
-      <input type="password" placeholder="password" name = "password"/>
+      <input type="text" placeholder="username" id = "username"/>
+      <input type="password" placeholder="password" id = "password"/>
       <button onclick = "sendLogin()">login</button>
       <p class="message">Not registered? <a href="/register">Create an account</a></p>
     </form>
