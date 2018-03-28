@@ -52,31 +52,37 @@ public class LoginResource extends HttpServlet {
 	/**
 	 * A Logger object
 	 */
+	
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private static final Gson g = new Gson();
 
 	public LoginResource() {
 	}
+	
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		RequestDispatcher r = request.getRequestDispatcher("HtmlPages/loginPage.html");
 		r.forward(request, response);
 	}
-
+	
 	@POST
-	@Path("/")
+	@Path("/l")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response doLogin(LoginData data) {
+		System.out.println("Hey");
 		LOG.fine("Attempt to login user: " + data.username);
 		if (data.username.equals("Lopes") && data.password.equals("picanha")) {
 			AuthToken token = new AuthToken(data.username);
+			System.out.println("Success");
 			return Response.ok(g.toJson(token)).build();
 		}
 		LOG.warning("Failed to login username: " + data.username);
+		System.out.println("Failed");
 		return Response.status(Status.FORBIDDEN).entity(g.toJson("Incorrect username or password.")).build();
 	}
+	
 
 	@GET
 	@Path("/{username}")
@@ -179,6 +185,7 @@ public class LoginResource extends HttpServlet {
 				txn.rollback();
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
+			
 		}
 
 	}
