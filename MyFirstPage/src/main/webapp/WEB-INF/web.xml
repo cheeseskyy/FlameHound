@@ -13,6 +13,16 @@
     <servlet-name>LoginServlet</servlet-name>
     <url-pattern>/login</url-pattern>
   </servlet-mapping>
+  
+    <servlet>
+    <servlet-name>HomeServlet</servlet-name>
+    <servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.MapResource</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>HomeServlet</servlet-name>
+    <url-pattern>/home</url-pattern>
+  </servlet-mapping>
 
  
 	<servlet>
