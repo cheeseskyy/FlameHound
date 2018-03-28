@@ -38,7 +38,7 @@ import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
-import com.google.appengine.repackaged.com.google.api.client.util.store.DataStore;
+
 import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
@@ -53,7 +53,7 @@ public class LoginResource extends HttpServlet {
 	 * A Logger object
 	 */
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
-
+	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private static final Gson g = new Gson();
 
 	public LoginResource() {
