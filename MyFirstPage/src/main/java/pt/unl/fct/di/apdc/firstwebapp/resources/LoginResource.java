@@ -24,6 +24,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -39,7 +41,6 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
 
-import com.google.appengine.repackaged.org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
@@ -66,7 +67,6 @@ public class LoginResource extends HttpServlet {
 		RequestDispatcher r = request.getRequestDispatcher("HtmlPages/loginPage.html");
 		r.forward(request, response);
 	}
-	
 	
 	@POST
 	@Path("/l")
@@ -104,7 +104,7 @@ public class LoginResource extends HttpServlet {
 		try {
 			Entity user = datastore.get(userKey);
 			String hashedPWD = (String) user.getProperty("user_pwd");
-			if (hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
+			if (hashedPWD.equals(DigestUtils.shaHex(data.password))) {
 				LOG.info("User '" + data.username + "' logged in sucessfully.");
 				AuthToken token = new AuthToken(data.username);
 				return Response.ok(g.toJson(token)).build();
@@ -144,7 +144,7 @@ public class LoginResource extends HttpServlet {
 			}
 
 			String hashedPWD = (String) user.getProperty("user_pwd");
-			if (hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
+			if (hashedPWD.equals(DigestUtils.shaHex(data.password))) {
 				// Password correct
 
 				// Construct the logs
@@ -202,7 +202,7 @@ public class LoginResource extends HttpServlet {
 		try {
 			Entity user = datastore.get(userKey);
 			String hashedPWD = (String) user.getProperty("user_pwd");
-			if (hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
+			if (hashedPWD.equals(DigestUtils.shaHex(data.password))) {
 
 				Calendar cal = Calendar.getInstance();
 				cal.add(Calendar.DATE, -1);
