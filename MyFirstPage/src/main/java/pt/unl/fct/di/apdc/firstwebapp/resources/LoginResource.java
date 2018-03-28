@@ -1,7 +1,13 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -12,7 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.google.appengine.repackaged.com.google.gson.Gson;
+import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.LoginData;
@@ -20,7 +26,7 @@ import pt.unl.fct.di.apdc.firstwebapp.util.LoginData;
 @Path("/login")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 
-public class LoginResource {
+public class LoginResource extends HttpServlet{
 	/**
 	 * A Logger object
 	 */
@@ -29,6 +35,13 @@ public class LoginResource {
 	private static final Gson g = new Gson();
 	
 	public LoginResource() {}
+	
+	@Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) 
+	      throws IOException, ServletException {
+		  RequestDispatcher r = request.getRequestDispatcher("HtmlPages/loginPage.html");
+		  r.forward(request, response);
+	}
 	
 	@POST
 	@Path("/")

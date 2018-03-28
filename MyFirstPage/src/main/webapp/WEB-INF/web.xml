@@ -4,14 +4,15 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          version="2.5">
   <servlet>
-    <servlet-name>HelloAppEngine</servlet-name>
-    <servlet-class>pt.unl.fct.di.apdc.firstwebapp.HelloAppEngine</servlet-class>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.LoginResource</servlet-class>
   </servlet>
   
   <servlet-mapping>
-    <servlet-name>HelloAppEngine</servlet-name>
+    <servlet-name>LoginServlet</servlet-name>
     <url-pattern>/login</url-pattern>
   </servlet-mapping>
+
  
 	<servlet>
 	<servlet-name>jerseyServlet</servlet-name>
