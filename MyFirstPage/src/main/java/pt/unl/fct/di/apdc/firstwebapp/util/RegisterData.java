@@ -2,25 +2,44 @@ package pt.unl.fct.di.apdc.firstwebapp.util;
 
 public class RegisterData {
 
+	public String name;
 	public String username;
-	public String password;
 	public String email;
+	public String role;
+	public String homeNumber;
+	public String phoneNumber;
+	public String address;
+	public String nif;
+	public String cc;
+	public String password;
 	public String confirmation;
 
-	public RegisterData() {}
+	public RegisterData() {
 
-	public RegisterData(String username, String password, String email, String confirmation) {
+	}
+
+	public RegisterData(String name, String username, String email, String role, String homeNumber, String phoneNumber,
+			String address, String nif, String cc, String password, String confirmation) {
+		this.name = name;
 		this.username = username;
-		this.password = password;
 		this.email = email;
+		this.role = role;
+		this.homeNumber = homeNumber;
+		this.phoneNumber = phoneNumber;
+		this.address = address;
+		this.nif = nif;
+		this.cc = cc;
+		this.password = password;
 		this.confirmation = confirmation;
 	}
 
+	private boolean nonEmptyField(String field) {
+		return field != null && !field.isEmpty();
+	}
+
 	public boolean validRegistration() {
-		if(username.equals("") || email.equals("") || password.equals("") || confirmation.equals(""))
-			return false;
-		if(!confirmation.equals(password))
-			return false;
-		return true;
+		return nonEmptyField(name) && nonEmptyField(username) && nonEmptyField(email) && nonEmptyField(role)
+				&& nonEmptyField(address) && nonEmptyField(password) && nonEmptyField(confirmation)
+				&& email.contains("@") && password.equals(confirmation);
 	}
 }

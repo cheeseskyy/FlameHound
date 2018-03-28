@@ -9,10 +9,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class MapResource extends HttpServlet{
-
+	
+	public MapResource() {}
+	
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		RequestDispatcher r = request.getRequestDispatcher("HtmlPages/homePage.html");
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException , ServletException{
+		RequestDispatcher r = request.getRequestDispatcher("pages/homePage.html");
 		r.forward(request, response);
 	}
+
 }
