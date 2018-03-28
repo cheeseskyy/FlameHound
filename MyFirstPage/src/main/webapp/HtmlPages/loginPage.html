@@ -9,11 +9,13 @@
     <form class="login-form">
     <script>
 	function sendLogin() {
+		var username = document.getElementByName("username");
+		var password = document.getElementByName("password");
 	    xhr = new XMLHttpRequest();
 	    var url = "/rest/l";
-	    xhr.open("POST", "localhost:8080/login/l", false);
+	    xhr.open("POST", "http://localhost:8080/rest/login/l", true);
 	    xhr.setRequestHeader("Content-type", "application/json");
-	    var data = JSON.stringify({"username":"heysjas","password":"asdjasd"});
+	    var data = JSON.stringify({"username":username,"password":password});
 	    xhr.send(data);
 	}
 	

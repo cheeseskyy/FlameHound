@@ -67,6 +67,7 @@ public class LoginResource extends HttpServlet {
 		r.forward(request, response);
 	}
 	
+	
 	@POST
 	@Path("/l")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -117,6 +118,7 @@ public class LoginResource extends HttpServlet {
 		}
 	}
 
+	
 	@POST
 	@Path("/v2")
 	@Consumes(MediaType.APPLICATION_JSON)
