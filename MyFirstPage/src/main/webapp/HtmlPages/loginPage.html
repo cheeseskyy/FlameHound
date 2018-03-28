@@ -9,21 +9,20 @@
     <form class="login-form">
     <script>
 	function sendLogin() {
-		var username = document.getElementById("username");
-		var password = document.getElementById("password");
+		var username = document.getElementById("username").value;
+		var password = document.getElementById("password").value;
 	    xhr = new XMLHttpRequest();
 	   // var url = "/rest/l";
-	   xhr.open("POST", "https://promising-env-198215.appspot.com/rest/login/l", true);
+	   xhr.open("POST", "https://my-first-project-196314.appspot.com/rest/login/l", true);
     	    xhr.setRequestHeader("Content-type", "application/json");
     	    var data = JSON.stringify({"username":username,"password":password});
     	    xhr.send(data);
   		var text = xhr.response;
-  		alert("finished");
 	}
 	
 	</script>
-      <input type="text" placeholder="username" id = "username"/>
-      <input type="password" placeholder="password" id = "password"/>
+      <input type="text" placeholder="username" id="username"/>
+      <input type="password" placeholder="password" id="password"/>
       <button onclick = "sendLogin()">login</button>
       <p class="message">Not registered? <a href="/register">Create an account</a></p>
     </form>
