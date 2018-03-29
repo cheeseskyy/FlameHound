@@ -6,7 +6,7 @@
 </head>
 <body>
 
-<script type="text/javascript">
+	<script type="text/javascript">
 function register(){
 	var userInfo = {"name": document.getElementById("name").value, 
 					"username": document.getElementById("username").value, 
@@ -17,81 +17,85 @@ function register(){
 					"address": document.getElementById("address").value, 
 					"nif": document.getElementById("nif").value, 
 					"cc": document.getElementById("cc").value, 
-					"psw": document.getElementById("username").value,
-					"psw-repeat": document.getElementById("psw-repeat").value};
+					"password": document.getElementById("psw").value,
+					"confirmation": document.getElementById("psw-repeat").value};
 	var JsonUserInfo = JSON.stringify(userInfo);
 	var xhttp = new XMLHttpRequest();
-	xhttp.open("POST", "https://promising-env-198215.appspot.com/rest/register/v3", true);
+	xhttp.open("POST", "/rest/register/v3", true);
 	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send(userInfo);
-	alert("ola");
+	xhttp.send(JsonUserInfo);
+	alert("ola " + JsonUserInfo);
 	xhttp.onreadystatechange = function() {
-		alert(xhttp.status);
-   		if(xhttp.status == 200){
-   			alert("Successful registration.")
-   	    	window.location.replace("https://promising-env-198215.appspot.com/homePage")
-   	    }
-   		if(xhttp.status == 400){
-   			alert("Invalid information, please fill the mandatory areas or username already exist.")
-   	    	window.location.replace("https://promising-env-198215.appspot.com/login");
-   		}
+			if(xhttp.readyState == 4){
+			alert(xhttp.status);
+   			if(xhttp.status == 200){
+   				alert("Successful registration.")
+   	    		window.location.replace("/homePage")
+   	   	 }
+   			if(xhttp.status == 400){
+   				alert("Invalid information, please fill the mandatory areas or username already exist.")
+   	    		window.location.replace("/register");
+   			}
+		}
    };
 }
 </script>
 
 
 
-<p>Please fill in this form to create an account.</p>
+	<p>Please fill in this form to create an account.</p>
 
 	<label for="name"><b>Name</b></label>
 	<input type="text" placeholder="Enter Name" id="name" required>
 	<br>
-	
+
 	<label for="username"><b>Username</b></label>
 	<input type="text" placeholder="Enter Username" id="username" required>
 	<br>
-	
-    <label for="email"><b>Email</b></label>
-    <input type="text" placeholder="Enter Email" id="email" required>
-    <br>
-    
-    <label for="role"><b>Role</b></label>
-    <select id="role">
-    	<option value="USER">User<selected /option>
-    	<option value="GBO">Gestor BackOffice</option>
-    	<option value="GS">Gestor Sistema</option>
-    	<option value="OPE">Operacional BackEnd</option>
-    </select>
-    <br>
-    
-    <label for="homeNumber"><b>Home Number</b></label>
-    <input type="text" placeholder="Enter Home Number" id="homeNumber">
-    <br>
-    
-    <label for="phoneNumber"><b>Phone Number</b></label>
-    <input type="text" placeholder="Enter Phone Number" id="phoneNumber">
-    <br>
-    
-    <label for="address"><b>Address</b></label>
-    <input type="text" placeholder="Enter Andress" id="address" required>
+
+	<label for="email"><b>Email</b></label>
+	<input type="text" placeholder="Enter Email" id="email" required>
 	<br>
-	
-    <label for="nif"><b>NIF</b></label>
-    <input type="text" placeholder="Enter NIF" id="nif">
-    <br>
-    
-    <label for="cc"><b>CC</b></label>
-    <input type="text" placeholder="Enter CC" id="cc">
-    <br>
-    
-    <label for="psw"><b>Password</b></label>
-    <input type="password" placeholder="Enter Password" id="psw" required>
+
+	<label for="role"><b>Role</b></label>
+	<select id="role">
+		<option value="USER">User
+			<selected /option>
+			<option value="GBO">Gestor BackOffice</option>
+			<option value="GS">Gestor Sistema</option>
+			<option value="OPE">Operacional BackEnd</option>
+	</select>
 	<br>
-	
-    <label for="psw-repeat"><b>Repeat Password</b></label>
-    <input type="password" placeholder="Repeat Password" id="psw-repeat" required>
+
+	<label for="homeNumber"><b>Home Number</b></label>
+	<input type="text" placeholder="Enter Home Number" id="homeNumber">
 	<br>
-	
+
+	<label for="phoneNumber"><b>Phone Number</b></label>
+	<input type="text" placeholder="Enter Phone Number" id="phoneNumber">
+	<br>
+
+	<label for="address"><b>Address</b></label>
+	<input type="text" placeholder="Enter Andress" id="address" required>
+	<br>
+
+	<label for="nif"><b>NIF</b></label>
+	<input type="text" placeholder="Enter NIF" id="nif">
+	<br>
+
+	<label for="cc"><b>CC</b></label>
+	<input type="text" placeholder="Enter CC" id="cc">
+	<br>
+
+	<label for="psw"><b>Password</b></label>
+	<input type="password" placeholder="Enter Password" id="psw" required>
+	<br>
+
+	<label for="psw-repeat"><b>Repeat Password</b></label>
+	<input type="password" placeholder="Repeat Password" id="psw-repeat"
+		required>
+	<br>
+
 	<button type="button" onclick="register()">Submit</button>
 	<br>
 </body>

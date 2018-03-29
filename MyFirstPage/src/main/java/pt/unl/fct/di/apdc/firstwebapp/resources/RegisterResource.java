@@ -115,6 +115,7 @@ public class RegisterResource extends HttpServlet{
 			Key userKey = KeyFactory.createKey("User", data.username);
 			Entity user = datastore.get(userKey);
 			txn.rollback();
+			System.out.println("User already exists");
 			return Response.status(Status.BAD_REQUEST).entity("User already exists.").build(); 
 		} catch (EntityNotFoundException e) {
 			Entity user = new Entity("User", data.username);
