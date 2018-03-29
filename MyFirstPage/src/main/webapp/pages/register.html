@@ -23,12 +23,12 @@ function register(){
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("POST", "https://promising-env-198215.appspot.com/rest/register/v3", true);
 	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send(jSonUserInfo);
+	xhttp.send(userInfo);
 	alert("ola");
 	xhttp.onreadystatechange = function() {
 		alert(xhttp.status);
    		if(xhttp.status == 200){
-   			alert("Succefull registration.")
+   			alert("Successful registration.")
    	    	window.location.replace("https://promising-env-198215.appspot.com/homePage")
    	    }
    		if(xhttp.status == 400){
