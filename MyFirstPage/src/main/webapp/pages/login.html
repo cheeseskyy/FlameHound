@@ -15,11 +15,12 @@ function login() {
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(jSonLoginInfo);
     xhttp.onreadystatechange = function() {
-    	 if(xhttp.readyState == 4 && xhttp.status == 200){
+    	alert("readyState = " + xhttp.readyState);
+    	if(xhttp.readyState == 4 && xhttp.status == 200){
     		 	alert("Successful login.");
     	    	window.location.replace("/homePage");
-    	    }
-    	if(xhttp.status == 403){
+    	}
+    	if(xhttp.readyState == 4 && xhttp.status == 403){
     		 alert("Password or username incorrect");
     		 window.location.replace("/");
     	 }
