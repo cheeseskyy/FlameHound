@@ -34,12 +34,14 @@ public class RegisterData {
 	}
 
 	private boolean nonEmptyField(String field) {
-		return field != null && !field.isEmpty();
+		if(field.isEmpty()) {
+			System.out.println("empty: " + field);
+		}
+		return !field.isEmpty();
 	}
 
 	public boolean validRegistration() {
-		return nonEmptyField(name) && nonEmptyField(username) && nonEmptyField(email) && nonEmptyField(role)
-				&& nonEmptyField(address) && nonEmptyField(password) && nonEmptyField(confirmation)
-				&& email.contains("@") && password.equals(confirmation);
+		return nonEmptyField(name) && nonEmptyField(username) && nonEmptyField(email) && nonEmptyField(address)
+				&& nonEmptyField(password) && nonEmptyField(confirmation) && password.equals(confirmation);
 	}
 }
