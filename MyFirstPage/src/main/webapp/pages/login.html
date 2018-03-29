@@ -11,17 +11,17 @@ function login() {
 	var loginInfo = {"username":usernameV , "password":passwordV};
 	var jSonLoginInfo = JSON.stringify(loginInfo);
 	var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "https://promising-env-198215.appspot.com/rest/login/l", true);
+    xhttp.open("POST", "/rest/login/l", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(jSonLoginInfo);
     xhttp.onreadystatechange = function() {
-    	 if(xhttp.status == 200){
-    		 	alert("Succefull login.")
-    	    	window.location.replace("https://promising-env-198215.appspot.com/homePage")
+    	 if(xhttp.readyState == 4 && xhttp.status == 200){
+    		 	alert("Successful login.");
+    	    	window.location.replace("/homePage");
     	    }
     	if(xhttp.status == 403){
     		 alert("Password or username incorrect");
-    		 window.location.replace("https://promising-env-198215.appspot.com")
+    		 window.location.replace("/");
     	 }
     };
 }
