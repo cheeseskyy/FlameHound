@@ -15,7 +15,7 @@
 			var xhttp = new XMLHttpRequest();
 		    xhttp.open("POST", "/rest/session/logout", true);
 		    xhttp.setRequestHeader("Content-type", "application/json");
-		    var jSonObj = JSON.stringify(sessionStorage.getItem('session').username);
+		    var jSonObj = JSON.stringify(sessionStorage.getItem('sessionUsername'));
 		    xhttp.send(jSonObj);
 		    xhttp.onreadystatechange = function() {
 		    	if(xhttp.readyState == 4 && xhttp.status == 200){
