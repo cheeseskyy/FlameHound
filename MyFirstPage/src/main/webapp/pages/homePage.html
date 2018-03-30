@@ -8,10 +8,51 @@
         <link rel="stylesheet" href="pages/css/hellomaps.css">
     </head>
     <body>
+    <script>
+    	
+    	
+		function logout(){
+			var xhttp = new XMLHttpRequest();
+		    xhttp.open("POST", "/rest/session/logout", true);
+		    xhttp.setRequestHeader("Content-type", "application/json");
+		    var jSonObj = JSON.stringify(sessionStorage.getItem('session').username);
+		    xhttp.send(jSonObj);
+		    xhttp.onreadystatechange = function() {
+		    	if(xhttp.readyState == 4 && xhttp.status == 200){
+		    		 	alert("Successful logout.");
+		    		 	sessionStorage.setItem('username', "");
+		    		 	sessionStorage.setItem('tokenId', "0");
+		    	    	window.location.replace("/");
+		    	}
+		    };
+		}
+		
+		function centerUserAddress(){
+			var xhttp = new XMLHttpRequest();
+		    xhttp.open("POST", "/rest/session/getAddress", true);
+		    xhttp.setRequestHeader("Content-type", "application/json");
+		    var username = sessionStorage.getItem('sessionUsername');
+		    var token = sessionStorage.getItem('sessionToken');
+		    var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+		    xhttp.send(jSonObj);
+		    xhttp.onreadystatechange = function() {
+		    	if(xhttp.readyState == 4 && xhttp.status == 200){
+					codeAddress(JSON.parse(xhttp.response));
+		    	}
+		    	if(xhttp.readyState == 4 && xhttp.status == 403){
+		    		 alert("User not logged in, redirecting you to login page");
+		    		 window.location.replace("/login");
+		    	 }
+		    };
+		}
+		
+	</script>
         <script type="text/javascript" src="pages/js/hellomaps.js"></script>
         <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAoCvXj6By2RuKZJzjfcTAtwtDLNSN6-sA&callback=initMap"></script>
         <div id="map"></div>
         <input type="text" id="cp" title="Codigopostal to Geocode" />
         <input type="button" class="pure-button pure-button-primary" id="geocode" value="Geocode"/>
+        <input type="button" onclick= "centerUserAddress()" class="pure-button purebutton-primary" id="logout" value="Center on my Address">
+        <input type="button" onclick= "logout()" class="pure-button purebutton-primary" id="logout" value="logout">
     </body>
 </html>

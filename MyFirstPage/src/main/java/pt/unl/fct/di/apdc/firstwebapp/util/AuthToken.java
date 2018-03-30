@@ -17,4 +17,26 @@ public class AuthToken {
 		this.creationData = System.currentTimeMillis();
 		this.expirationData = this.creationData + AuthToken.EXPIRATION_TIME;
 	}
+	
+	public AuthToken() {
+		this.tokenID = UUID.randomUUID().toString();
+	}
+
+	public static long getExpirationTime() {
+		return EXPIRATION_TIME;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public void setCreationData(long creationData) {
+		this.creationData = creationData;
+	}
+
+	public void setExpirationData(long expirationData) {
+		this.expirationData = expirationData;
+	}
+	
+	
 }
