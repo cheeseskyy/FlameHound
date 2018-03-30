@@ -128,6 +128,9 @@ public class RegisterResource extends HttpServlet{
 			user.setProperty("nif", data.nif);
 			user.setProperty("cc", data.cc);
 			user.setProperty("user_pwd", DigestUtils.shaHex(data.password));
+			user.setProperty("TokenKey", "");
+			user.setProperty("TokenCreationDate", "");
+			user.setProperty("TokenExpirationDate", "");
 			user.setUnindexedProperty("user_creation_time", new Date());
 			datastore.put(txn,user);
 			LOG.info("User registered " + data.username);

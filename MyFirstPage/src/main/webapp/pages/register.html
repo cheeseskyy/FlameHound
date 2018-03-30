@@ -24,13 +24,10 @@ function register(){
 	xhttp.open("POST", "/rest/register/v3", true);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.send(JsonUserInfo);
-	alert("ola " + JsonUserInfo);
 	xhttp.onreadystatechange = function() {
-			if(xhttp.readyState == 4){
-			alert(xhttp.status);
-   			if(xhttp.status == 200){
+			if(xhttp.readyState == 4 && xhttp.status == 200){
    				alert("Successful registration.")
-   	    		window.location.replace("/homePage")
+   	    		window.location.replace("/login")
    	   	 }
    			if(xhttp.status == 400){
    				alert("Invalid information, please fill the mandatory areas or username already exist.")

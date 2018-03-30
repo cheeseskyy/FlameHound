@@ -44,6 +44,7 @@ import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.LoginData;
+import pt.unl.fct.di.apdc.firstwebapp.util.SessionInfo;
 
 @Path("/login")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -55,6 +56,7 @@ public class LoginResource extends HttpServlet {
 	/**
 	 * A logger object.
 	 */
+	private static final AuthToken token = new AuthToken();
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
 	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -75,12 +77,20 @@ public class LoginResource extends HttpServlet {
 		LOG.fine("Attempt to login user: " + data.username);
 
 		if (data.username.equals("jleitao") && data.password.equals("password")) {
-			AuthToken token = new AuthToken(data.username);
+			
 			LOG.info("User '" + data.username + "' logged in sucessfully.");
 			return Response.ok(g.toJson(token)).build();
 		}
 		LOG.warning("Failed login attempt for username: " + data.username);
 		return Response.status(Status.FORBIDDEN).entity(g.toJson("Incorrect username or password.")).build();
+	}
+	
+	@GET
+	@Path("/getToken")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	public Response getToken() {
+			return Response.ok(g.toJson(token)).build();
 	}
 
 	@GET
@@ -121,7 +131,7 @@ public class LoginResource extends HttpServlet {
 	@Path("/v2")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public Response doLoginV2(LoginData data, @Context HttpServletRequest request, @Context HttpHeaders headers) {
+	public Response doLoginV2(LoginData data, @Context HttpServletRequest request, @Context HttpServletResponse response, @Context HttpHeaders headers) throws ServletException, IOException {
 		LOG.info("Attempt to login user: " + data.username);
 
 		Transaction txn = datastore.beginTransaction();
@@ -161,12 +171,20 @@ public class LoginResource extends HttpServlet {
 				// Batch operation
 				List<Entity> logs = Arrays.asList(log, ustats);
 				datastore.put(txn, logs);
-				txn.commit();
-
+				
 				// Return token
-				AuthToken token = new AuthToken(data.username);
+				token.setUsername(data.username);
+				token.setCreationData(System.currentTimeMillis());
+				token.setExpirationData(token.creationData + AuthToken.EXPIRATION_TIME);
+				
+				user.setProperty("TokenKey", token.tokenID);
+				user.setProperty("TokenCreationDate", token.creationData);
+				user.setProperty("TokenExpirationDate", token.expirationData);
+				datastore.put(txn, user);
 				LOG.info("User '" + data.username + "' logged in sucessfully.");
-				return Response.ok(g.toJson(token)).build();
+				txn.commit();
+				SessionInfo s = new SessionInfo(data.username, token.tokenID);
+				return Response.ok(g.toJson(s)).build();
 			} else {
 				// Incorrect password
 				ustats.setProperty("user_stats_failed", 1L + (long) ustats.getProperty("user_stats_failed"));
