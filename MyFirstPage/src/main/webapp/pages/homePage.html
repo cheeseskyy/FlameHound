@@ -7,15 +7,38 @@
         <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/pure/0.6.2/pure-min.css">
         <link rel="stylesheet" href="pages/css/hellomaps.css">
     </head>
-    <body>
+    <body onload= "onLoad()">
     <script>
-    	
+    
+    function getInfo(){
+    	var xhttp = new XMLHttpRequest();
+	    xhttp.open("GET", "/rest/session/userInfo", true);
+	    xhttp.setRequestHeader("Content-type", "application/json");
+	    var jSonObj = sessionStorage.getItem('sessionUsername');
+	    xhttp.send(jSonObj);
+	    xhttp.onreadystatechange = function() {
+	    	if(xhttp.readyState == 4 && xhttp.status == 200){
+	    		 	alert("Successful logout.");
+	    		 	sessionStorage.setItem('username', "");
+	    		 	sessionStorage.setItem('tokenId', "0");
+	    	    	window.location.replace("/");
+	    	}
+	    };	
+    }
+    
+    function onLoad(){
+    	if(sessionStorage.getItem('sessionToken') == "0"){
+    		alert("You are not logged in, please do so. Redirecting...")
+    		window.location.replace("/login");
+    	}
+    		
+    }
     	
 		function logout(){
 			var xhttp = new XMLHttpRequest();
 		    xhttp.open("POST", "/rest/session/logout", true);
 		    xhttp.setRequestHeader("Content-type", "application/json");
-		    var jSonObj = JSON.stringify(sessionStorage.getItem('sessionUsername'));
+		    var jSonObj = sessionStorage.getItem('sessionUsername');
 		    xhttp.send(jSonObj);
 		    xhttp.onreadystatechange = function() {
 		    	if(xhttp.readyState == 4 && xhttp.status == 200){
@@ -52,7 +75,8 @@
         <div id="map"></div>
         <input type="text" id="cp" title="Codigopostal to Geocode" />
         <input type="button" class="pure-button pure-button-primary" id="geocode" value="Geocode"/>
-        <input type="button" onclick= "centerUserAddress()" class="pure-button purebutton-primary" id="logout" value="Center on my Address">
+        <input type="button" onclick= "centerUserAddress()" class="pure-button purebutton-primary" id="centerAddress" value="Center on my Address">
         <input type="button" onclick= "logout()" class="pure-button purebutton-primary" id="logout" value="logout">
+    	<input type="button" class="pure-button pure-button-primary" id="getInfo" onclick = "getInfo()"/>
     </body>
 </html>
