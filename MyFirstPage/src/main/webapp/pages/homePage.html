@@ -12,16 +12,20 @@
     
     function getInfo(){
     	var xhttp = new XMLHttpRequest();
-	    xhttp.open("GET", "/rest/session/userInfo", true);
+    	xhttp.open("POST", "/rest/session/getUserInfo", true);
 	    xhttp.setRequestHeader("Content-type", "application/json");
-	    var jSonObj = sessionStorage.getItem('sessionUsername');
+	    var username = sessionStorage.getItem('sessionUsername');
+	    var token = sessionStorage.getItem('sessionToken');
+	    var jSonObj = JSON.stringify({"username": username, "tokenId": token});
 	    xhttp.send(jSonObj);
 	    xhttp.onreadystatechange = function() {
 	    	if(xhttp.readyState == 4 && xhttp.status == 200){
-	    		 	alert("Successful logout.");
-	    		 	sessionStorage.setItem('username', "");
-	    		 	sessionStorage.setItem('tokenId', "0");
-	    	    	window.location.replace("/");
+	    		var userInfo = JSON.parse(xhttp.response);
+	    		var info = "Username: " + userInfo.username + "\n"
+				+ "Name: " + userInfo.name + "\n"
+				+ "Address: "+userInfo.address + "\n"
+				+ "Email: " + userInfo.email;
+	    		alert(info);
 	    	}
 	    };	
     }
@@ -50,6 +54,25 @@
 		    };
 		}
 		
+		function geocode(){
+			var xhttp = new XMLHttpRequest();
+		    xhttp.open("POST", "/rest/session/geocodeAddress", true);
+		    xhttp.setRequestHeader("Content-type", "application/json");
+		    var username = sessionStorage.getItem('sessionUsername');
+		    var token = sessionStorage.getItem('sessionToken');
+		    var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+		    xhttp.send(jSonObj);
+		    xhttp.onreadystatechange = function() {
+		    	if(xhttp.readyState == 4 && xhttp.status == 200){
+					codeAddress(document.getElementById("cp").value);
+		    	}
+		    	if(xhttp.readyState == 4 && xhttp.status == 403){
+		    		 alert("User not logged in, redirecting you to login page");
+		    		 window.location.replace("/login");
+		    	 }
+		    };
+		}
+		
 		function centerUserAddress(){
 			var xhttp = new XMLHttpRequest();
 		    xhttp.open("POST", "/rest/session/getAddress", true);
@@ -74,9 +97,9 @@
         <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAoCvXj6By2RuKZJzjfcTAtwtDLNSN6-sA&callback=initMap"></script>
         <div id="map"></div>
         <input type="text" id="cp" title="Codigopostal to Geocode" />
-        <input type="button" class="pure-button pure-button-primary" id="geocode" value="Geocode"/>
+        <input type="button" class="pure-button pure-button-primary" id="geocode" value="Geocode" onclick="geocode()"/>
         <input type="button" onclick= "centerUserAddress()" class="pure-button purebutton-primary" id="centerAddress" value="Center on my Address">
         <input type="button" onclick= "logout()" class="pure-button purebutton-primary" id="logout" value="logout">
-    	<input type="button" class="pure-button pure-button-primary" id="getInfo" onclick = "getInfo()"/>
+    	<input type="button" class="pure-button pure-button-primary" id="getInfo" onclick = "getInfo()" value = "Get My Info"/>
     </body>
 </html>

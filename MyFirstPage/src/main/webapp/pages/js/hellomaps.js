@@ -41,8 +41,4 @@ function initMap()
     marker.addListener('click', function() {
         infowindow.open(map, marker);
     });
-
-    document.getElementById('geocode').onclick = function(event) {
-        codeAddress(document.getElementById('cp').value);
-    }
 }
