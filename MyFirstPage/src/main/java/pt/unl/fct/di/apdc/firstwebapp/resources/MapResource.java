@@ -30,8 +30,10 @@ import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.LoginData;
+import pt.unl.fct.di.apdc.firstwebapp.util.OccurrencyData;
 import pt.unl.fct.di.apdc.firstwebapp.util.SessionInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.UserInfo;
+import pt.unl.fct.di.apdc.firstwebapp.util.Utilities;
 
 @Path("/session")
 public class MapResource extends HttpServlet{
@@ -155,6 +157,42 @@ public class MapResource extends HttpServlet{
 			}
 		}
 		
+	}
+	
+	@POST
+	@Path("/saveOccurrency")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response saveOccurrency(SessionInfo session) {
+		
+		Object r = isLoggedIn(session);
+		if(r instanceof Response)
+			return (Response) r;
+		
+		OccurrencyData data = (OccurrencyData) session.getArgs().get(0);
+		
+		Transaction txn = datastore.beginTransaction();
+		Key userKey = KeyFactory.createKey("User", session.username);
+		Key ocId = KeyFactory.createKey("OccurrencyId", 0);
+		try {
+			
+			Entity occurrency = new Entity("Occurrency", Utilities.generateID());
+			occurrency.setIndexedProperty("user", data.getUser());
+			occurrency.setProperty("coordinates", data.getLocation());
+			occurrency.setProperty("type", data.getType());
+			occurrency.setProperty("creationTime", System.currentTimeMillis());
+			
+			datastore.put(occurrency);
+			
+			txn.commit();
+		}catch (Exception e) {
+			
+		} finally {
+			if (txn.isActive()) {
+				txn.rollback();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			}
+		}
+		return Response.ok().build();
 	}
 
 }
