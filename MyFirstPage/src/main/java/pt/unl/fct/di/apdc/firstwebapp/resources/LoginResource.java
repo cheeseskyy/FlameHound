@@ -56,7 +56,6 @@ public class LoginResource extends HttpServlet {
 	/**
 	 * A logger object.
 	 */
-	private static final AuthToken token = new AuthToken();
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
 	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -68,29 +67,6 @@ public class LoginResource extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException , ServletException{
 		RequestDispatcher r = request.getRequestDispatcher("pages/login.html");
 		r.forward(request, response);
-	}
-
-	@POST
-	@Path("/l")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response doLogin(LoginData data) {
-		LOG.fine("Attempt to login user: " + data.username);
-
-		if (data.username.equals("jleitao") && data.password.equals("password")) {
-			
-			LOG.info("User '" + data.username + "' logged in sucessfully.");
-			return Response.ok(g.toJson(token)).build();
-		}
-		LOG.warning("Failed login attempt for username: " + data.username);
-		return Response.status(Status.FORBIDDEN).entity(g.toJson("Incorrect username or password.")).build();
-	}
-	
-	@GET
-	@Path("/getToken")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public Response getToken() {
-			return Response.ok(g.toJson(token)).build();
 	}
 
 	@GET
@@ -152,7 +128,7 @@ public class LoginResource extends HttpServlet {
 			}
 
 			String hashedPWD = (String) user.getProperty("user_pwd");
-			if (hashedPWD.equals(DigestUtils.shaHex(data.password))) {
+			if (hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
 				// Password correct
 
 				// Construct the logs
@@ -173,6 +149,7 @@ public class LoginResource extends HttpServlet {
 				datastore.put(txn, logs);
 				
 				// Return token
+				AuthToken token = new AuthToken();
 				token.setUsername(data.username);
 				token.setCreationData(System.currentTimeMillis());
 				token.setExpirationData(token.creationData + AuthToken.EXPIRATION_TIME);
@@ -217,7 +194,7 @@ public class LoginResource extends HttpServlet {
 		try {
 			Entity user = datastore.get(userKey);
 			String hashedPWD = (String) user.getProperty("user_pwd");
-			if (hashedPWD.equals(DigestUtils.shaHex(data.password))) {
+			if (hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
 
 				Calendar cal = Calendar.getInstance();
 				cal.add(Calendar.DATE, -1);
