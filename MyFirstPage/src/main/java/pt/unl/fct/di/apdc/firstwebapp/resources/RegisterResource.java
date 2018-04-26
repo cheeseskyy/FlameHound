@@ -63,7 +63,7 @@ public class RegisterResource extends HttpServlet{
 		LOG.fine("Attempt to register user: " + data.username);
 		
 		Entity user = new Entity("User", data.username);
-		user.setProperty("user_pwd", DigestUtils.shaHex(data.password));
+		user.setProperty("user_pwd", DigestUtils.sha512Hex(data.password));
 		user.setUnindexedProperty("user_creation_time", new Date());
 		datastore.put(user);
 		LOG.info("User registered " + data.username);
@@ -127,7 +127,7 @@ public class RegisterResource extends HttpServlet{
 			user.setProperty("address", data.address);
 			user.setProperty("nif", data.nif);
 			user.setProperty("cc", data.cc);
-			user.setProperty("user_pwd", DigestUtils.shaHex(data.password));
+			user.setProperty("user_pwd", DigestUtils.sha512Hex(data.password));
 			user.setProperty("TokenKey", "");
 			user.setProperty("TokenCreationDate", "");
 			user.setProperty("TokenExpirationDate", "");
