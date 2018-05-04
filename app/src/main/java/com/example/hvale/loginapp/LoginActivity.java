@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -58,6 +59,7 @@ import static android.Manifest.permission.READ_CONTACTS;
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
+    private boolean status = false;
     /**
      * Id to identity READ_CONTACTS permission request.
      */
@@ -106,6 +108,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             @Override
             public void onClick(View view) {
                 attemptLogin();
+                if(status == true) {
+                    Intent it = new Intent(LoginActivity.this, HomePage.class);
+                    startActivity(it);
+                }
+
             }
         });
 
@@ -166,7 +173,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         }
     }
+    /**
+     * Verify if the login was a sucess
+     */
 
+    private boolean logon(){
+        status = true;
+        return status;
+    }
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -220,6 +234,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(true);
             mAuthTask = new UserLoginTask(username, password);
             mAuthTask.execute((Void) null);
+            if(status == true) {
+                Intent it = new Intent(LoginActivity.this, HomePage.class);
+                startActivity(it);
+            }
+            /**if(mAuthTask.getStatus().equals("FINISHED")) {
+                Intent it = new Intent(LoginActivity.this, HomePage.class);
+                startActivity(it);
+            }
+            **/
         }
     }
     /**
@@ -344,11 +367,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // TODO: attempt authentication against a network service.
 
             try {
-                // Simulate network access.
+                // network access.
                 JSONObject credentials = new JSONObject();
                 credentials.accumulate("username", mUsername);
                 credentials.accumulate("password", mPassword);
                 return RequestsREST.doPOST(new URL("https://my-first-project-196314.appspot.com/rest/login/v2"), credentials);
+
 
             } catch (Exception e) {
                 return e.toString();
@@ -386,6 +410,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 }catch(Exception e) {
                     Log.e("Authentication", e.toString());
                 }
+                logon();
 
 
             } else {
