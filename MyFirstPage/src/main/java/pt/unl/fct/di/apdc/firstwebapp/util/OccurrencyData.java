@@ -5,7 +5,7 @@ import java.util.List;
 public class OccurrencyData {
 
 	public String user;
-	public Coordinates location;
+	public GeoLocation location;
 	public OccurrencyTypes type;
 	public List<String> mediaURI;
 	
@@ -15,7 +15,7 @@ public class OccurrencyData {
 	}
 
 
-	public OccurrencyData(String user, Coordinates location, OccurrencyTypes type, List<String> mediaURI) {
+	public OccurrencyData(String user, GeoLocation location, OccurrencyTypes type, List<String> mediaURI) {
 		this.user = user;
 		this.location = location;
 		this.type = type;
@@ -28,7 +28,7 @@ public class OccurrencyData {
 	}
 
 
-	public Coordinates getLocation() {
+	public GeoLocation getLocation() {
 		return location;
 	}
 

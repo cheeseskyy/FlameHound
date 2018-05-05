@@ -109,6 +109,11 @@
 			<artifactId>commons-codec</artifactId>
 			<version>1.6</version>
 		</dependency>
+		<dependency>
+    		<groupId>com.dropbox.core</groupId>
+    		<artifactId>dropbox-core-sdk</artifactId>
+    		<version>3.0.7</version>
+		</dependency>
 
 	</dependencies>
 
