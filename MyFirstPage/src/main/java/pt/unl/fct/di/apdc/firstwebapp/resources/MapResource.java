@@ -1,6 +1,10 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
@@ -13,11 +17,14 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
+import com.dropbox.core.DbxException;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -27,10 +34,13 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.gson.Gson;
+import com.sun.research.ws.wadl.Application;
 
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
+import pt.unl.fct.di.apdc.firstwebapp.util.Location;
 import pt.unl.fct.di.apdc.firstwebapp.util.LoginData;
 import pt.unl.fct.di.apdc.firstwebapp.util.OccurrencyData;
+import pt.unl.fct.di.apdc.firstwebapp.util.OccurrencyTypes;
 import pt.unl.fct.di.apdc.firstwebapp.util.SessionInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.UserInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.Utilities;
@@ -43,6 +53,7 @@ public class MapResource extends HttpServlet{
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private static final Logger LOG = Logger.getLogger(MapResource.class.getName());
 	private final Gson g = new Gson();
+	private static DropBoxResource dbIntegration = new DropBoxResource();
 	
 	public MapResource() {}
 	
@@ -168,21 +179,21 @@ public class MapResource extends HttpServlet{
 		if(r instanceof Response)
 			return (Response) r;
 		
-		OccurrencyData data = (OccurrencyData) session.getArgs().get(0);
-		
+		//OccurrencyData data = (OccurrencyData) session.getArgs().get(0);
+		List<String> l = new LinkedList<String>();
+		l.add("ola");
+		OccurrencyData data = new OccurrencyData("gpslopes", new Location("Rua Cristóvão Colombo"), OccurrencyTypes.light, l);
 		Transaction txn = datastore.beginTransaction();
-		Key userKey = KeyFactory.createKey("User", session.username);
-		Key ocId = KeyFactory.createKey("OccurrencyId", 0);
+		LOG.info("Generating ID");
+		String uuid = Utilities.generateID();
 		try {
-			
-			Entity occurrency = new Entity("Occurrency", Utilities.generateID());
+			Entity occurrency = new Entity("Occurrency", uuid);
 			occurrency.setIndexedProperty("user", data.getUser());
-			occurrency.setProperty("coordinates", data.getLocation());
-			occurrency.setProperty("type", data.getType());
+			occurrency.setProperty("location", ((Location) data.getLocation()).getAddress());
+			occurrency.setProperty("type", data.getType().toString());
 			occurrency.setProperty("creationTime", System.currentTimeMillis());
-			
-			datastore.put(occurrency);
-			
+			datastore.put(txn, occurrency);
+			LOG.info("Put Occurrency");
 			txn.commit();
 		}catch (Exception e) {
 			
@@ -192,7 +203,32 @@ public class MapResource extends HttpServlet{
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
 		}
-		return Response.ok().build();
+		return Response.ok(g.toJson(uuid)).build();
 	}
-
+	
+	@POST
+	@Path("/saveImage/{extension}/{ocID}")
+	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response uploadFileDropbox(byte[] file, @PathParam("extension") String ext, @PathParam("ocID") String ocID) {
+		String uuid = Utilities.generateID();
+		Transaction txn = datastore.beginTransaction();
+		try {
+			dbIntegration.putFile(uuid, file , ext);
+			Entity occurrency = new Entity("OccurrencyImage", uuid);
+			occurrency.setIndexedProperty("OccurrencyID", ocID);
+			datastore.put(txn, occurrency);
+			txn.commit();
+	} catch (IOException | DbxException e) {
+		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+	} catch (Exception e) {
+		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+	}finally {
+		if (txn.isActive()) {
+			txn.rollback();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+		return Response.ok(g.toJson(uuid)).build();
+	}
 }

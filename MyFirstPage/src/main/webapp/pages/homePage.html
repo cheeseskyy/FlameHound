@@ -92,6 +92,26 @@
 		    };
 		}
 		
+		function saveOccurrency(){
+			var xhttp = new XMLHttpRequest();
+		    xhttp.open("POST", "/rest/session/saveOccurrency", true);
+		    xhttp.setRequestHeader("Content-type", "application/json");
+		    var username = sessionStorage.getItem('sessionUsername');
+		    var token = sessionStorage.getItem('sessionToken');
+		    var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+		    xhttp.send(jSonObj);
+		    xhttp.onreadystatechange = function() {
+		    	if(xhttp.readyState == 4 && xhttp.status == 200){
+					//codeAddress(JSON.parse(xhttp.response));
+					alert("Saved");
+		    	}
+		    	if(xhttp.readyState == 4 && xhttp.status == 403){
+		    		 alert("User not logged in, redirecting you to login page");
+		    		 window.location.replace("/login");
+		    	 }
+		    };
+		}
+		
 	</script>
         <script type="text/javascript" src="pages/js/hellomaps.js"></script>
         <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAoCvXj6By2RuKZJzjfcTAtwtDLNSN6-sA&callback=initMap"></script>
@@ -101,5 +121,6 @@
         <input type="button" onclick= "centerUserAddress()" class="pure-button purebutton-primary" id="centerAddress" value="Center on my Address">
         <input type="button" onclick= "logout()" class="pure-button purebutton-primary" id="logout" value="logout">
     	<input type="button" class="pure-button pure-button-primary" id="getInfo" onclick = "getInfo()" value = "Get My Info"/>
+    	<input type="button" class="pure-button pure-button-primary" id="saveOccurrency" onclick = "saveOccurrency()" value = "Test Occurrency"/>
     </body>
 </html>

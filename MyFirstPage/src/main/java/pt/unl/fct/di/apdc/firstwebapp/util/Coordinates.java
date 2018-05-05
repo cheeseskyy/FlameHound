@@ -1,6 +1,6 @@
 package pt.unl.fct.di.apdc.firstwebapp.util;
 
-public class Coordinates {
+public class Coordinates extends GeoLocation{
 
 	private long x;
 	private long y;
