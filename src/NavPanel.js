@@ -13,19 +13,18 @@ class NavPanel extends Component{
             <Router>
                 <div className={this.props.class} id="NavPanel">
                   <div className="title">
-                      <center><img src={"imagens/Mock-up Logo.PNG"} alt="company logo" width={150} height={150}/></center>
-                      <h1>FlameHound!</h1>
+                      <img src={"imagens/Mock-up Logo.PNG"} alt="company logo" width={150} height={150}/>
+                      <h1>FlameHound</h1>
                       <p>Conseguimos farejar os fogos!</p>
                   </div>
                   <nav>
-                      <p>Login Here <button> Login </button> </p>
-
-                      <p>Create an account?</p>
+                      <p><Link to="/login">Login </Link></p>
                       <Link to="/register">
-                          Click me
+                          Create an account?
                       </Link>
 
                       <Route path="/register" component={RegisterForm} />
+
 
                   </nav>
                 </div>
