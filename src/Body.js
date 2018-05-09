@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import MapView from './MapView';
 import NavPanel from "./NavPanel";
+
 import './Body.css';
 
 
