@@ -1,9 +1,13 @@
 import React, {Component} from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import RegisterForm from "./Register";
+import {RegisterForm, LoginForm} from "./Forms";
 
 function log(text){
     console.log(text);
+}
+
+const loginLinks = {
+
 }
 
 class NavPanel extends Component{
@@ -18,13 +22,19 @@ class NavPanel extends Component{
                       <p>Conseguimos farejar os fogos!</p>
                   </div>
                   <nav>
-                      <p><Link to="/login">Login </Link></p>
-                      <Link to="/register">
-                          Create an account?
-                      </Link>
+                      <Route exact path="/"
+                             render = {()=>
+                             <div>
+                                <p><Link to="/login">Login </Link></p>
+                                <Link to="/register">
+                                Create an account?
+                                </Link>
+                             </div>
+                             }
+                      />
 
                       <Route path="/register" component={RegisterForm} />
-
+                      <Route path="/login" component={LoginForm}/>
 
                   </nav>
                 </div>
