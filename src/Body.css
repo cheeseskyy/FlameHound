@@ -1,0 +1,19 @@
+.Column{
+    float: left;
+    height: 100%;
+}
+
+#NavPanel{
+    color: aliceblue;
+    background-color: brown;
+    height: 100vh;
+    width: 15vw;
+}
+
+#Occurrences{
+    float: right;
+    background-color: gainsboro;
+    width: 30vw;
+    height: 100vh;
+}
+
