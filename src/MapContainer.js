@@ -57,7 +57,7 @@ export default class MapContainer extends Component {
         }
 
         return ( // in our return function you must return a div with ref='map' and style.
-            <div ref="map" style={style} className="Column">
+            <div ref="map" style={style}>
                 loading map...
             </div>
         )

@@ -3,9 +3,22 @@ img {
     max-width: 100%;
 }
 
+h1{
+    font-size: 4em;
+    min-width: 1em;
+}
+
+.Floater{
+    display: inline-block;
+}
+
+.ColumnLayout{
+    white-space: nowrap;
+}
+
 .Column{
-    float: left;
     height: 100%;
+    float: left;
 }
 
 #NavPanel{
@@ -14,19 +27,18 @@ img {
     height: 100vh;
     width: 15vw;
     max-height: 100vh;
+    min-width: 70px;
 }
 
 #Occurrences{
-    float: right;
     background-color: gainsboro;
-    width: 30vw;
+    width: 35vw;
     height: 100vh;
 }
 
-.title{
+.logo{
     text-align: center;
-    border-bottom: solid white 10px;
-    height: 25%;
+    min-height: 70px;
 }
 
 /* unvisited link */
@@ -55,5 +67,14 @@ a:active {
 }
 
 #image{
-    height: 50%;
+    height: 100%;
+}
+
+#title{
+    position: fixed;
+    top: 0;
+    font-size: 5em;
+    font-weight: bold;
+    text-align: center;
+    width: 85vw;
 }

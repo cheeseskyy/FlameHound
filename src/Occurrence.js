@@ -9,8 +9,9 @@ class Occurrence extends Component{
         const description = this.props.description;
         const media = this.props.media;
 
-        return(
-          <h1>Isto é uma Ocorrência</h1>
+        return(<div>
+          Isto é uma Ocorrência
+            </div>
         );
     }
 }

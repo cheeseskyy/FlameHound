@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {BrowserRouter as Router, Route, Link} from "react-router-dom";
 
-
 export class RegisterForm extends Component {
     render() {
         return (
@@ -72,6 +71,7 @@ export class RegisterForm extends Component {
                         onClick="register()">Submit
                     </button>
                     <br></br>
+                    <button onClick={this.props.history.goBack}>Back</button>
                 </div>
             </Router>
         );
@@ -113,19 +113,20 @@ export class LoginForm extends Component {
 
     render() {
         return (
-            <Router>
+            <Router    >
                 <div className="loginForm">
-                    <label htmlFor="uname"><b>Username</b></label>
+                    <label htmlFor="uname"><b>Username</b></label><br/>
 
-                    <input type="text" placeholder="Enter Username" name="uname" id="un" required></input>
+                    <input type="text" placeholder="Enter Username" name="uname" id="un" required></input><br/>
 
-                    <label htmlFor="psw"><b>Password</b></label>
+                    <label htmlFor="psw"><b>Password</b></label><br/>
 
-                    <input type="password" placeholder="Enter Password" name="psw" id="pw" required></input>
+                    <input type="password" placeholder="Enter Password" name="psw" id="pw" required></input><br/>
 
                     <button type="submit" onClick={this.login}>Login</button>
 
-                    <label> <input type="checkbox" id="rememberMe" name="remember"></input>Remember me</label>
+                    <label> <input type="checkbox" id="rememberMe" name="remember"></input>Remember me</label><br/>
+                    <button onClick={this.props.history.goBack}>Back</button>
 
                     <p id="errorMessage"/>
                 </div>

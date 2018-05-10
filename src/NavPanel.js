@@ -1,43 +1,39 @@
 import React, {Component} from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import {BrowserRouter as Router, Route, Link} from "react-router-dom";
 import {RegisterForm, LoginForm} from "./Forms";
 import logo from "./imagens/Logo.png";
 
-function log(text){
+function log(text) {
     console.log(text);
 }
 
-const loginLinks = {
+const loginLinks = {}
 
-}
-
-class NavPanel extends Component{
-    render(){
-        return(
+class NavPanel extends Component {
+    render() {
+        return (
 
             <Router>
-                <div className={this.props.class} id="NavPanel">
-                  <div className="title">
-                      <div id="image"> <img src={logo} alt="company logo"/></div>
-                      <h1>FlameHound</h1>
-                      <p>Conseguimos farejar os fogos!</p>
-                  </div>
-              <nav>
-                      <Route exact path="/"
-                             render = {()=>
-                             <div>
-                                <p><Link to="/login">Login </Link></p>
-                                <Link to="/register">
-                                Create an account?
-                                </Link>
-                             </div>
-                             }
-                      />
+                <div id="NavPanel" className="Column">
+                    <div className="logo">
+                        <div id="image"><img src={logo} alt="company logo"/></div>
+                    </div>
+                    <nav>
+                        <Route exact path="/"
+                               render={() =>
+                                   <div>
+                                       <p><Link to="/login">Login </Link></p>
+                                       <p><Link to="/register">Register</Link></p>
+                                       <p><Link to="/about">About</Link></p>
+                                       <p><Link to="/contact">Contact</Link></p>
+                                   </div>
+                               }
+                        />
 
-                      <Route path="/register" component={RegisterForm} />
-                      <Route path="/login" component={LoginForm}/>
+                        <Route path="/register" component={RegisterForm}/>
+                        <Route path="/login" component={LoginForm}/>
 
-                  </nav>
+                    </nav>
                 </div>
             </Router>
 

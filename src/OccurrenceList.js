@@ -5,6 +5,9 @@ import Occurrence from "./Occurrence";
 class OccurrenceList extends Component {
 
     render(){
+        const style = {
+            cssFloat: 'right'
+        }
         return(
           <div id="Occurrences" className="Column">
               Occurrences Panel
