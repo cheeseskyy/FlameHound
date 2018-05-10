@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<script>
+	
+	
+	function uploadOc(mediaURI, username){
+		alert(mediaURI);
+		var xhttp = new XMLHttpRequest();
+ 	    xhttp.open("POST", "/rest/occurrency/saveOccurrency", true);
+ 	    xhttp.setRequestHeader("Content-type", "application/json");
+		var list = [mediaURI];
+		var jSonList = JSON.stringify(list);
+ 	    var jSonInfo = JSON.stringify({"user": username, "location": "a", "type": "light", "mediaURI": list});
+   		xhttp.send(jSonInfo);
+		xhttp.onreadystatechange = function() {
+	   		if(xhttp.readyState == 4 && xhttp.status == 200){
+		  		alert("Saved Occurrency");
+			}
+	   	};
+	}
+	
+	function loadOc(){
+		var id = document.getElementById("imageID").value;
+		var xhttp = new XMLHttpRequest();
+	    xhttp.open("POST", "/rest/occurrency/getImage/png/" + id, true);
+	    xhttp.setRequestHeader("Content-type", "application/json");
+	    var username = sessionStorage.getItem('sessionUsername');
+	    var token = sessionStorage.getItem('sessionToken');
+	    var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+	    xhttp.send(jSonObj);
+		xhttp.onreadystatechange = function() {
+	   		if(xhttp.readyState == 4 && xhttp.status == 200){
+	   			document.getElementById("ItemPreview").src = "data:image/png;base64," + xhttp.response;
+			}
+	   	};
+	}
+
+</script>
+<head>
+    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+    <title>Submit Occurrence</title>
+</head>
+
+<body>
+    <p>Please fill in the form below to submit an occurrence</p>
+
+    <label for="title">
+        <b>Title</b>
+    </label>
+	
+	<img id="ItemPreview" src="" />
+	
+	 <label for="location">
+        <b>Location</b>
+    </label>
+    <input type="text" placeholder="Enter the id" id="imageID" required>
+    <br>
+    
+    <button type="button" onclick="loadOc()">Submit</button>
+    <br>
+</body>
+
+</html>

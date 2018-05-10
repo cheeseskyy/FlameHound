@@ -30,14 +30,6 @@
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
   <servlet>
-    <servlet-name>storage-servlet</servlet-name>
-    <servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.GcsExampleServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>storage-servlet</servlet-name>
-    <url-pattern>/gcs/*</url-pattern>
-  </servlet-mapping>
-  <servlet>
     <servlet-name>loginServlet</servlet-name>
     <servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.LoginResource</servlet-class>
   </servlet>
@@ -57,9 +49,17 @@
     <servlet-name>mapServlet</servlet-name>
     <servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.MapResource</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>occurrencyServlet</servlet-name>
+    <servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.OccurrencyResource</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>mapServlet</servlet-name>
     <url-pattern>/homePage</url-pattern>
+  </servlet-mapping>
+   <servlet-mapping>
+    <servlet-name>occurrencyServlet</servlet-name>
+    <url-pattern>/occurrency</url-pattern>
   </servlet-mapping>
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
