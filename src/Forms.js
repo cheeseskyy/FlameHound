@@ -12,7 +12,7 @@ export class RegisterForm extends Component {
                     <input type="text" placeholder="Enter Name" id="name" required></input>
                     <br></br>
 
-                    <label htmlFor="username"><b>Username</b></label>
+                    <label htmlFor="username"><b>Username</b></label><br/>
                     <input type="text" placeholder="Enter Username" id="username" required></input>
                     <br></br>
 
@@ -29,11 +29,11 @@ export class RegisterForm extends Component {
                     </select>
                     <br></br>
 
-                    <label htmlFor="homeNumber"><b>Home Number</b></label>
+                    <label htmlFor="homeNumber"><b>Home Number</b></label><br/>
                     <input type="text" placeholder="Enter Home Number" id="homeNumber"></input>
                     <br></br>
 
-                    <label htmlFor="phoneNumber"><b>Phone Number</b></label>
+                    <label htmlFor="phoneNumber"><b>Phone Number</b></label><br/>
                     <input type="text" placeholder="Enter Phone Number"
                            id="phoneNumber"></input><br/>
 
@@ -53,15 +53,14 @@ export class RegisterForm extends Component {
                     <br></br>
 
                     <label
-                        htmlFor="psw"><b>Password</b></label>
+                        htmlFor="psw"><b>Password</b></label><br/>
                     <input type="password"
                            placeholder="Enter Password"
                            id="psw" required></input>
                     <br></br>
 
                     <label
-                        htmlFor="psw-repeat"><b>Repeat
-                        Password</b></label>
+                        htmlFor="psw-repeat"><b>Repeat Password</b></label> <br/>
                     <input type="password"
                            placeholder="Repeat Password"
                            id="psw-repeat"
