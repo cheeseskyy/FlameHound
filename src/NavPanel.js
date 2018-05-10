@@ -36,7 +36,7 @@ class NavPanel extends Component {
                             <div>
                                 <p><Link to="/submitOcurrence">Criar Ocorrência</Link></p>
                                 <p><Link to="/profile">Perfil </Link></p>
-                                <p><Link to="/logout">Logout </Link></p>
+                                <p><Link to="/">Logout </Link></p>
                             </div>
                         }
                         />
