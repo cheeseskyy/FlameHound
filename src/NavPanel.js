@@ -10,7 +10,27 @@ function log(text) {
 const loginLinks = {}
 
 class NavPanel extends Component {
+    logout(){
+
+        console.log("Logging out");
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com//rest/session/logout", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        var jSonObj = sessionStorage.getItem('sessionUsername');
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = function() {
+            if(xhttp.readyState == 4 && xhttp.status == 200){
+                alert("Successful logout.");
+                sessionStorage.setItem('username', "");
+                sessionStorage.setItem('tokenId', "0");
+                window.location.replace("/");
+            }
+        };
+    }
+
     render() {
+
         return (
 
             <Router>
@@ -31,12 +51,15 @@ class NavPanel extends Component {
                         />
                         <Route path="/register" component={RegisterForm}/>
                         <Route path="/login" component={LoginForm}/>
+                        <Route path="/logout" onEnter={()=>
+                            this.logout()}/>
 
                         <Route path="/map" render={() =>
                             <div>
-                                <p><Link to="/submitOcurrence">Criar Ocorrência</Link></p>
+                                <p><Link to="/submitOccurrence">Criar Ocorrência</Link></p>
                                 <p><Link to="/profile">Perfil </Link></p>
-                                <p><Link to="/">Logout </Link></p>
+                                <p><Link to="/logout" onClick = {()=>
+                                    this.logout()}>Logout </Link></p>
                             </div>
                         }
                         />
