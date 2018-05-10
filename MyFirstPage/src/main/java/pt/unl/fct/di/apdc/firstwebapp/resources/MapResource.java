@@ -69,10 +69,12 @@ public class MapResource extends HttpServlet{
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAddress(SessionInfo session) {
 		
+		Entity user;
 		Object r = isLoggedIn(session);
-		if(r instanceof Response)
+		if(((Response) r).getStatus() != Response.Status.OK.getStatusCode())
 			return (Response) r;
-		Entity user = (Entity) r;
+		user = (Entity)((Response) r).getEntity();
+		
 		return Response.ok(g.toJson(user.getProperty("address"))).build();
 		
 	}
@@ -83,11 +85,12 @@ public class MapResource extends HttpServlet{
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserInfo(SessionInfo session) {
 		
-		Object r = isLoggedIn(session);
-		if(r instanceof Response)
-			return (Response) r;
+		Entity userE;
+		Response r = isLoggedIn(session);
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return r;
+		userE = (Entity) r.getEntity();
 		
-		Entity userE = (Entity) r;
 		String name = (String) userE.getProperty("user_name");
 		String uN = userE.getKey().toString();
 		uN = uN.substring(6, uN.length()-2);
@@ -106,11 +109,11 @@ public class MapResource extends HttpServlet{
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response geocodeAddress(SessionInfo session) {
 		
-		Object r = isLoggedIn(session);
-		if(r instanceof Response)
-			return (Response) r;
-		else
-			return Response.ok().build();
+		Response r = isLoggedIn(session);
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return r;
+		return Response.ok().build();
+		
 			
 	}
 	
@@ -139,11 +142,10 @@ public class MapResource extends HttpServlet{
 				txn.rollback();
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
-		}
-		
+		}	
 	}
 	
-	private Object isLoggedIn(SessionInfo session) {
+	private Response isLoggedIn(SessionInfo session) {
 		if(session.tokenId.equals("0")) {
 			LOG.warning("User is not logged in");
 			return Response.status(Status.FORBIDDEN).build();
@@ -157,7 +159,7 @@ public class MapResource extends HttpServlet{
 			if(!user.getProperty("TokenKey").equals(session.tokenId))
 				return Response.status(Status.FORBIDDEN).build();
 			txn.commit();
-			return user;
+			return Response.ok(user).build();
 		}catch (EntityNotFoundException e) {
 			LOG.warning("Failed to locate username: " + session.username);
 			return Response.status(Status.FORBIDDEN).build();
@@ -170,65 +172,6 @@ public class MapResource extends HttpServlet{
 		
 	}
 	
-	@POST
-	@Path("/saveOccurrency")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response saveOccurrency(SessionInfo session) {
-		
-		Object r = isLoggedIn(session);
-		if(r instanceof Response)
-			return (Response) r;
-		
-		//OccurrencyData data = (OccurrencyData) session.getArgs().get(0);
-		List<String> l = new LinkedList<String>();
-		l.add("ola");
-		OccurrencyData data = new OccurrencyData("gpslopes", new Location("Rua Cristóvão Colombo"), OccurrencyTypes.light, l);
-		Transaction txn = datastore.beginTransaction();
-		LOG.info("Generating ID");
-		String uuid = Utilities.generateID();
-		try {
-			Entity occurrency = new Entity("Occurrency", uuid);
-			occurrency.setIndexedProperty("user", data.getUser());
-			occurrency.setProperty("location", ((Location) data.getLocation()).getAddress());
-			occurrency.setProperty("type", data.getType().toString());
-			occurrency.setProperty("creationTime", System.currentTimeMillis());
-			datastore.put(txn, occurrency);
-			LOG.info("Put Occurrency");
-			txn.commit();
-		}catch (Exception e) {
-			
-		} finally {
-			if (txn.isActive()) {
-				txn.rollback();
-				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-			}
-		}
-		return Response.ok(g.toJson(uuid)).build();
-	}
 	
-	@POST
-	@Path("/saveImage/{extension}/{ocID}")
-	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response uploadFileDropbox(byte[] file, @PathParam("extension") String ext, @PathParam("ocID") String ocID) {
-		String uuid = Utilities.generateID();
-		Transaction txn = datastore.beginTransaction();
-		try {
-			dbIntegration.putFile(uuid, file , ext);
-			Entity occurrency = new Entity("OccurrencyImage", uuid);
-			occurrency.setIndexedProperty("OccurrencyID", ocID);
-			datastore.put(txn, occurrency);
-			txn.commit();
-	} catch (IOException | DbxException e) {
-		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-	} catch (Exception e) {
-		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-	}finally {
-		if (txn.isActive()) {
-			txn.rollback();
-			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-		}
-	}
-		return Response.ok(g.toJson(uuid)).build();
-	}
+	
 }

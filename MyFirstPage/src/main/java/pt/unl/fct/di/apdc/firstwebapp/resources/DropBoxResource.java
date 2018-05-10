@@ -1,8 +1,10 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -224,13 +226,13 @@ public class DropBoxResource {
 
         }
     
-    public void getFile(String foldername) throws Exception {
+    public byte[] getFile(String foldername, String ext) throws Exception {
         
           try {
 
             URL url = new URL("https://content.dropboxapi.com/2/files/download");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            String parameters = "{\"path\": \"" + foldername + "\"}";
+            String parameters = "{\"path\": \"" + "/" + foldername + "/" + foldername + "." + ext + "\"}";
             
             conn.addRequestProperty ("Authorization", token);
             conn.addRequestProperty ("Dropbox-API-Arg", parameters);
@@ -242,16 +244,13 @@ public class DropBoxResource {
                         + conn.getResponseCode());
             }
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                (conn.getInputStream())));
-
-            String output;
-            System.out.println("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
-                System.out.println(output);
-            }
+            InputStream reply = conn.getInputStream();
+            byte[] file = new byte[reply.available()];
+            reply.read(file);
 
             conn.disconnect();
+            
+            return file;
 
           } catch (MalformedURLException e) {
 
@@ -262,6 +261,7 @@ public class DropBoxResource {
             LOG.info("Bad IO");
 
           }
+          return null;
 
         }
 
