@@ -3,6 +3,10 @@ img {
     max-width: 100%;
 }
 
+.gmnoprint img {
+    max-width: none;
+}
+
 h1{
     font-size: 4em;
     min-width: 1em;
