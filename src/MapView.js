@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { GoogleApiWrapper } from 'google-maps-react'
 // import child component
 import MapContainer from './MapContainer'
-import Occurrences from "./Occurrences";
+import Occurrences from "./OccurrenceList";
 
 class MapView extends Component{
 

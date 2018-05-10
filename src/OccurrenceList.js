@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Occurrence from "./Occurrence";
 
 
-class Occurrences extends Component {
+class OccurrenceList extends Component {
 
     render(){
         return(
@@ -20,4 +20,4 @@ class Occurrences extends Component {
     }
 }
 
-export default Occurrences;
+export default OccurrenceList;

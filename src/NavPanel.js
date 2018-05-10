@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import {RegisterForm, LoginForm} from "./Forms";
+import logo from "./imagens/Logo.png";
 
 function log(text){
     console.log(text);
@@ -17,7 +18,7 @@ class NavPanel extends Component{
             <Router>
                 <div className={this.props.class} id="NavPanel">
                   <div className="title">
-                      <img src={"imagens/Mock-up Logo.PNG"} alt="company logo" width={150} height={150}/>
+                      <img src={logo} alt="company logo" width={150} height={150}/>
                       <h1>FlameHound</h1>
                       <p>Conseguimos farejar os fogos!</p>
                   </div>
