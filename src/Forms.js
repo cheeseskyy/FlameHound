@@ -102,7 +102,7 @@ export class LoginForm extends Component {
                 var sessionInfo = JSON.parse(xhttp.response);
                 sessionStorage.setItem('sessionUsername', sessionInfo.username);
                 sessionStorage.setItem('sessionToken', sessionInfo.tokenId);
-                window.location.replace("/home");
+                window.location.replace("/map");
             }
             if (xhttp.readyState == 4 && xhttp.status == 403) {
                 errorText.innerHTML = "Wrong Username or Password";
