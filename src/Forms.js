@@ -6,7 +6,7 @@ export class RegisterForm extends Component {
     render() {
         return (
             <Router>
-                <div className="Form">
+                <div className="form">
                     <br/>
                     <label htmlFor="name"><b>Name</b></label><br/>
                     <input type="text" placeholder="Enter Name" id="name" required></input>

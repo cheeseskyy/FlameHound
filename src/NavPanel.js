@@ -18,11 +18,11 @@ class NavPanel extends Component{
             <Router>
                 <div className={this.props.class} id="NavPanel">
                   <div className="title">
-                      <img src={logo} alt="company logo" width={150} height={150}/>
+                      <div id="image"> <img src={logo} alt="company logo"/></div>
                       <h1>FlameHound</h1>
                       <p>Conseguimos farejar os fogos!</p>
                   </div>
-                  <nav>
+              <nav>
                       <Route exact path="/"
                              render = {()=>
                              <div>
