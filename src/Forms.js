@@ -20,8 +20,8 @@ export class RegisterForm extends Component {
                     <br></br>
 
                     <label htmlFor="role"><b>Role</b></label><br/>
-                    <select id="role">
-                        <option value="USER" selected>User</option>
+                    <select id="role" defaultValue="USER">
+                        <option value="USER">User</option>
                         <option value="GBO">Gestor BackOffice</option>
                         <option value="GS">Gestor Sistema</option>
                         <option value="OPE">Operacional BackEnd</option>
