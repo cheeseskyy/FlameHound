@@ -21,16 +21,23 @@
 	
 	function loadOc(){
 		var id = document.getElementById("imageID").value;
+		alert(id);
 		var xhttp = new XMLHttpRequest();
 	    xhttp.open("POST", "/rest/occurrency/getImage/png/" + id, true);
 	    xhttp.setRequestHeader("Content-type", "application/json");
 	    var username = sessionStorage.getItem('sessionUsername');
 	    var token = sessionStorage.getItem('sessionToken');
 	    var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+	    xhttp.responseType = "arraybuffer";
 	    xhttp.send(jSonObj);
 		xhttp.onreadystatechange = function() {
 	   		if(xhttp.readyState == 4 && xhttp.status == 200){
-	   			document.getElementById("ItemPreview").src = "data:image/png;base64," + xhttp.response;
+	   			var arrayBufferView = new Uint8Array( xhttp.response );
+	   		    var blob = new Blob( [ arrayBufferView ], { type: "image/png" } );
+	   		    var urlCreator = window.URL || window.webkitURL;
+	   		    var imageUrl = urlCreator.createObjectURL( blob );
+	   		    var img = document.getElementById("ItemPreview");
+	   		    img.src = imageUrl;
 			}
 	   	};
 	}
