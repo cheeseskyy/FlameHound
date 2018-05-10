@@ -7,7 +7,8 @@ export class RegisterForm extends Component {
         return (
             <Router>
                 <div>
-                    <label htmlFor="name"><b>Name</b></label>
+                    <br/>
+                    <label htmlFor="name"><b>Name</b></label><br/>
                     <input type="text" placeholder="Enter Name" id="name" required></input>
                     <br></br>
 
@@ -15,7 +16,7 @@ export class RegisterForm extends Component {
                     <input type="text" placeholder="Enter Username" id="username" required></input>
                     <br></br>
 
-                    <label htmlFor="email"><b>Email</b></label>
+                    <label htmlFor="email"><b>Email</b></label><br/>
                     <input type="text" placeholder="Enter Email" id="email" required></input>
                     <br></br>
 
@@ -34,9 +35,9 @@ export class RegisterForm extends Component {
 
                     <label htmlFor="phoneNumber"><b>Phone Number</b></label>
                     <input type="text" placeholder="Enter Phone Number"
-                           id="phoneNumber"></input>
+                           id="phoneNumber"></input><br/>
 
-                    <label htmlFor="address"><b>Address</b></label>
+                    <label htmlFor="address"><b>Address</b></label><br/>
                     <input type="text" placeholder="Enter Andress"
                            id="address" required></input>
                     <br></br>
