@@ -29,10 +29,17 @@ class NavPanel extends Component {
                                    </div>
                                }
                         />
-
                         <Route path="/register" component={RegisterForm}/>
                         <Route path="/login" component={LoginForm}/>
 
+                        <Route path="/map" render={() =>
+                            <div>
+                                <p><Link to="/submitOcurrence">Criar Ocorrência</Link></p>
+                                <p><Link to="/profile">Perfil </Link></p>
+                                <p><Link to="/logout">Logout </Link></p>
+                            </div>
+                        }
+                        />
                     </nav>
                 </div>
             </Router>
