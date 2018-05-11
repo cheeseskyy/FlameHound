@@ -108,10 +108,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             @Override
             public void onClick(View view) {
                 attemptLogin();
-                if(status == true) {
-                    Intent it = new Intent(LoginActivity.this, HomePage.class);
-                    startActivity(it);
-                }
 
             }
         });
@@ -234,15 +230,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(true);
             mAuthTask = new UserLoginTask(username, password);
             mAuthTask.execute((Void) null);
-            if(status == true) {
-                Intent it = new Intent(LoginActivity.this, HomePage.class);
-                startActivity(it);
-            }
-            /**if(mAuthTask.getStatus().equals("FINISHED")) {
-                Intent it = new Intent(LoginActivity.this, HomePage.class);
-                startActivity(it);
-            }
-            **/
+
         }
     }
     /**
@@ -406,11 +394,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     SharedPreferences.Editor editor = settings.edit();
                     editor.putString("tokenID", token.toString());
                     editor.commit();
+                    logon();
                     finish();
                 }catch(Exception e) {
                     Log.e("Authentication", e.toString());
                 }
-                logon();
+
+                if(status == true) {
+                    Intent it = new Intent(LoginActivity.this, HomePage.class);
+                    startActivity(it);
+                }
 
 
             } else {
