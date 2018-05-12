@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -23,6 +24,8 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
@@ -47,6 +50,37 @@ public class ComputationResource {
 	private static final DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
 	
 	public ComputationResource() {} //nothing to be done here
+	
+	
+	@POST
+	@Path("/validLogin")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response validLogin(SessionInfo session) {
+		if(session.tokenId.equals("0")) {
+			LOG.warning("User is not logged in");
+			return Response.status(Status.FORBIDDEN).build();
+		}
+		Transaction txn = datastore.beginTransaction();
+		Key userKey = KeyFactory.createKey("User", session.username);
+		try {
+			LOG.info("Attempt to get user: " + session.username);
+			Entity user = datastore.get(userKey);
+			LOG.info("Got user");
+			if(!user.getProperty("TokenKey").equals(session.tokenId))
+				return Response.status(Status.FORBIDDEN).build();
+			txn.commit();
+			return Response.ok().build();
+		}catch (EntityNotFoundException e) {
+			LOG.warning("Failed to locate username: " + session.username);
+			return Response.status(Status.FORBIDDEN).build();
+		} finally {
+			if (txn.isActive()) {
+				txn.rollback();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			}
+		}
+		
+	}
 	
 	@GET
 	@Path("/time")

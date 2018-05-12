@@ -232,6 +232,7 @@ public class DropBoxResource {
 
             URL url = new URL("https://content.dropboxapi.com/2/files/download");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            LOG.info("Getting image with id " + foldername);
             String parameters = "{\"path\": \"" + "/" + foldername + "/" + foldername + "." + ext + "\"}";
             
             conn.addRequestProperty ("Authorization", token);
@@ -240,6 +241,7 @@ public class DropBoxResource {
                                     
             if (conn.getResponseCode() != 200) {
                 System.out.println(conn.getResponseMessage());
+                LOG.warning("Failed with code " + conn.getResponseCode());
                 throw new RuntimeException("Failed : HTTP error code : "
                         + conn.getResponseCode());
             }

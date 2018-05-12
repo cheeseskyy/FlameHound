@@ -88,44 +88,9 @@ public class OccurrencyResource extends HttpServlet{
 	}
 	
 	@POST
-	@Path("/validLogin")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response validLogin(SessionInfo session) {
-		if(session.tokenId.equals("0")) {
-			LOG.warning("User is not logged in");
-			return Response.status(Status.FORBIDDEN).build();
-		}
-		Transaction txn = datastore.beginTransaction();
-		Key userKey = KeyFactory.createKey("User", session.username);
-		try {
-			LOG.info("Attempt to get user: " + session.username);
-			Entity user = datastore.get(userKey);
-			LOG.info("Got user");
-			if(!user.getProperty("TokenKey").equals(session.tokenId))
-				return Response.status(Status.FORBIDDEN).build();
-			txn.commit();
-			return Response.ok().build();
-		}catch (EntityNotFoundException e) {
-			LOG.warning("Failed to locate username: " + session.username);
-			return Response.status(Status.FORBIDDEN).build();
-		} finally {
-			if (txn.isActive()) {
-				txn.rollback();
-				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-			}
-		}
-		
-	}
-	
-	@POST
 	@Path("/saveOccurrency")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response saveOccurrency(OccurrencyData data) {
-		
-		//OccurrencyData data = (OccurrencyData) session.getArgs().get(0);
-		//List<String> l = new LinkedList<String>();
-		////l.add("ola");
-		//data = new OccurrencyData("gpslopes", "Rua Cristóvão Colombo", OccurrencyTypes.light.toString()/*,l*/);
 		Transaction txn = datastore.beginTransaction();
 		LOG.info("Generating ID");
 		String uuid = Utilities.generateID();
@@ -179,7 +144,7 @@ public class OccurrencyResource extends HttpServlet{
 	}
 	
 	@POST
-	@Path("getImage/{imageID}/{extension}")
+	@Path("getImage/{extension}/{imageID}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	public Response downloadFileDropbox(SessionInfo session, @PathParam("imageID") String imageID, @PathParam("extension") String ext){
