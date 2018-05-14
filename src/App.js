@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import MapView from './MapView';
 import './App.css';
 import Body from "./Body";
+
 class App extends Component {
     render() {
         return (
