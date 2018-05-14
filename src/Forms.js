@@ -161,6 +161,10 @@ export class LoginForm extends Component {
     }
 }
 
+export class OccurrenceForm extends Component{
+
+}
+
 function login() {
     console.log("Function login called");
     /*var usernameV = document.getElementById("un").value;
