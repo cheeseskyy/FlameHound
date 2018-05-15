@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {BrowserRouter as Router, Route, Link} from "react-router-dom";
 import {RegisterForm, LoginForm} from "./Forms";
-import logo from "./imagens/Logo.png";
+import logo from "./imagens/FlameHound Logo.png";
 
 function log(text) {
     console.log(text);

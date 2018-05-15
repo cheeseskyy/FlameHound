@@ -27,11 +27,14 @@ h1{
 
 #NavPanel{
     color: aliceblue;
-    background-color: brown;
+    background-color: #F5F5F5;
     height: 100vh;
     width: 15vw;
     max-height: 100vh;
     min-width: 70px;
+    border-right: #FF6E00 solid 5px;
+    margin-right: -5px;
+    z-index: 99;
 }
 
 #Occurrences{
@@ -47,12 +50,12 @@ h1{
 
 /* unvisited link */
 a:link {
-    color: white;
+    color: black;
 }
 
 /* visited link */
 a:visited {
-    color: white;
+    color: black;
 }
 
 /* mouse over link */
