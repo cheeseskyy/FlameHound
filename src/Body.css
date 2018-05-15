@@ -29,6 +29,8 @@ h1{
     max-height: 100vh;
     min-width: 70px;
     border-right: #FF6E00 solid 5px;
+    margin-right: -5px;
+    z-index: 99;
 }
 
 #Occurrences{
@@ -49,7 +51,7 @@ a:link {
 
 /* visited link */
 a:visited {
-    color: white;
+    color: black;
 }
 
 /* mouse over link */
