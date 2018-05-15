@@ -53,8 +53,7 @@ public class MapResource extends HttpServlet{
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private static final Logger LOG = Logger.getLogger(MapResource.class.getName());
 	private final Gson g = new Gson();
-	private static DropBoxResource dbIntegration = new DropBoxResource();
-	
+	private static DropBoxResource dbIntegration = new DropBoxResource();	
 	public MapResource() {}
 	
 	@Override
@@ -78,6 +77,8 @@ public class MapResource extends HttpServlet{
 		return Response.ok(g.toJson(user.getProperty("address"))).build();
 		
 	}
+
+	
 	
 	@POST
 	@Path("/getUserInfo")

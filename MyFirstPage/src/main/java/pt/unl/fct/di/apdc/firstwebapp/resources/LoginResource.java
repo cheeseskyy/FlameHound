@@ -174,7 +174,7 @@ public class LoginResource extends HttpServlet {
 		} catch (EntityNotFoundException e) {
 			// Username does not exist
 			LOG.warning("Failed login attempt for username: " + data.username);
-			return Response.status(Status.FORBIDDEN).build();
+			return Response.status(Status.NOT_FOUND).build();
 		} finally {
 			if (txn.isActive()) {
 				txn.rollback();

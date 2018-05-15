@@ -32,6 +32,7 @@
   <servlet>
     <servlet-name>loginServlet</servlet-name>
     <servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.LoginResource</servlet-class>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>loginServlet</servlet-name>
@@ -40,6 +41,7 @@
   <servlet>
     <servlet-name>registerServlet</servlet-name>
     <servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.RegisterResource</servlet-class>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>registerServlet</servlet-name>
@@ -48,10 +50,12 @@
   <servlet>
     <servlet-name>mapServlet</servlet-name>
     <servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.MapResource</servlet-class>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>
     <servlet-name>occurrencyServlet</servlet-name>
     <servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.OccurrencyResource</servlet-class>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>mapServlet</servlet-name>

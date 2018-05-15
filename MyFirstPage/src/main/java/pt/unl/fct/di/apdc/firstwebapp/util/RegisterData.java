@@ -40,8 +40,19 @@ public class RegisterData {
 		return !field.isEmpty();
 	}
 
-	public boolean validRegistration() {
-		return nonEmptyField(name) && nonEmptyField(username) && nonEmptyField(email) && nonEmptyField(address)
-				&& nonEmptyField(password) && nonEmptyField(confirmation) && password.equals(confirmation);
-	}
+	public String validRegistration() {
+		if(nonEmptyField(name))
+			return "name";
+		if(nonEmptyField(username))
+			return "username";
+		if(nonEmptyField(email))
+			return "email";
+		if(nonEmptyField(password))
+			return "password";
+		if(nonEmptyField(confirmation))
+			return "confirmation";
+		if(!password.equals(confirmation))
+			return "mismatch";
+		return "ok";
+	}	
 }

@@ -6,8 +6,10 @@ public class OccurrencyData {
 
 	public String user;
 	/*GeoLocation*/ public String location;
-	/*OccurrencyType*/public String type;
+	/*OccurrencyType*/public OccurrencyTypes type;
 	public List<String> mediaURI;
+	public String title;
+	public String description;
 	
 	
 	public OccurrencyData() {
@@ -15,11 +17,18 @@ public class OccurrencyData {
 	}
 
 
-	public OccurrencyData(String user, String location, String type/*, List<String> mediaURI*/) {
+	public OccurrencyData(String title, String description, String user, String location, String type, List<String> mediaURI) {
+		this.title = title;
+		this.description = description;
 		this.user = user;
 		this.location = location;
-		this.type = type;
+		this.type = selectType(type);
 		this.mediaURI = mediaURI;
+	}
+
+
+	private OccurrencyTypes selectType(String type) {
+		return OccurrencyTypes.valueOf(type);
 	}
 
 
@@ -33,13 +42,22 @@ public class OccurrencyData {
 	}
 
 
-	public String getType() {
+	public OccurrencyTypes getType() {
 		return type;
 	}
 
 
 	public List<String> getMediaURI() {
 		return mediaURI;
+	}
+
+
+	public String getTitle() {
+		return title;
+	}
+	
+	public String getDescription() {
+		return description;
 	}
 	
 	
