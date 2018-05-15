@@ -2,7 +2,11 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
 
+
+
 export default class MapContainer extends Component {
+
+
 
     constructor(props){
         super(props);
@@ -49,8 +53,7 @@ export default class MapContainer extends Component {
                     map: this.map, // sets markers to appear on the map we just created on line 35
                     title: location.name // the title of the marker is set to the name of the location
                 });
-            })
-
+            });
         }
     }
 
