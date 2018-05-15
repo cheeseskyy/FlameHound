@@ -12,6 +12,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -90,47 +91,40 @@ public class ComputationResource {
 	}
 	
 	@POST
-	@Path("/compute")
-	public Response executeComputeTask() {
-		
-		LOG.fine("Starting to execute computation taks");
-		try {
-			Thread.sleep(30*1000); //30s //5 min...
-		} catch (Exception e) {
-			LOG.logp(Level.SEVERE, this.getClass().getCanonicalName(), "executeComputeTask", "An exeption has ocurred", e);
-			return Response.serverError().build();
-		} //Simulates 60s execution
-		
-		Query q = new Query("User") ;
-		PreparedQuery pq = datastore.prepare(q);  
-		for (Entity result : pq.asIterable()) {   
-	       long loginExpiration = (long) result.getProperty("TokenExpirationDate"); 
-	       if(System.currentTimeMillis() > loginExpiration) {
-	    	   Transaction txn = datastore.beginTransaction();
-	    	   try {
-	    		    result.setProperty("TokenKey", "");
-					result.setProperty("TokenCreationDate", "");
-					result.setProperty("TokenExpirationDate", "");
-					datastore.put(result);
-					txn.commit();
-	   			}catch (Exception e) {
-	   			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-	   		} finally {
-	   			if (txn.isActive()) {
-	   				txn.rollback();
-	   				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-	   			}
-	   		}
-	       }
+	@Path("/compute/{username}")
+	public void executeComputeTask(@PathParam("username") String username) {
+		while(true) {
+			Transaction txn = datastore.beginTransaction();
+			LOG.fine("Starting to execute computation taks");
+			try {
+				Thread.sleep(60*1000*5);//30s //5 min...
+				
+				Key userKey = KeyFactory.createKey("User", username);
+				LOG.info("Attempt to get user: " + username);
+				Entity user = datastore.get(userKey);
+				LOG.info("Got user");
+				long expiration = Long.parseLong((String)user.getProperty("TokenExpirationDate"));
+				if(expiration > System.currentTimeMillis()) {
+					user.setProperty("TokenExpirationDate", "");
+					user.setProperty("TokenCreationDate", "");
+					user.setProperty("TokenKey", 0);
+				}
+				txn.commit();
+				
+			} catch (Exception e) {
+				LOG.logp(Level.SEVERE, this.getClass().getCanonicalName(), "executeComputeTask", "An exeption has ocurred", e);
+			} finally {
+				txn.rollback();
+			}
 		}
-		return Response.ok().build();
-	}
+	}	
 	
 	@GET
 	@Path("/compute")
-	public Response triggerExecuteComputeTask() {
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response triggerExecuteComputeTask(String username) {
 		Queue queue = QueueFactory.getDefaultQueue();
-		queue.add(TaskOptions.Builder.withUrl("/rest/utils/compute"));
+		queue.add(TaskOptions.Builder.withUrl("/rest/utils/compute/" + username));
 		return Response.ok().build();
 
 	}

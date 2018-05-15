@@ -3,6 +3,7 @@ package pt.unl.fct.di.apdc.firstwebapp.resources;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -30,9 +31,15 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.gson.Gson;
 import com.sun.research.ws.wadl.Application;
 
@@ -57,14 +64,59 @@ public class OccurrencyResource extends HttpServlet{
 	
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException , ServletException{
-		RequestDispatcher r = request.getRequestDispatcher("pages/ocurrencyView.html");
+		RequestDispatcher r = request.getRequestDispatcher("pages/occurrencyForm.html");
 		r.forward(request, response);
 	}
 	
+	
+	@POST
+	@Path("/occurrencyByUser/{username}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getOcurrencyByUsername(SessionInfo session, @PathParam("username") String username) {
+		if(username == null)
+			return Response.status(Status.BAD_REQUEST).build();
+		Response r = checkIsLoggedIn(session);
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return Response.status(Status.FORBIDDEN).build();
+			LOG.info("Preparing filter");
+			Filter propertyFilter =
+			    new FilterPredicate("user", FilterOperator.EQUAL, username);
+			LOG.info("Preparing query");
+			Query q = new Query("Occurrency").setFilter(propertyFilter);
+			LOG.info("Executing query");
+			PreparedQuery pQ = datastore.prepare(q);
+			LOG.info("Iterator");
+			List<Entity> it = pQ.asList(FetchOptions.Builder.withDefaults());
+			return Response.ok().entity(g.toJson(it)).build();
+	}
+	
+	@POST
+	@Path("/occurrencyByType/{type}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getOcurrencyByType(SessionInfo session, @PathParam("type") String type) {
+		if(OccurrencyTypes.valueOf(type) == null)
+			return Response.status(Status.BAD_REQUEST).build();
+		Response r = checkIsLoggedIn(session);
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return Response.status(Status.FORBIDDEN).build();
+			LOG.info("Preparing filter");
+			Filter propertyFilter =
+			    new FilterPredicate("type", FilterOperator.EQUAL, type);
+			LOG.info("Preparing query");
+			Query q = new Query("Occurrency").setFilter(propertyFilter);
+			LOG.info("Executing query");
+			PreparedQuery pQ = datastore.prepare(q);
+			LOG.info("Iterator");
+			List<Entity> it = pQ.asList(FetchOptions.Builder.withDefaults());
+			return Response.ok().entity(g.toJson(it)).build();
+	}
+
 	private Response checkIsLoggedIn(SessionInfo session) {
 		if(session.tokenId.equals("0")) {
 			LOG.warning("User is not logged in");
-			return Response.status(Status.FORBIDDEN).build();
+			 Response.status(Status.FORBIDDEN).build();
 		}
 		Transaction txn = datastore.beginTransaction();
 		Key userKey = KeyFactory.createKey("User", session.username);
@@ -95,9 +147,13 @@ public class OccurrencyResource extends HttpServlet{
 		LOG.info("Generating ID");
 		String uuid = Utilities.generateID();
 		try {
+			String[] coords = data.getLocation().substring(1, data.getLocation().length()-2).split(",");
 			Entity occurrency = new Entity("Occurrency", uuid);
+			occurrency.setUnindexedProperty("title", data.getTitle());
+			occurrency.setUnindexedProperty("description", data.getDescription());
 			occurrency.setIndexedProperty("user", data.getUser());
-			occurrency.setProperty("location", data.getLocation());
+			occurrency.setProperty("locationLat", coords[0].substring(6).trim());
+			occurrency.setProperty("locationLong", coords[1].substring(6).trim());
 			occurrency.setProperty("type", data.getType().toString());
 			occurrency.setProperty("creationTime", System.currentTimeMillis());
 			occurrency.setProperty("imagesID", data.getMediaURI());
@@ -191,8 +247,4 @@ public class OccurrencyResource extends HttpServlet{
 			}
 		}
 	}
-	
-	
-	
-	
 }

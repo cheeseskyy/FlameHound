@@ -13,6 +13,26 @@ function codeAddress(addr) {
     });
 }
 
+function getCodedAddress(addr, xhttp, mediaURI, username){
+	geocoder = new google.maps.Geocoder();
+	geocoder.geocode({ address: addr,
+			componentRestrictions: {
+				country: 'PT'
+			}
+	}, function(results, status) {
+					if(status == 'OK') {
+						 var coordinates = results[0].geometry.location;
+						var list = ["a", "b"];
+						var jSonList = JSON.stringify(list);
+					    var jSonInfo = JSON.stringify({"user": username, "location": JSON.stringify(coordinates), "type": "light", "mediaURI": list});
+				  		xhttp.send(jSonInfo);
+					}
+					else {
+						alert('Geocode was not successful for the following reason: '+status);
+					}
+			});
+}
+
 function initMap() 
 {
     map = new google.maps.Map(document.getElementById('map'), {
