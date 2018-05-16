@@ -2,19 +2,19 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
 
-function addMarker(title, lat, lng){
-
-    new google.maps.Marker({
-        position: {lat: lat, lng: lng},
-        map: this.map,
-        title: title
-    })
-    console.log("new marker!");
-}
-
 export default class MapContainer extends Component {
 
+    addMarker(title, lat, lng){
+        const {google} = this.props; // sets props equal to google
+        const maps = google.maps; // sets maps to google maps props
 
+        new google.maps.Marker({
+            position: {lat: lat, lng: lng},
+            map: this.map,
+            title: title
+        })
+        console.log("new marker!");
+    }
 
     constructor(props){
         super(props);
@@ -52,7 +52,7 @@ export default class MapContainer extends Component {
 
             const addMarkerFunc = this.addMarker;
 
-            this.map.addListener('click', this.addMarker);
+            //this.map.addListener('click', MapContainer.addMarker);
 
 
             // ==================

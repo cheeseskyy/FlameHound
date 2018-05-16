@@ -26,7 +26,7 @@ class MapView extends Component{
         return (
             <div>
                 <div style={style} className="Column">
-                    <MapContainer google={this.props.google} onChildClick={consoleLog}/>
+                    <MapContainer google={this.props.google}/>
                 </div>
                 <Occurrences/>
             </div>
