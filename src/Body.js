@@ -7,7 +7,6 @@ import NavPanel from "./NavPanel";
 import './Body.css';
 import {RegisterForm} from "./Forms";
 import Home from "./Home";
-import GoogleMapView from "./MapTest";
 
 
 class Body extends Component{
@@ -20,7 +19,6 @@ class Body extends Component{
                     <div>
                         <Route path="/map" component={MapView}/>
                         <Route exact path="/" component={Home}/>
-                        <Route path = "/mapTest" component={GoogleMapView}/>
                     </div>
                 </div>
             </Router>

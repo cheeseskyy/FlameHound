@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 // import the Google Maps API Wrapper from google-maps-react
 import { GoogleApiWrapper } from 'google-maps-react'
-import {GoogleMap } from 'react-google-maps';
 // import child component
 import MapContainer from './MapContainer';
 import Occurrences from "./OccurrenceList";
 import "./MapView.css";
+
+function consoleLog(){
+    console.log("message");
+}
 
 class MapView extends Component{
 
@@ -23,7 +26,7 @@ class MapView extends Component{
         return (
             <div>
                 <div style={style} className="Column">
-                    <MapContainer google={this.props.google} onClick={this.consolelog}/>
+                    <MapContainer google={this.props.google} onChildClick={consoleLog}/>
                 </div>
                 <Occurrences/>
             </div>

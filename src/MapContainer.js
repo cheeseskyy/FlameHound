@@ -2,7 +2,15 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
 
+function addMarker(title, lat, lng){
 
+    new google.maps.Marker({
+        position: {lat: lat, lng: lng},
+        map: this.map,
+        title: title
+    })
+    console.log("new marker!");
+}
 
 export default class MapContainer extends Component {
 
@@ -22,6 +30,7 @@ export default class MapContainer extends Component {
     // ======================
 
 
+
     componentDidMount() {
         this.loadMap(); // call loadMap function to load the google map
     }
@@ -30,7 +39,7 @@ export default class MapContainer extends Component {
         if (this.props && this.props.google) { // checks to make sure that props have been passed
             const {google} = this.props; // sets props equal to google
             const maps = google.maps; // sets maps to google maps props
- 
+
             const mapRef = this.refs.map; // looks for HTML div ref 'map'. Returned in render below.
             const node = ReactDOM.findDOMNode(mapRef); // finds the 'map' div in the React DOM, names it node
 
@@ -41,6 +50,9 @@ export default class MapContainer extends Component {
             })
             this.map = new maps.Map(node, mapConfig); // creates a new Google map on the specified node (ref='map') with the specified configuration set above.
 
+            const addMarkerFunc = this.addMarker;
+
+            this.map.addListener('click', this.addMarker);
 
 
             // ==================
