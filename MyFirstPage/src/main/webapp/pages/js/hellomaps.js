@@ -22,8 +22,7 @@ function getCodedAddress(addr, xhttp, mediaURI, username){
 	}, function(results, status) {
 					if(status == 'OK') {
 						 var coordinates = results[0].geometry.location;
-						var list = ["a", "b"];
-						var jSonList = JSON.stringify(list);
+						var jSonList = JSON.stringify(mediaUri);
 					    var jSonInfo = JSON.stringify({"user": username, "location": JSON.stringify(coordinates), "type": "light", "mediaURI": list});
 				  		xhttp.send(jSonInfo);
 					}
