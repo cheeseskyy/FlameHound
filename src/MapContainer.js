@@ -1,29 +1,24 @@
-
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom'
 
 export default class MapContainer extends Component {
 
-    addMarker(title, lat, lng){
-        const {google} = this.props; // sets props equal to google
-        const maps = google.maps; // sets maps to google maps props
+    constructor(props) {
+        super();
+        this.state = {
+            locations: []
+        }
+    }
 
-        new google.maps.Marker({
+    addMarker(title, lat, lng) {
+        new this.maps.Marker({
             position: {lat: lat, lng: lng},
             map: this.map,
             title: title
-        })
+        });
         console.log("new marker!");
     }
 
-    constructor(props){
-        super(props);
-        this.state = {
-            locations: [
-
-            ]
-        }
-    }
 
     // ======================
     // ADD LOCATIONS TO STATE
@@ -39,8 +34,10 @@ export default class MapContainer extends Component {
 
     loadMap() {
         if (this.props && this.props.google) { // checks to make sure that props have been passed
-            this.google = this.props; // sets props equal to google
-            this.maps = this.google.maps; // sets maps to google maps props
+            const {google} = this.props; // sets props equal to google
+            this.google = google;
+            const maps = google.maps; // sets maps to google maps props
+            this.maps = maps;
 
             const mapRef = this.refs.map; // looks for HTML div ref 'map'. Returned in render below.
             const node = ReactDOM.findDOMNode(mapRef); // finds the 'map' div in the React DOM, names it node
@@ -50,7 +47,7 @@ export default class MapContainer extends Component {
                 zoom: 11, // sets zoom. Lower numbers are zoomed further out.
                 mapTypeId: 'roadmap' // optional main map layer. Terrain, satellite, hybrid or roadmap--if unspecified, defaults to roadmap.
             })
-            const map = new this.maps.Map(node, mapConfig); // creates a new Google map on the specified node (ref='map') with the specified configuration set above.
+            this.map = new maps.Map(node, mapConfig); // creates a new Google map on the specified node (ref='map') with the specified configuration set above.
 
             const addMarkerFunc = this.addMarker;
 
@@ -60,9 +57,12 @@ export default class MapContainer extends Component {
             // ==================
             // ADD MARKERS TO MAP
             // ==================
-            this.state.locations.push({name: "New York County Supreme Court", location: {lat: 40.7143033, lng: -74.0036919}});
-            this.state.locations.forEach( location => { // iterate through locations saved in state
-                const marker = new this.google.maps.Marker({ // creates a new Google maps Marker object.
+            /*this.state.locations.push({
+                name: "New York County Supreme Court",
+                location: {lat: 40.7143033, lng: -74.0036919}
+            });*/
+            this.state.locations.forEach(location => { // iterate through locations saved in state
+                const marker = new google.maps.Marker({ // creates a new Google maps Marker object.
                     position: {lat: location.location.lat, lng: location.location.lng}, // sets position of marker to specified location
                     map: this.map, // sets markers to appear on the map we just created on line 35
                     title: location.name // the title of the marker is set to the name of the location
@@ -78,7 +78,7 @@ export default class MapContainer extends Component {
         }
 
         return ( // in our return function you must return a div with ref='map' and style.
-            <div ref="map" style={style}>
+            <div ref="map" style={style} onClick={() => this.addMarker("bleh", 40.7143033, -74.0036919)}>
                 loading map...
             </div>
         )

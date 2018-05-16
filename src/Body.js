@@ -8,8 +8,8 @@ import './Body.css';
 import {RegisterForm} from "./Forms";
 import Home from "./Home";
 import Contactos from "./Contactos";
-import {MyFancyComponent} from "./MapTest";
 import About from "./About";
+import {GoogleMap, GoogleMapView, MapWithControlledZoom} from "./MapTest";
 
 
 class Body extends Component{
@@ -22,7 +22,7 @@ class Body extends Component{
                     <div>
                         <Route path="/map" component={MapView}/>
                         <Route exact path="/" component={Home}/>
-                        <Route path="/mapTest" component = {MyFancyComponent}/>
+                        <Route path="/mapTest" component = {MapWithControlledZoom}/>
                         <Router path="/about" component={About}/>
                         <Route path="/contact" component={Contactos}/>
                     </div>
