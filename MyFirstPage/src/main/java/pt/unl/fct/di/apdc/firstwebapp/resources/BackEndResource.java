@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -31,6 +32,7 @@ import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.PropertyProjection;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
@@ -43,6 +45,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.UserRoles;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminInfo;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminRegisterInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
@@ -74,8 +78,30 @@ public class BackEndResource extends HttpServlet {
 	@Path("/addAdmin")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addNewAdmin(AdminInfo info) {
+	public Response addNewAdmin(AdminRegisterInfo info) {
+		LOG.fine("Attempt to register admin: " + info.username);
+		if(info.username == null || info.password == null)
+			return Response.status(Status.BAD_REQUEST).build();
 		
+		Transaction txn = datastore.beginTransaction();
+		try {
+			// If the entity does not exist an Exception is thrown. Otherwise,
+			Key userKey = KeyFactory.createKey("UserAdmin", info.username);
+			datastore.get(userKey);
+			txn.rollback();
+			return Response.status(Status.FORBIDDEN).entity("Username").build(); 
+		} catch (EntityNotFoundException e) {
+			Entity user = new Entity("UserAdmin", info.username);
+			user.setProperty("password", info.password);
+			datastore.put(txn,user);
+			LOG.info("Admin registered " + info.username);
+			txn.commit();
+			return Response.ok().build();
+		} finally {
+			if (txn.isActive() ) {
+				txn.rollback();
+			}
+		}
 	}
 	
 	@POST

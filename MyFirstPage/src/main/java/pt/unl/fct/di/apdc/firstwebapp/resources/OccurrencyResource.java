@@ -43,8 +43,6 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.gson.Gson;
 import com.sun.research.ws.wadl.Application;
-
-import pt.unl.fct.di.apdc.firstwebapp.util.Location;
 import pt.unl.fct.di.apdc.firstwebapp.util.Utilities;
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.OccurrencyTypes;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;

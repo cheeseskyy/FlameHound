@@ -1,10 +1,6 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
@@ -13,22 +9,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
-import com.dropbox.core.DbxException;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -38,14 +24,6 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.gson.Gson;
-import com.sun.research.ws.wadl.Application;
-
-import pt.unl.fct.di.apdc.firstwebapp.util.Location;
-import pt.unl.fct.di.apdc.firstwebapp.util.Utilities;
-import pt.unl.fct.di.apdc.firstwebapp.util.Enums.OccurrencyTypes;
-import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
-import pt.unl.fct.di.apdc.firstwebapp.util.objects.OccurrencyData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserInfo;
 
