@@ -1,7 +1,18 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom'
 
+var googleMap;
+
 export default class MapContainer extends Component {
+
+    addMarker0() {
+        new this.maps.Marker({
+            position: {lat: 40.7143033, lng: -74.0036919},
+            map: this.map,
+            title: "bleh"
+        });
+        console.log("new marker0!");
+    }
 
     constructor(props) {
         super();
@@ -48,10 +59,18 @@ export default class MapContainer extends Component {
                 mapTypeId: 'roadmap' // optional main map layer. Terrain, satellite, hybrid or roadmap--if unspecified, defaults to roadmap.
             })
             this.map = new maps.Map(node, mapConfig); // creates a new Google map on the specified node (ref='map') with the specified configuration set above.
+            googleMap = this.map;
+
 
             const addMarkerFunc = this.addMarker;
 
-            //this.map.addListener('click', MapContainer.addMarker);
+            this.map.addListener('click', function(e){
+                new maps.Marker({
+                    position: e.latLng,
+                    map: googleMap
+                });
+                console.log("Added empty marker: lat = " + e.latLng)
+            });
 
 
             // ==================
