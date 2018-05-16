@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -35,8 +36,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -63,10 +68,12 @@ import static android.Manifest.permission.READ_CONTACTS;
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     private boolean status = false;
+    private boolean saveLogin;
     /**
      * Id to identity READ_CONTACTS permission request.
      */
-    private static final int REQUEST_READ_CONTACTS = 0;
+    private static final int REQUEST_READ_CONTACTS = 0,
+                             REQUEST_INTERNET = 1;
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -83,19 +90,37 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     // UI references.
     private AutoCompleteTextView mUsername;
     private EditText mPasswordView;
+    private Button mEmailSignInButton;
+    private CheckBox rememberme;
+    private SharedPreferences loginPreferences;
+    private SharedPreferences.Editor loginPrefsEditor;
     private View mProgressView;
     private View mLoginFormView;
+    private Switch aSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_act);
         setupUI(findViewById(R.id.login_form));
-        // Set up the login form.
+        //Setup of the switch
+        aSwitch = (Switch) findViewById(R.id.switch1);
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(aSwitch.isChecked()) {
+                    Intent switchToRegister = new Intent(LoginActivity.this, Register.class);
+                    startActivity(switchToRegister);
+                }
+            }
+        });
+
+        // Setup the login form.
         mUsername = (AutoCompleteTextView) findViewById(R.id.username);
         populateAutoComplete();
 
         mPasswordView = (EditText) findViewById(R.id.password);
+
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -107,10 +132,36 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        rememberme = (CheckBox) findViewById(R.id.checkBox);
+        loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
+        loginPrefsEditor = loginPreferences.edit();
+        saveLogin = loginPreferences.getBoolean("saveLogin", false);
+        if(saveLogin == true) {
+            mUsername.setText(loginPreferences.getString("username", ""));
+            mPasswordView.setText(loginPreferences.getString("password", ""));
+            rememberme.setChecked(true);
+        }
+        rememberme.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(saveLogin == false) {
+                    saveLogin = true;
+                    rememberme.setChecked(true);
+                }
+                else
+                    rememberme.setChecked(false);
+                    saveLogin = false;
+
+
+
+            }
+        });
+
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 attemptLogin();
 
             }
@@ -125,8 +176,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         InputMethodManager inputMethodManager;
         inputMethodManager = (InputMethodManager) activity.getSystemService(
                         Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(
-                activity.getCurrentFocus().getWindowToken(), 0);
+        if (inputMethodManager.isAcceptingText() == true) {
+            inputMethodManager.hideSoftInputFromWindow(
+                    activity.getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
     public void setupUI(View view) {
@@ -158,7 +211,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         getLoaderManager().initLoader(0, null, this);
     }
 
-    /**private boolean mayRequestInternet() {
+    private boolean mayRequestInternet() {
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
         }
@@ -166,9 +219,22 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             return true;
         }
 
+        if (shouldShowRequestPermissionRationale(INTERNET)) {
+            Snackbar.make(mUsername, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok, new View.OnClickListener() {
+                        @Override
+                        @TargetApi(Build.VERSION_CODES.M)
+                        public void onClick(View v) {
+                            requestPermissions(new String[]{INTERNET}, REQUEST_INTERNET);
+                        }
+                    });
+        } else {
+            requestPermissions(new String[]{INTERNET}, REQUEST_INTERNET);
+        }
 
+        return false;
     }
-    **/
+
     private boolean mayRequestContacts() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
@@ -229,6 +295,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Store values at the time of the login attempt.
         String username = mUsername.getText().toString();
         String password = mPasswordView.getText().toString();
+
+        if(rememberme.isChecked()) {
+            Toast.makeText(rememberme.getContext(),"checked", Toast.LENGTH_SHORT).show();
+            loginPrefsEditor.putBoolean("saveLogin", true);
+            loginPrefsEditor.putString("username", username);
+            loginPrefsEditor.putString("password", password);
+            loginPrefsEditor.commit();
+        }
+        else {
+            loginPrefsEditor.clear();
+            loginPrefsEditor.commit();
+        }
 
         boolean cancel = false;
         View focusView = null;
