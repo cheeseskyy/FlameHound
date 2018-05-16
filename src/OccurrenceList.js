@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import OccurrencePreview, {Occurence} from "./OccurrencePreview";
 import {BrowserRouter as Router, Route, Link} from "react-router-dom";
-import logo from "./imagens/indo_fire_1.jpg";
+import pick1 from "./imagens/indo_fire_1.jpg";
 
 class OccurrenceList extends Component {
 
@@ -12,19 +12,29 @@ class OccurrenceList extends Component {
         return(
           <div id="Occurrences" className="Column">
 
-              <b>Lista de Ocorrências</b>
-
-              <OccurrencePreview title = "Fogo"/>
-              <div className="logo">
-                  <div className="OccurrenceImage"><img src={logo} alt="company logo" align="right" height="150" width="150" /></div>
+            <div>
+              <div id="occu">
+                <h2>Lista de Ocorrências</h2>
               </div>
-              <OccurrencePreview description = "António Batata"/>
-              <OccurrencePreview description = "Pequeno incêncio na mata"/>
-              <OccurrencePreview description = "Parque da Paz"/>
 
-              <p><Link to = "/ocurrencePreview"> Adicionar Ocorrência </Link></p>
+              <div className="OccurrenceImage">
+                  <img src={pick1}/>
+              </div>
+
+              <div className="TextOccurrence">
+                  <OccurrencePreview title = "Título: Fogo"/>
+                  <OccurrencePreview user = "Utilizador: António Batata" />
+                  <OccurrencePreview description = "Descrição: Pequeno incêncio na mata"  />
+                  <OccurrencePreview location = "Localização: Parque da Paz"  />
+              </div>
+            </div>
+
+              <div>
+                  <p><Link to = "/ocurrencePreview"> Adicionar Ocorrência </Link></p>
+              </div>
 
           </div>
+
         );
     }
 }
