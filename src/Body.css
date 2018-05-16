@@ -85,3 +85,13 @@ a:active {
     text-align: center;
     width: 85vw;
 }
+#msg{
+    background-position: bottom;
+
+
+}
+
+#location_map {
+    height:150px;
+    width: 150px;
+}

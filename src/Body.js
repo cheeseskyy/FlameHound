@@ -7,6 +7,7 @@ import NavPanel from "./NavPanel";
 import './Body.css';
 import {RegisterForm} from "./Forms";
 import Home from "./Home";
+import Contactos from "./Contactos";
 
 
 class Body extends Component{
@@ -19,6 +20,8 @@ class Body extends Component{
                     <div>
                         <Route path="/map" component={MapView}/>
                         <Route exact path="/" component={Home}/>
+                        <Router path="/about" component={About}/>
+                        <Route path="/contact" component={Contactos}/>
                     </div>
                 </div>
             </Router>
