@@ -29,6 +29,8 @@ export default class MapContainer extends Component {
     // ADD LOCATIONS TO STATE
     // ======================
 
+    google;
+    maps;
 
 
     componentDidMount() {
@@ -37,8 +39,8 @@ export default class MapContainer extends Component {
 
     loadMap() {
         if (this.props && this.props.google) { // checks to make sure that props have been passed
-            const {google} = this.props; // sets props equal to google
-            const maps = google.maps; // sets maps to google maps props
+            this.google = this.props; // sets props equal to google
+            this.maps = this.google.maps; // sets maps to google maps props
 
             const mapRef = this.refs.map; // looks for HTML div ref 'map'. Returned in render below.
             const node = ReactDOM.findDOMNode(mapRef); // finds the 'map' div in the React DOM, names it node
@@ -52,7 +54,7 @@ export default class MapContainer extends Component {
 
             const addMarkerFunc = this.addMarker;
 
-            //this.map.addListener('click', MapContainer.addMarker);
+            this.map.addListener('click', MapContainer.addMarker);
 
 
             // ==================
