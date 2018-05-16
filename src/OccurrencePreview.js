@@ -14,10 +14,10 @@ class OccurrencePreview extends Component{
 
         return(
             <div>
-                <p>{this.props.title}</p>
-                <p>{this.props.user}</p>
-                <p>{this.props.description}</p>
-                <p>{this.props.location}</p>
+                <p> {this.props.title}</p>
+                <p> {this.props.user}</p>
+                <p> {this.props.description}</p>
+                <p> {this.props.location}</p>
             </div>
         );
     }

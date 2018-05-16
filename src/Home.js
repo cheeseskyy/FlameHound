@@ -13,13 +13,22 @@ class Home extends Component{
       return(
 
             <div style={style} className="Column">
-                <h4 id="title">FlameHound</h4>
-                <p align="bottom">Todos nós sabemos como os incêndios assolaram Portugal no ano de 2017, com um registo mortal enorme, nunca antes visto, neste tipo de ocorrências.
-                    O nosso objectivo é erradicar estes acontecimentos, nunca os esquecendo mas sim utilizando-os como motor para o desenvolvimento deste projecto. Uma actuação rápida, sem burocracia, e de cómodo uso.
-                    Uma aplicação/página web, que promova o sentido comunitário, a entre ajuda na prevenção e na luta contra o desflorestamento do nosso país.
-                    Deste modo promovemos uma nova ferramenta que entidades podem utilizar ou mesmo, no futuro, promover.
-                </p>
+                <div>
+                    <h1>FlameHound</h1>
+
+                    <div id ="text">
+                        <p> Todos nós sabemos como os incêndios assolaram Portugal no ano de 2017, com um registo mortal enorme, nunca antes visto, neste tipo de ocorrências.</p>
+                        <p> O nosso objectivo é erradicar estes acontecimentos, nunca os esquecendo mas sim utilizando-os como motor para o desenvolvimento deste projecto.</p>
+                        <p> Uma actuação rápida, sem burocracia, e de cómodo uso.</p>
+                        <p> Uma aplicação/página web, que promova o sentido comunitário, a entre ajuda na prevenção e na luta contra o desflorestamento do nosso país.</p>
+                        <p> Deste modo promovemos uma nova ferramenta que entidades podem utilizar ou mesmo, no futuro, promover.</p>
+                    </div>
+
+                    <br/>
+                    <h2 id = "title1">Com a sua ajuda, conseguimos farejar os fogos!</h2>
+                    <br/>
                 </div>
+            </div>
 
 
 

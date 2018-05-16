@@ -43,9 +43,20 @@ h1{
     height: 100vh;
 }
 
+#occu{
+    text-align: center;
+    font-weight: bold;
+    font-family: "Times New Roman", Times, serif;
+}
+
 .logo{
     text-align: center;
     min-height: 70px;
+}
+
+.TextOccurrence{
+    display:inline;
+    white-space:nowrap;
 }
 
 /* unvisited link */
@@ -78,7 +89,16 @@ a:active {
 }
 
 .OccurrenceImage{
+    float:right;
+    height: 40%;
+    width: 40%;
+    display:inline;
+}
 
+#OcurrenceP{
+    text-align:center;
+    display: inline-block;
+    direction: rtl;
 }
 
 #title{
@@ -89,11 +109,30 @@ a:active {
     text-align: center;
     width: 85vw;
 }
+
+#title1{
+    border-style: double;
+    margin-top: 100px;
+    margin-bottom: 100px;
+    margin-right: 150px;
+    margin-left: 80px;
+}
+
+#text{
+    position: center;
+    text-align: justify;
+    text-indent: 50px;
+}
+
 #msg{
     background-position: bottom;
 }
 
 #location_map {
-    height:150px;
-    width: 150px;
+    position: center;
+    margin-right: 150px;
+    margin-left: 500px;
+    height: 150px;
+    width: 300px;
 }
+
