@@ -16,7 +16,7 @@ class OccurrenceList extends Component {
 
               <OccurrencePreview title = "Fogo"/>
               <div className="logo">
-                  <div id="image"><img src={logo} alt="company logo" align="right" height="150" width="150" /></div>
+                  <div className="OccurrenceImage"><img src={logo} alt="company logo" align="right" height="150" width="150" /></div>
               </div>
               <OccurrencePreview description = "António Batata"/>
               <OccurrencePreview description = "Pequeno incêncio na mata"/>
