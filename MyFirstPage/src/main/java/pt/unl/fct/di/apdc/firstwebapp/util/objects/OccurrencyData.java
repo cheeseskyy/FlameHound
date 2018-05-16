@@ -1,6 +1,8 @@
-package pt.unl.fct.di.apdc.firstwebapp.util;
+package pt.unl.fct.di.apdc.firstwebapp.util.objects;
 
 import java.util.List;
+
+import pt.unl.fct.di.apdc.firstwebapp.util.Enums.OccurrencyTypes;
 
 public class OccurrencyData {
 

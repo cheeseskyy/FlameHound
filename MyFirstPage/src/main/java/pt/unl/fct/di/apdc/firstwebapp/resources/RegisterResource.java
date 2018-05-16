@@ -41,9 +41,9 @@ import com.google.apphosting.datastore.DatastoreV4.PropertyFilter;
 import org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
-import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.LoginData;
-import pt.unl.fct.di.apdc.firstwebapp.util.RegisterData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.RegisterData;
 
 @Path("/register")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")

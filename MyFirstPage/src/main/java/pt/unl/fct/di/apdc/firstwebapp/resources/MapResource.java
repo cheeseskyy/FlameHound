@@ -19,6 +19,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation.Builder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -36,14 +40,14 @@ import com.google.appengine.api.datastore.Transaction;
 import com.google.gson.Gson;
 import com.sun.research.ws.wadl.Application;
 
-import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.Location;
-import pt.unl.fct.di.apdc.firstwebapp.util.LoginData;
-import pt.unl.fct.di.apdc.firstwebapp.util.OccurrencyData;
-import pt.unl.fct.di.apdc.firstwebapp.util.OccurrencyTypes;
-import pt.unl.fct.di.apdc.firstwebapp.util.SessionInfo;
-import pt.unl.fct.di.apdc.firstwebapp.util.UserInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.Utilities;
+import pt.unl.fct.di.apdc.firstwebapp.util.Enums.OccurrencyTypes;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.OccurrencyData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserInfo;
 
 @Path("/session")
 public class MapResource extends HttpServlet{
@@ -69,10 +73,10 @@ public class MapResource extends HttpServlet{
 	public Response getAddress(SessionInfo session) {
 		
 		Entity user;
-		Object r = isLoggedIn(session);
-		if(((Response) r).getStatus() != Response.Status.OK.getStatusCode())
-			return (Response) r;
-		user = (Entity)((Response) r).getEntity();
+		Response r = isLoggedIn(session);
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return r;
+		user = (Entity) r.getEntity();
 		
 		return Response.ok(g.toJson(user.getProperty("address"))).build();
 		
@@ -102,7 +106,7 @@ public class MapResource extends HttpServlet{
 		String nif = (String) userE.getProperty("nif");
 		String cc = (String) userE.getProperty("cc");
 		UserInfo user = new UserInfo(name,uN,email,hN,pN,add,nif,cc);
-		return Response.ok(g.toJson(user)).build();
+		return Response.ok(user).build();
 	}
 	
 	@POST
@@ -159,6 +163,15 @@ public class MapResource extends HttpServlet{
 			LOG.info("Got user");
 			if(!user.getProperty("TokenKey").equals(session.tokenId))
 				return Response.status(Status.FORBIDDEN).build();
+			txn.commit();
+			txn = datastore.beginTransaction();
+			Key timeoutKey = KeyFactory.createKey("timeout", session.username);
+			Entity timeout = datastore.get(timeoutKey);
+			long lastOp = (long) timeout.getProperty("lastOp");
+			if(System.currentTimeMillis() - lastOp > 10*60*1000)
+				return Response.status(Status.FORBIDDEN).build();
+			timeout.setProperty("lastOp", System.currentTimeMillis());
+			datastore.put(timeout);
 			txn.commit();
 			return Response.ok(user).build();
 		}catch (EntityNotFoundException e) {

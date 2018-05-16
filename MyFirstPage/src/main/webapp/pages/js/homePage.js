@@ -23,8 +23,7 @@
     	if(sessionStorage.getItem('sessionToken') == "0"){
     		alert("You are not logged in, please do so. Redirecting...")
     		window.location.replace("/login");
-    	}
-    		
+    	}	
     }
     	
 		function logout(){

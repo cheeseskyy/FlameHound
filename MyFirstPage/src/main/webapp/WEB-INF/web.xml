@@ -30,6 +30,15 @@
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
   <servlet>
+    <servlet-name>adminServlet</servlet-name>
+    <servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.BackEndResource</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>adminServlet</servlet-name>
+    <url-pattern>/_be/_admin</url-pattern>
+  </servlet-mapping>
+  <servlet>
     <servlet-name>loginServlet</servlet-name>
     <servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.LoginResource</servlet-class>
     <load-on-startup>1</load-on-startup>
@@ -76,13 +85,4 @@
     <error-code>500</error-code>
     <location>/error/500.html</location>
   </error-page>
-  <security-constraint>
-    <web-resource-collection>
-      <web-resource-name>Restricted Area</web-resource-name>
-      <url-pattern>/secret/*</url-pattern>
-    </web-resource-collection>
-    <auth-constraint>
-      <role-name>admin</role-name>
-    </auth-constraint>
-  </security-constraint>
 </web-app>
