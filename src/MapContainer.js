@@ -50,11 +50,11 @@ export default class MapContainer extends Component {
                 zoom: 11, // sets zoom. Lower numbers are zoomed further out.
                 mapTypeId: 'roadmap' // optional main map layer. Terrain, satellite, hybrid or roadmap--if unspecified, defaults to roadmap.
             })
-            this.map = new maps.Map(node, mapConfig); // creates a new Google map on the specified node (ref='map') with the specified configuration set above.
+            const map = new this.maps.Map(node, mapConfig); // creates a new Google map on the specified node (ref='map') with the specified configuration set above.
 
             const addMarkerFunc = this.addMarker;
 
-            this.map.addListener('click', MapContainer.addMarker);
+            //this.map.addListener('click', MapContainer.addMarker);
 
 
             // ==================
@@ -62,7 +62,7 @@ export default class MapContainer extends Component {
             // ==================
             this.state.locations.push({name: "New York County Supreme Court", location: {lat: 40.7143033, lng: -74.0036919}});
             this.state.locations.forEach( location => { // iterate through locations saved in state
-                const marker = new google.maps.Marker({ // creates a new Google maps Marker object.
+                const marker = new this.google.maps.Marker({ // creates a new Google maps Marker object.
                     position: {lat: location.location.lat, lng: location.location.lng}, // sets position of marker to specified location
                     map: this.map, // sets markers to appear on the map we just created on line 35
                     title: location.name // the title of the marker is set to the name of the location
