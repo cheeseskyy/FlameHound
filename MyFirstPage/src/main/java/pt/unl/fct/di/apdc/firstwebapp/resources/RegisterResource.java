@@ -43,6 +43,7 @@ import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.MessageData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.RegisterData;
 
 @Path("/register")
@@ -51,6 +52,7 @@ public class RegisterResource extends HttpServlet{
 
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+	private final Gson g = new Gson();
 	
 	public RegisterResource() { } //Nothing to be done here...
 
@@ -66,7 +68,7 @@ public class RegisterResource extends HttpServlet{
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public Response registerUserV3(RegisterData data) {
-		LOG.fine("Attempt to register user: " + data.username);
+		LOG.info("Attempt to register user: " + data.username);
 		String valid = data.validRegistration();
 		if(!valid.equals("ok")) {
 			return Response.status(Status.BAD_REQUEST).entity(valid).build();
@@ -80,13 +82,13 @@ public class RegisterResource extends HttpServlet{
 			Filter propertyFilter =
 				    new FilterPredicate("email", FilterOperator.EQUAL, data.email);
 			Query q = new Query("User").setFilter(propertyFilter);
-			PreparedQuery pQ = datastore.prepare(txn, q);
+			PreparedQuery pQ = datastore.prepare(q);
 			Iterator<Entity> it = pQ.asIterator();
 			if(!it.hasNext())
 				throw new EntityNotFoundException(userKey);
 			user = datastore.get(userKey);
 			txn.rollback();
-			return Response.status(Status.FORBIDDEN).entity("Username").build(); 
+			return Response.status(Status.UNAUTHORIZED).build(); 
 		} catch (EntityNotFoundException e) {
 			Entity user = new Entity("User", data.username);
 			user.setProperty("user_name", data.name);
@@ -105,7 +107,7 @@ public class RegisterResource extends HttpServlet{
 			datastore.put(txn,user);
 			LOG.info("User registered " + data.username);
 			txn.commit();
-			return Response.ok().build();
+			return Response.ok().entity(g.toJson(new MessageData("Success"))).build();
 		} finally {
 			if (txn.isActive() ) {
 				txn.rollback();
