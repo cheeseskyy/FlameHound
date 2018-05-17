@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps"
+import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
+import {BrowserRouter as Router} from "react-router-dom";
 
 let FooterMap = withScriptjs(withGoogleMap((props) =>
     <GoogleMap
@@ -15,22 +15,22 @@ class Contactos extends Component{
     render(){
 
         const style = {
-            'text-align': 'center',
+
 
         }
 
         return(
-            <body style={style}>
-                <div id="contactos">
-                  <h1 align="center">Contactos</h1>
-                    <ul style={style}>
-                        <h4>Contactos Telefónicos de Emergência</h4>
+            <Router>
+            <div>
+                <h1 align="center">Contactos</h1>
+                <div id="TextConctatos1"> <div id="TextConctatos2">
+                    <h4>Contactos Telefónicos de Emergência</h4>
+                    <ul>
                         <li>Emergência: 112</li>
                         <li>Emergência Florestal: 117</li>
                         <li>Autoridade Protecção Civil: 214 247 100</li>
                         <li>GNR - Comando Geral: 213 217 000</li>
-                 </ul>
-                </div>
+                    </ul>
 
                     <h4> Nossa localização</h4>
                     <div id="location_map" style={style}>
@@ -42,10 +42,13 @@ class Contactos extends Component{
                         />
                     </div>
 
-                    <h4>Morada</h4>
-                    <p>Quinta da Torre, Campus Universitário</p>
-                    <p>2829-516 Caparica</p>
-            </body>
+                    <p>Quinta da Torre, Campus Universitário<br/>
+                    2829-516 Caparica</p>
+
+                </div>
+                </div>
+                </div>
+            </Router>
 );
 }
 }

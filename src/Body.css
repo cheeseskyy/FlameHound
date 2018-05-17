@@ -10,6 +10,7 @@ img {
 h1{
     font-size: 4em;
     min-width: 1em;
+    margin: 0px;
 }
 
 .Floater{
@@ -129,10 +130,19 @@ a:active {
 }
 
 #location_map {
-    position: center;
-    margin-right: 150px;
-    margin-left: 500px;
+    display: inline-block;
     height: 150px;
     width: 300px;
+}
+
+#TextConctatos1{
+    padding: 30px;
+    text-align: center;
+}
+
+#TextConctatos2{
+    margin: 0 auto;
+    padding: 50px;
+    display: inline-block;
 }
 

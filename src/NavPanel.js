@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {BrowserRouter as Router, Route, Link} from "react-router-dom";
+import {BrowserRouter as Router, Route, Link, Switch} from "react-router-dom";
 import {RegisterForm, LoginForm} from "./Forms";
 import logo from "./imagens/FlameHound Logo.png";
 
@@ -39,16 +39,7 @@ class NavPanel extends Component {
                         <div id="image"><img src={logo} alt="company logo"/></div>
                     </div>
                     <nav>
-                        <Route exact path="/"
-                               render={() =>
-                                   <div>
-                                       <p><Link to="/login">Login </Link></p>
-                                       <p><Link to="/register">Register</Link></p>
-                                       <p><Link to="/about">About</Link></p>
-                                       <p><Link to="/contact">Contact</Link></p>
-                                   </div>
-                               }
-                        />
+                        <Switch>
                         <Route path="/register" component={RegisterForm}/>
                         <Route path="/login" component={LoginForm}/>
                         <Route path="/logout" onEnter={()=>
@@ -63,6 +54,17 @@ class NavPanel extends Component {
                             </div>
                         }
                         />
+                            <Route path="/"
+                                   render={() =>
+                                       <div>
+                                           <p><Link to="/login">Login </Link></p>
+                                           <p><Link to="/register">Register</Link></p>
+                                           <a href="/about">About</a> <br/><br/>
+                                           <a href="/contact">Contact</a>
+                                       </div>
+                                   }
+                            />
+                        </Switch>
                     </nav>
                 </div>
             </Router>

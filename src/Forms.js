@@ -139,7 +139,7 @@ export class LoginForm extends Component {
 
     render() {
         return (
-            <Router    >
+            <Router>
                 <div className="loginForm">
                     <label htmlFor="uname"><b>Username</b></label><br/>
 

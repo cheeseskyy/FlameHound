@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router} from "react-router-dom";
 
 
 class About extends Component{
@@ -11,10 +11,11 @@ class About extends Component{
             width: '84vw'
         }
         return(
-
+        <Router>
             <div style={style} className="Column">
                 <h4 id="title">FlameHound</h4>
             </div>
+        </Router>
 
 
 

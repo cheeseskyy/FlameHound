@@ -21,10 +21,10 @@ class Body extends Component{
                     <NavPanel/>
                     <div>
                         <Route path="/map" component={MapView}/>
-                        <Route exact path="/" component={Home}/>
-                        <Route path="/mapTest" component = {MapWithControlledZoom}/>
-                        <Router path="/about" component={About}/>
+                        <Route path="/about" component={About}/>
                         <Route path="/contact" component={Contactos}/>
+                        <Route exact path="/" component={Home}/>
+
                     </div>
                 </div>
             </Router>
