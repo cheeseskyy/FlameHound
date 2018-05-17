@@ -12,6 +12,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -34,8 +35,8 @@ import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.gson.Gson;
 
-import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.SessionInfo;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 
 @Path("/utils")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -68,7 +69,24 @@ public class ComputationResource {
 			LOG.info("Got user");
 			if(!user.getProperty("TokenKey").equals(session.tokenId))
 				return Response.status(Status.FORBIDDEN).build();
+			Key timeoutKey = KeyFactory.createKey("timeout", session.username);
 			txn.commit();
+			Transaction txn2 = datastore.beginTransaction();
+			Entity timeout = datastore.get(txn2, timeoutKey);
+			long lastOp = (long) timeout.getProperty("lastOp");
+			if(System.currentTimeMillis() - lastOp > 10*60*1000) {
+				user.setProperty("TokenExpirationDate", "");
+				user.setProperty("TokenCreationDate", "");
+				user.setProperty("TokenKey", 0);
+				datastore.put(txn, user);
+				txn.commit();
+				txn2.commit();
+				return Response.status(Status.FORBIDDEN).build();
+			}
+			timeout.setProperty("lastOp", System.currentTimeMillis());
+			datastore.put(txn2, timeout);
+			txn.commit();
+			txn2.commit();
 			return Response.ok().build();
 		}catch (EntityNotFoundException e) {
 			LOG.warning("Failed to locate username: " + session.username);
@@ -87,52 +105,6 @@ public class ComputationResource {
 	public Response getCurrentTime() {
 		LOG.fine("Replying to date request.");
 		return Response.ok().entity(g.toJson(fmt.format(new Date()))).build();
-	}
-	
-	@POST
-	@Path("/compute")
-	public Response executeComputeTask() {
-		
-		LOG.fine("Starting to execute computation taks");
-		try {
-			Thread.sleep(30*1000); //30s //5 min...
-		} catch (Exception e) {
-			LOG.logp(Level.SEVERE, this.getClass().getCanonicalName(), "executeComputeTask", "An exeption has ocurred", e);
-			return Response.serverError().build();
-		} //Simulates 60s execution
-		
-		Query q = new Query("User") ;
-		PreparedQuery pq = datastore.prepare(q);  
-		for (Entity result : pq.asIterable()) {   
-	       long loginExpiration = (long) result.getProperty("TokenExpirationDate"); 
-	       if(System.currentTimeMillis() > loginExpiration) {
-	    	   Transaction txn = datastore.beginTransaction();
-	    	   try {
-	    		    result.setProperty("TokenKey", "");
-					result.setProperty("TokenCreationDate", "");
-					result.setProperty("TokenExpirationDate", "");
-					datastore.put(result);
-					txn.commit();
-	   			}catch (Exception e) {
-	   			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-	   		} finally {
-	   			if (txn.isActive()) {
-	   				txn.rollback();
-	   				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-	   			}
-	   		}
-	       }
-		}
-		return Response.ok().build();
-	}
-	
-	@GET
-	@Path("/compute")
-	public Response triggerExecuteComputeTask() {
-		Queue queue = QueueFactory.getDefaultQueue();
-		queue.add(TaskOptions.Builder.withUrl("/rest/utils/compute"));
-		return Response.ok().build();
-
 	}
 	
 	

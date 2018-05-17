@@ -1,10 +1,6 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
@@ -13,18 +9,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
-import com.dropbox.core.DbxException;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -34,16 +24,8 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.gson.Gson;
-import com.sun.research.ws.wadl.Application;
-
-import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.Location;
-import pt.unl.fct.di.apdc.firstwebapp.util.LoginData;
-import pt.unl.fct.di.apdc.firstwebapp.util.OccurrencyData;
-import pt.unl.fct.di.apdc.firstwebapp.util.OccurrencyTypes;
-import pt.unl.fct.di.apdc.firstwebapp.util.SessionInfo;
-import pt.unl.fct.di.apdc.firstwebapp.util.UserInfo;
-import pt.unl.fct.di.apdc.firstwebapp.util.Utilities;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserInfo;
 
 @Path("/session")
 public class MapResource extends HttpServlet{
@@ -53,8 +35,7 @@ public class MapResource extends HttpServlet{
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private static final Logger LOG = Logger.getLogger(MapResource.class.getName());
 	private final Gson g = new Gson();
-	private static DropBoxResource dbIntegration = new DropBoxResource();
-	
+	private static DropBoxResource dbIntegration = new DropBoxResource();	
 	public MapResource() {}
 	
 	@Override
@@ -70,14 +51,16 @@ public class MapResource extends HttpServlet{
 	public Response getAddress(SessionInfo session) {
 		
 		Entity user;
-		Object r = isLoggedIn(session);
-		if(((Response) r).getStatus() != Response.Status.OK.getStatusCode())
-			return (Response) r;
-		user = (Entity)((Response) r).getEntity();
+		Response r = isLoggedIn(session);
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return r;
+		user = (Entity) r.getEntity();
 		
 		return Response.ok(g.toJson(user.getProperty("address"))).build();
 		
 	}
+
+	
 	
 	@POST
 	@Path("/getUserInfo")
@@ -101,7 +84,7 @@ public class MapResource extends HttpServlet{
 		String nif = (String) userE.getProperty("nif");
 		String cc = (String) userE.getProperty("cc");
 		UserInfo user = new UserInfo(name,uN,email,hN,pN,add,nif,cc);
-		return Response.ok(g.toJson(user)).build();
+		return Response.ok(user).build();
 	}
 	
 	@POST
@@ -158,6 +141,15 @@ public class MapResource extends HttpServlet{
 			LOG.info("Got user");
 			if(!user.getProperty("TokenKey").equals(session.tokenId))
 				return Response.status(Status.FORBIDDEN).build();
+			txn.commit();
+			txn = datastore.beginTransaction();
+			Key timeoutKey = KeyFactory.createKey("timeout", session.username);
+			Entity timeout = datastore.get(timeoutKey);
+			long lastOp = (long) timeout.getProperty("lastOp");
+			if(System.currentTimeMillis() - lastOp > 10*60*1000)
+				return Response.status(Status.FORBIDDEN).build();
+			timeout.setProperty("lastOp", System.currentTimeMillis());
+			datastore.put(timeout);
 			txn.commit();
 			return Response.ok(user).build();
 		}catch (EntityNotFoundException e) {

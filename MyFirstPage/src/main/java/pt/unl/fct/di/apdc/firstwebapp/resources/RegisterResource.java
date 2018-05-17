@@ -3,6 +3,7 @@ package pt.unl.fct.di.apdc.firstwebapp.resources;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -26,19 +27,23 @@ import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.PropertyProjection;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.Transaction;
+import com.google.apphosting.datastore.DatastoreV4.PropertyFilter;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
-import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.LoginData;
-import pt.unl.fct.di.apdc.firstwebapp.util.RegisterData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.RegisterData;
 
 @Path("/register")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -57,66 +62,31 @@ public class RegisterResource extends HttpServlet{
 	}
 	
 	@POST
-	@Path("/v1")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response registerUserV1(LoginData data) {
-		LOG.fine("Attempt to register user: " + data.username);
-		
-		Entity user = new Entity("User", data.username);
-		user.setProperty("user_pwd", DigestUtils.sha512Hex(data.password));
-		user.setUnindexedProperty("user_creation_time", new Date());
-		datastore.put(user);
-		LOG.info("User registered " + data.username);
-		return Response.ok().build();
-	}
-	
-	@POST
-	@Path("/v2")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public Response registerUserV2(RegisterData data) {
-		LOG.fine("Attempt to register user: " + data.username);
-		
-		if( ! data.validRegistration() ) {
-			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
-		}
-		
-		try {
-			// If the entity does not exist an Exception is thrown. Otherwise,
-			Key userKey = KeyFactory.createKey("User", data.username);
-			Entity user = datastore.get(userKey);
-			return Response.status(Status.BAD_REQUEST).entity("User already exists.").build(); 
-		} catch (EntityNotFoundException e) {
-			Entity user = new Entity("User", data.username);
-			user.setProperty("user_name", data.name);
-			user.setProperty("user_pwd", DigestUtils.shaHex(data.password));
-			user.setProperty("user_email", data.email);
-			user.setUnindexedProperty("user_creation_time", new Date());
-			datastore.put(user);
-			LOG.info("User registered " + data.username);
-			return Response.ok().build();
-		}
-	}
-	
-	@POST
 	@Path("/v3")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public Response registerUserV3(RegisterData data) {
 		LOG.fine("Attempt to register user: " + data.username);
-		
-		if( ! data.validRegistration() ) {
-			return Response.status(Status.BAD_REQUEST).entity("Missing or wrong parameter.").build();
+		String valid = data.validRegistration();
+		if(!valid.equals("ok")) {
+			return Response.status(Status.BAD_REQUEST).entity(valid).build();
 		}
 		
 		Transaction txn = datastore.beginTransaction();
 		try {
 			// If the entity does not exist an Exception is thrown. Otherwise,
 			Key userKey = KeyFactory.createKey("User", data.username);
-			Entity user = datastore.get(userKey);
+			Entity user;
+			Filter propertyFilter =
+				    new FilterPredicate("email", FilterOperator.EQUAL, data.email);
+			Query q = new Query("User").setFilter(propertyFilter);
+			PreparedQuery pQ = datastore.prepare(txn, q);
+			Iterator<Entity> it = pQ.asIterator();
+			if(!it.hasNext())
+				throw new EntityNotFoundException(userKey);
+			user = datastore.get(userKey);
 			txn.rollback();
-			System.out.println("User already exists");
-			return Response.status(Status.BAD_REQUEST).entity("User already exists.").build(); 
+			return Response.status(Status.FORBIDDEN).entity("Username").build(); 
 		} catch (EntityNotFoundException e) {
 			Entity user = new Entity("User", data.username);
 			user.setProperty("user_name", data.name);
