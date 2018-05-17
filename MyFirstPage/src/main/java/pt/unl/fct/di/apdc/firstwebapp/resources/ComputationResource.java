@@ -66,7 +66,7 @@ public class ComputationResource {
 		Key userKey = KeyFactory.createKey("User", session.username);
 		try {
 			LOG.info("Attempt to get user: " + session.username);
-			Entity user = datastore.get(userKey);
+			Entity user = datastore.get(txn, userKey);
 			LOG.info("Got user");
 			if (!user.getProperty("TokenKey").equals(session.tokenId)) {
 				LOG.info("Wrong token for user " + session.username);
@@ -77,9 +77,11 @@ public class ComputationResource {
 			LOG.info("Correct token for use " + session.username);
 
 			Key timeoutKey = KeyFactory.createKey("timeout", session.username);
-
+			LOG.info("Got timeoutKey");
 			Entity timeout = datastore.get(txn2, timeoutKey);
+			LOG.info("Got Timeout");
 			long lastOp = (long) timeout.getProperty("lastOp");
+			LOG.info("timeout is Long");
 			if (System.currentTimeMillis() - lastOp > 10 * 60 * 1000) {
 				LOG.info("Timed out");
 				user.setProperty("TokenExpirationDate", "");
@@ -101,7 +103,11 @@ public class ComputationResource {
 			txn.rollback();
 			txn2.rollback();
 			return Response.status(Status.FORBIDDEN).build();
-		} finally {
+		} catch(Exception e) {
+			LOG.info(e.getMessage());
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		}
+		finally {
 			if (txn.isActive() || txn2.isActive()) {
 				LOG.info("Transactions still active");
 				txn.rollback();
