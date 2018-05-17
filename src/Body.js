@@ -9,7 +9,6 @@ import {RegisterForm} from "./Forms";
 import Home from "./Home";
 import Contactos from "./Contactos";
 import About from "./About";
-import {GoogleMap, GoogleMapView, MapWithControlledZoom} from "./MapTest";
 import SubmitOcccurrence from "./SubmitOccurrence";
 
 
