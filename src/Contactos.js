@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps"
 
 let FooterMap = withScriptjs(withGoogleMap((props) =>

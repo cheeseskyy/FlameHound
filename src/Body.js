@@ -10,6 +10,7 @@ import Home from "./Home";
 import Contactos from "./Contactos";
 import About from "./About";
 import {GoogleMap, GoogleMapView, MapWithControlledZoom} from "./MapTest";
+import SubmitOcccurrence from "./SubmitOccurrence";
 
 
 class Body extends Component{
@@ -23,8 +24,9 @@ class Body extends Component{
                         <Route path="/map" component={MapView}/>
                         <Route exact path="/" component={Home}/>
                         <Route path="/mapTest" component = {MapWithControlledZoom}/>
-                        <Router path="/about" component={About}/>
+                        <Route path="/about" component={About}/>
                         <Route path="/contact" component={Contactos}/>
+                        <Route path="/submitOccurrence" component={SubmitOcccurrence}/>
                     </div>
                 </div>
             </Router>
