@@ -92,7 +92,9 @@ public class BackEndResource extends HttpServlet {
 			return Response.status(Status.FORBIDDEN).entity("Username").build(); 
 		} catch (EntityNotFoundException e) {
 			Entity user = new Entity("UserAdmin", info.username);
-			user.setProperty("password", info.password);
+			user.setProperty("password", DigestUtils.sha512Hex(info.password));
+			user.setProperty("adminPermission", info.registerUsername);
+			user.setProperty("creationTime", new Date());
 			datastore.put(txn,user);
 			LOG.info("Admin registered " + info.username);
 			txn.commit();
@@ -116,10 +118,12 @@ public class BackEndResource extends HttpServlet {
 		Key userKey = KeyFactory.createKey("User", session.username);
 		try {
 			LOG.info("Attempt to get user: " + session.username);
-			Entity user = datastore.get(userKey);
-			if(!user.getProperty("role").equals(UserRoles.ADMIN.toString()))
+			Entity userN = datastore.get(userKey);
+			if(!userN.getProperty("role").equals(UserRoles.ADMIN.toString()))
 				return Response.status(Status.FORBIDDEN).build();
 			LOG.info("Got user");
+			Key adminUserKey = KeyFactory.createKey("UserAdmin", session.username);
+			Entity user = datastore.get(adminUserKey);
 			if(!user.getProperty("TokenKey").equals(session.tokenId))
 				return Response.status(Status.FORBIDDEN).build();
 			Key timeoutKey = KeyFactory.createKey("timeout", session.username);
@@ -160,29 +164,35 @@ public class BackEndResource extends HttpServlet {
 		LOG.info("Attempt to login admin user: " + data.username);
 
 		Transaction txn = datastore.beginTransaction();
-		Key userKey = KeyFactory.createKey("User", data.username);
+		Key userKey = KeyFactory.createKey("UserAdmin", data.username);
 		try {
 			Entity user = datastore.get(userKey);
-			if(!user.getProperty("role").equals(UserRoles.ADMIN.toString()))
-				return Response.status(Status.FORBIDDEN).build();
+			LOG.info("Got AdminUser");
 			// Obtain the user login statistics
-			Query ctrQuery = new Query("UserStats").setAncestor(userKey);
+			Query ctrQuery = new Query("AdminUserStats").setAncestor(userKey);
 			List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
 			Entity ustats = null;
-			if (results.isEmpty()) {
+			LOG.info("Logging stats");
+			if(results != null) {
+				if (results.isEmpty()) {
+					ustats = new Entity("UserStats", user.getKey());
+					ustats.setProperty("user_stats_logins", 0L);
+					ustats.setProperty("user_stats_failed", 0L);
+				} else {
+					ustats = results.get(0);
+				}
+			}else {
 				ustats = new Entity("UserStats", user.getKey());
 				ustats.setProperty("user_stats_logins", 0L);
 				ustats.setProperty("user_stats_failed", 0L);
-			} else {
-				ustats = results.get(0);
 			}
 
-			String hashedPWD = (String) user.getProperty("user_pwd");
+			String hashedPWD = (String) user.getProperty("password");
 			if (hashedPWD.equals(DigestUtils.sha512Hex(data.password))) {
 				// Password correct
-
+				LOG.info("Constructing logs");
 				// Construct the logs
-				Entity log = new Entity("UserLog", user.getKey());
+				Entity log = new Entity("AdminUserLog", user.getKey());
 				log.setProperty("user_login_ip", request.getRemoteAddr());
 				log.setProperty("user_login_host", request.getRemoteHost());
 				log.setProperty("user_login_latlon", headers.getHeaderString("X-AppEngine-CityLatLong"));
@@ -197,7 +207,7 @@ public class BackEndResource extends HttpServlet {
 				// Batch operation
 				List<Entity> logs = Arrays.asList(log, ustats);
 				datastore.put(txn, logs);
-				
+				LOG.info("Put logs");
 				// Return token
 				AuthToken token = new AuthToken();
 				token.setUsername(data.username);

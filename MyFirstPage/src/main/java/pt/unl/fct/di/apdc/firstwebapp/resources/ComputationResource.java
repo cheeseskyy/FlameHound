@@ -62,16 +62,19 @@ public class ComputationResource {
 			return Response.status(Status.FORBIDDEN).build();
 		}
 		Transaction txn = datastore.beginTransaction();
+		Transaction txn2 = datastore.beginTransaction();
 		Key userKey = KeyFactory.createKey("User", session.username);
 		try {
 			LOG.info("Attempt to get user: " + session.username);
 			Entity user = datastore.get(userKey);
 			LOG.info("Got user");
-			if(!user.getProperty("TokenKey").equals(session.tokenId))
+			if(!user.getProperty("TokenKey").equals(session.tokenId)) {
+				txn.commit();
+				txn2.commit();
 				return Response.status(Status.FORBIDDEN).build();
+			}
 			Key timeoutKey = KeyFactory.createKey("timeout", session.username);
-			txn.commit();
-			Transaction txn2 = datastore.beginTransaction();
+			
 			Entity timeout = datastore.get(txn2, timeoutKey);
 			long lastOp = (long) timeout.getProperty("lastOp");
 			if(System.currentTimeMillis() - lastOp > 10*60*1000) {
@@ -90,10 +93,13 @@ public class ComputationResource {
 			return Response.ok().build();
 		}catch (EntityNotFoundException e) {
 			LOG.warning("Failed to locate username: " + session.username);
+			txn.rollback();
+			txn2.rollback();
 			return Response.status(Status.FORBIDDEN).build();
 		} finally {
-			if (txn.isActive()) {
+			if (txn.isActive() || txn2.isActive()) {
 				txn.rollback();
+				txn2.rollback();
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
 		}

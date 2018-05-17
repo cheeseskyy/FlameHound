@@ -27,7 +27,7 @@ public class OccurrencyManagement {
 	
 	public Response confirmOccurrency(DatastoreService datastore, String ocID, Logger LOG) {
 		Transaction txn = datastore.beginTransaction();
-		Key ocKey = KeyFactory.createKey("Ocurrency", ocID);
+		Key ocKey = KeyFactory.createKey("Occurrency", ocID);
 		try {
 			LOG.info("Attempt to get ocurrency: " + ocID);
 			Entity occurrency = datastore.get(txn, ocKey);
@@ -50,7 +50,7 @@ public class OccurrencyManagement {
 	public Response deleteOccurrency(DatastoreService datastore, String ocID, Logger LOG) {
 		LOG.info("Deleting occurrency with id: " + ocID);
 		Transaction txn = datastore.beginTransaction();
-		Key ocKey = KeyFactory.createKey("Ocurrency", ocID);
+		Key ocKey = KeyFactory.createKey("Occurrency", ocID);
 		datastore.delete(ocKey);
 		txn.commit();
 		LOG.info("Occurrency Deleted");
@@ -60,7 +60,7 @@ public class OccurrencyManagement {
 	
 	public Response updateOccurrency(SessionInfo session, Entity user, DatastoreService datastore, String ocID, Logger LOG){
 		Transaction txn = datastore.beginTransaction();
-		Key ocKey = KeyFactory.createKey("Ocurrency", ocID);
+		Key ocKey = KeyFactory.createKey("Occurrency", ocID);
 		try {
 			LOG.info("Attempt to get ocurrency: " + ocID);
 			Entity occurrency = datastore.get(txn, ocKey);

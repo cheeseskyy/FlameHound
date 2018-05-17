@@ -37,7 +37,7 @@ public class RegisterData {
 		if(field.isEmpty()) {
 			System.out.println("empty: " + field);
 		}
-		return !field.isEmpty();
+		return field.isEmpty();
 	}
 
 	public String validRegistration() {
