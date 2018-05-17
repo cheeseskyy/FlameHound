@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import {BrowserRouter as Router, Route, Link} from "react-router-dom";
+import {BrowserRouter as Router, Route, Link, Switch} from "react-router-dom";
 import {RegisterForm, LoginForm} from "./Forms";
-import logo from "./imagens/FlameHound Logo.png";
+import logo from "./imagens/FlameHound Logo with Transparency@2x.png";
+import mapLogo from "./imagens/FlameHound Logo with Orange Background@2x.png";
 
 function log(text) {
     console.log(text);
@@ -36,7 +37,10 @@ class NavPanel extends Component {
             <Router>
                 <div id="NavPanel" className="Column">
                     <div className="logo">
-                        <div id="image"><img src={logo} alt="company logo"/></div>
+                        <Switch>
+                            <Route path="/map"><div id="image"><img src={mapLogo} alt="company logo"/></div></Route>
+                            <Route path="/"><div id="image"><img src={logo} alt="company logo"/></div></Route>
+                        </Switch>
                     </div>
                     <nav>
                         <Route exact path="/"
