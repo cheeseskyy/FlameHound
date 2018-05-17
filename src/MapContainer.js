@@ -1,18 +1,14 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom'
 
-var googleMap;
+let googleMap;
+let globalGoogle;
+
+let showingMarker = false;
+let marker;
+let infoWindow;
 
 export default class MapContainer extends Component {
-
-    addMarker0() {
-        new this.maps.Marker({
-            position: {lat: 40.7143033, lng: -74.0036919},
-            map: this.map,
-            title: "bleh"
-        });
-        console.log("new marker0!");
-    }
 
     constructor(props) {
         super();
@@ -60,15 +56,25 @@ export default class MapContainer extends Component {
             })
             this.map = new maps.Map(node, mapConfig); // creates a new Google map on the specified node (ref='map') with the specified configuration set above.
             googleMap = this.map;
+            globalGoogle = this.google;
 
 
-            const addMarkerFunc = this.addMarker;
+            this.map.addListener('click', function(e) {
+                if (!showingMarker) {
+                    infoWindow = new globalGoogle.maps.InfoWindow({
+                        content: '<a href="/submitOccurrence">Submit Occurrence?</a>'
+                    });
+                    marker = new maps.Marker({
+                        position: e.latLng,
+                        map: googleMap
+                    });
 
-            this.map.addListener('click', function(e){
-                new maps.Marker({
-                    position: e.latLng,
-                    map: googleMap
-                });
+                    infoWindow.open(googleMap, marker);
+                    showingMarker = true;
+                } else {
+                    showingMarker = false;
+                    marker.setMap(null);
+                }
                 console.log("Added empty marker: lat = " + e.latLng)
             });
 
@@ -97,7 +103,7 @@ export default class MapContainer extends Component {
         }
 
         return ( // in our return function you must return a div with ref='map' and style.
-            <div ref="map" style={style} onClick={() => this.addMarker("bleh", 40.7143033, -74.0036919)}>
+            <div ref="map" style={style}>
                 loading map...
             </div>
         )
