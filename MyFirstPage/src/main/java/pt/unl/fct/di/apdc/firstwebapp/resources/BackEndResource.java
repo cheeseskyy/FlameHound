@@ -150,8 +150,8 @@ public class BackEndResource extends HttpServlet {
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
 		}
-		
 	}
+	
 	@POST
 	@Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
