@@ -138,6 +138,7 @@ export class LoginForm extends Component {
 
 
     render() {
+
         return (
             <Router>
                 <div className="loginForm">
@@ -161,9 +162,6 @@ export class LoginForm extends Component {
     }
 }
 
-export class OccurrenceForm extends Component{
-
-}
 
 function login() {
     console.log("Function login called");
@@ -193,3 +191,52 @@ function login() {
         }
     };*/
 }
+
+export class OccurrenceForm extends Component{
+
+    tipsPanel = <div className="Column">
+        ighoijhuolkjoikl
+    </div>;
+
+
+
+    render() {
+
+        return (
+            <Router>
+                <div className="ocurrenceform">
+                    <div id="xpto" className="Column">
+                        <h3>Please fill in the form below to submit an occurrence</h3><br/>
+
+                        <label htmlFor="title"><b>Title</b></label><br/>
+                        <input type="text" size="40" placeholder="Enter a title" id="title3" required></input><br/>
+                        <br/>
+
+                        <label htmlFor="description"><b>Description</b></label><br/>
+                        <input type="text"  size="40" placeholder="Describe the occurrence"  id="description"
+                               required></input><br/>
+                        <br/>
+
+                        <label htmlFor="location"><b>Location</b></label><br/>
+                        <input type="text" size="40" placeholder="Enter the location" id="location"
+                               required></input><br/>
+                        <br/>
+
+                        <label htmlFor="type"><b>Type</b></label><br/>
+                        <input type="text" size="40"  placeholder="Enter the type" id="type" required></input><br/>
+                        <br/><br/>
+
+                        <input type="file" placeholder="Submit an image" id="image" required></input><br/>
+                        <br/><br/>
+
+                        <button type="button" onClick="saveOc()">Submit</button>
+                    </div>
+                    {this.tipsPanel}
+                </div>
+            </Router>
+
+        );
+    }
+
+}
+

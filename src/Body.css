@@ -102,14 +102,6 @@ a:active {
     direction: rtl;
 }
 
-#title{
-    position: fixed;
-    top: 0;
-    font-size: 5em;
-    font-weight: bold;
-    text-align: center;
-    width: 85vw;
-}
 
 #title1{
     border-style: double;
@@ -146,3 +138,14 @@ a:active {
     display: inline-block;
 }
 
+#xpto {
+    display: inline-block;
+    align-items: center;
+    text-align: center;
+    width: 50%;
+}
+
+#description{
+
+    padding: 25px;
+}
