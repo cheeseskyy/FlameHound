@@ -49,15 +49,15 @@ public class ComputationResource {
 	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private static final DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
-	
-	public ComputationResource() {} //nothing to be done here
-	
-	
+
+	public ComputationResource() {
+	} // nothing to be done here
+
 	@POST
 	@Path("/validLogin")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response validLogin(SessionInfo session) {
-		if(session.tokenId.equals("0")) {
+		if (session.tokenId.equals("0")) {
 			LOG.warning("User is not logged in");
 			return Response.status(Status.FORBIDDEN).build();
 		}
@@ -68,16 +68,20 @@ public class ComputationResource {
 			LOG.info("Attempt to get user: " + session.username);
 			Entity user = datastore.get(userKey);
 			LOG.info("Got user");
-			if(!user.getProperty("TokenKey").equals(session.tokenId)) {
+			if (!user.getProperty("TokenKey").equals(session.tokenId)) {
+				LOG.info("Wrong token for user " + session.username);
 				txn.commit();
 				txn2.commit();
 				return Response.status(Status.FORBIDDEN).build();
 			}
+			LOG.info("Correct token for use " + session.username);
+
 			Key timeoutKey = KeyFactory.createKey("timeout", session.username);
-			
+
 			Entity timeout = datastore.get(txn2, timeoutKey);
 			long lastOp = (long) timeout.getProperty("lastOp");
-			if(System.currentTimeMillis() - lastOp > 10*60*1000) {
+			if (System.currentTimeMillis() - lastOp > 10 * 60 * 1000) {
+				LOG.info("Timed out");
 				user.setProperty("TokenExpirationDate", "");
 				user.setProperty("TokenCreationDate", "");
 				user.setProperty("TokenKey", 0);
@@ -86,32 +90,33 @@ public class ComputationResource {
 				txn2.commit();
 				return Response.status(Status.FORBIDDEN).build();
 			}
+			LOG.info("Didn't time out");
 			timeout.setProperty("lastOp", System.currentTimeMillis());
 			datastore.put(txn2, timeout);
 			txn.commit();
 			txn2.commit();
 			return Response.ok().build();
-		}catch (EntityNotFoundException e) {
+		} catch (EntityNotFoundException e) {
 			LOG.warning("Failed to locate username: " + session.username);
 			txn.rollback();
 			txn2.rollback();
 			return Response.status(Status.FORBIDDEN).build();
 		} finally {
 			if (txn.isActive() || txn2.isActive()) {
+				LOG.info("Transactions still active");
 				txn.rollback();
 				txn2.rollback();
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
 		}
-		
+
 	}
-	
+
 	@GET
 	@Path("/time")
 	public Response getCurrentTime() {
 		LOG.fine("Replying to date request.");
 		return Response.ok().entity(g.toJson(fmt.format(new Date()))).build();
 	}
-	
-	
+
 }
