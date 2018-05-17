@@ -20,17 +20,18 @@ class Home extends Component{
             <div style={style} className="Column">
                 <div style={estilo}>
                     <h1>FlameHound</h1>
-
-                    <div id ="text">
-                        <p> Todos nós sabemos como os incêndios assolaram Portugal no ano de 2017, com um registo mortal enorme, nunca antes visto, neste tipo de ocorrências.</p>
-                        <p> O nosso objectivo é erradicar estes acontecimentos, nunca os esquecendo mas sim utilizando-os como motor para o desenvolvimento deste projecto.</p>
-                        <p> Uma actuação rápida, sem burocracia, e de cómodo uso.</p>
-                        <p> Uma aplicação/página web, que promova o sentido comunitário, a entre ajuda na prevenção e na luta contra o desflorestamento do nosso país.</p>
-                        <p> Deste modo promovemos uma nova ferramenta que entidades podem utilizar ou mesmo, no futuro, promover.</p>
+                        <div id ="text">
+                         ​​​​​​<p>A nossa missão é facilitar a <b>Prevenção de Incêndios</b>, ajudar o país e as pessoas e contribuir para que o sistema funcione melhor para todos nós.</p>
+                            <div style={style}>
+                                ​​​​​​<ul><b>Integridade:</b> Honrar compromissos.</ul>
+                                <ul><b>Compreensão:</b> Pomo-nos na pele dos nossos clientes e dos nossos colaboradores.</ul>
+                                <ul><b>Relacionamento​:</b> Construir confiança apostando na colaboração.</ul>
+                                <ul><b>Inovação:</b> Inventar o futuro, aprender com o passado.​</ul>
+                                <ul><b>Desempenho:</b> Demonstrar excelência em tudo o que fazemos.</ul>
+                            </div>
                     </div>
-
                     <br/>
-                    <h2 id = "title1">Com a sua ajuda, conseguimos farejar os fogos!</h2>
+                    <h2 id = "title1">Com a sua ajuda, conseguimos farejar os fogos e desta forma prevenir!</h2>
                     <br/>
                 </div>
             </div>
