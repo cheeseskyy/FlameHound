@@ -115,15 +115,24 @@ public class OccurrencyResource extends HttpServlet{
 	@PUT
 	@Path("/updateOccurrency/{ocID}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateOccurrency(List<String> params, @PathParam("ocID") String ocID){
+	public Response updateOccurrency(SessionInfo session, @PathParam("ocID") String ocID){
+		Response r = checkIsLoggedIn(session);
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return Response.status(Status.FORBIDDEN).build();
+		Entity user = (Entity) r.getEntity();
 		Transaction txn = datastore.beginTransaction();
 		Key ocKey = KeyFactory.createKey("Ocurrency", ocID);
 		try {
 			LOG.info("Attempt to get ocurrency: " + ocID);
 			Entity occurrency = datastore.get(txn, ocKey);
 			LOG.info("Got occurrency");
-			txn.commit();
-			Iterator<String> it = params.iterator();
+			if(!occurrency.getProperty("user").equals(session.username)) {
+				txn.commit();
+				Response.status(Status.FORBIDDEN).build();
+			}
+			
+			@SuppressWarnings("unchecked")
+			Iterator<String> it = ((List<String>) session.getArgs().get(0)).iterator();
 			while(it.hasNext()) {
 				String param = it.next();
 				String[] line = param.split(":");
