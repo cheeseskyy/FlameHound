@@ -8,12 +8,17 @@ class Home extends Component{
 
         const style = {
             'text-align': 'center',
-            width: '84vw'
-        }
+            width: '84vw',
+            whiteSpace: 'nowrap'
+
+        };
+        const estilo ={
+            display: 'inline-block'
+        };
       return(
 
             <div style={style} className="Column">
-                <div>
+                <div style={estilo}>
                     <h1>FlameHound</h1>
 
                     <div id ="text">

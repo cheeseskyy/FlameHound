@@ -5,7 +5,7 @@ import NavPanel from "./NavPanel";
 
 
 import './Body.css';
-import {RegisterForm} from "./Forms";
+import {OccurrenceForm, RegisterForm} from "./Forms";
 import Home from "./Home";
 import Contactos from "./Contactos";
 import About from "./About";
@@ -23,7 +23,7 @@ class Body extends Component{
                         <Route path="/map" component={MapView}/>
                         <Route path="/about" component={About}/>
                         <Route path="/contact" component={Contactos}/>
-                        <Route path="/submitOccurrence" component={SubmitOcccurrence}/>
+                        <Route path="/submitOccurrence" component={OccurrenceForm}/>
                         <Route exact path="/" component={Home}/>
 
                     </div>
