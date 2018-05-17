@@ -4,12 +4,6 @@ import {RegisterForm, LoginForm} from "./Forms";
 import logo from "./imagens/FlameHound Logo with Transparency@2x.png";
 import mapLogo from "./imagens/FlameHound Logo with Orange Background@2x.png";
 
-function log(text) {
-    console.log(text);
-}
-
-const loginLinks = {}
-
 class NavPanel extends Component {
     logout(){
 
