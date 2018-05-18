@@ -27,8 +27,6 @@ class NavPanel extends Component {
     render() {
 
         return (
-
-            <Router>
                 <div id="NavPanel" className="Column">
                     <Link to="/">
                         <div className="logo">
@@ -59,15 +57,14 @@ class NavPanel extends Component {
                                        <div>
                                            <p><Link to="/login">Login </Link></p>
                                            <p><Link to="/register">Register</Link></p>
-                                           <a href="/about">About</a> <br/><br/>
-                                           <a href="/contact">Contact</a>
+                                           <p><Link to="/about">About</Link></p>
+                                           <Link to="/contact">Contact</Link>
                                        </div>
                                    }
                             />
                         </Switch>
                     </nav>
                 </div>
-            </Router>
 
         );
     }
