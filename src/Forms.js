@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {BrowserRouter as Router, Route, Link} from "react-router-dom";
+import {OccurrenceTips} from "./TipsPanels";
 
 export class RegisterForm extends Component {
     register(){
@@ -230,8 +231,10 @@ export class OccurrenceForm extends Component{
                         <br/><br/>
 
                         <button type="button" onClick="saveOc()">Submit</button>
+
+                        <button onClick={this.props.history.goBack}>Back</button>
                     </div>
-                    {this.tipsPanel}
+                    <OccurrenceTips/>
                 </div>
             </Router>
 

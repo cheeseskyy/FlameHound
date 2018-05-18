@@ -30,12 +30,14 @@ class NavPanel extends Component {
 
             <Router>
                 <div id="NavPanel" className="Column">
-                    <div className="logo">
-                        <Switch>
-                            <Route path="/map"><div id="image"><img src={mapLogo} alt="company logo"/></div></Route>
-                            <Route path="/"><div id="image"><img src={logo} alt="company logo"/></div></Route>
-                        </Switch>
-                    </div>
+                    <Link to="/">
+                        <div className="logo">
+                            <Switch>
+                                <Route path="/map"><div id="image"><img src={mapLogo} alt="company logo"/></div></Route>
+                                <Route path="/"><div id="image"><img src={logo} alt="company logo"/></div></Route>
+                            </Switch>
+                        </div>
+                    </Link>
                     <nav>
                         <Switch>
                         <Route path="/register" component={RegisterForm}/>

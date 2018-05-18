@@ -149,3 +149,8 @@ a:active {
 
     padding: 25px;
 }
+
+.TipsPanel{
+    border-left: black solid;
+    height: 100vh;
+}
