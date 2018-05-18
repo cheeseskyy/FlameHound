@@ -23,9 +23,13 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 
 
 import org.json.JSONException;
@@ -109,7 +113,8 @@ public class Register extends AppCompatActivity implements LoaderCallbacks<Curso
         String password = mPasswordView.getText().toString();
         String confirmation = mPasswordConfirmationView.getText().toString();
 
-        boolean cancel = false;
+        boolean cancel;
+        cancel = false;
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
@@ -139,7 +144,7 @@ public class Register extends AppCompatActivity implements LoaderCallbacks<Curso
             // perform the user login attempt.
             showProgress(true);
             mAuthTask = new UserRegisterTask(name, username, email, address, password,confirmation);
-            mAuthTask.execute((Void) null);
+            mAuthTask.doInBackground();
         }
     }
 
@@ -233,7 +238,7 @@ public class Register extends AppCompatActivity implements LoaderCallbacks<Curso
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserRegisterTask extends AsyncTask<Void, Void,JSONObject> {
+    public class UserRegisterTask {
 
         private final String mName;
         private final String mUsername;
@@ -241,7 +246,6 @@ public class Register extends AppCompatActivity implements LoaderCallbacks<Curso
         private final String mAddress;
         private final String mPassword;
         private final String mPasswordConfirmation;
-        private JSONObject finalResponse;
 
         UserRegisterTask(String name, String username, String email, String address, String password, String confirmation) {
             mName = name;
@@ -250,11 +254,9 @@ public class Register extends AppCompatActivity implements LoaderCallbacks<Curso
             mAddress = address;
             mPassword = password;
             mPasswordConfirmation = confirmation;
-            finalResponse = null;
         }
 
-        @Override
-        protected JSONObject doInBackground(Void... params) {
+        private void  doInBackground() {
             Map<String, String> jsonObjParam = new HashMap();
             jsonObjParam.put("name",mName);
             jsonObjParam.put("username", mUsername);
@@ -269,65 +271,57 @@ public class Register extends AppCompatActivity implements LoaderCallbacks<Curso
             jsonObjParam.put("confirmation", mPasswordConfirmation);
             JSONObject jsonObject = new JSONObject(jsonObjParam);
             setProgressBarVisibility(true);
-            RegisterRequest jsonRequest = new RegisterRequest(Request.Method.POST, URL_SERVER + "/register/v3", jsonObject, new Response.Listener<JSONObject>() {
+            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL_SERVER + "/register/v3", jsonObject, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                        finalResponse = response;
+                    onPostExecute();
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     error.printStackTrace();
-                    onCancelled();
+                    onCancelled(error);
                 }
             });
             VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonRequest);
             setProgressBarVisibility(false);
-            return finalResponse;
         }
 
 
-        @Override
-        protected void onPreExecute() {
+        private boolean onPreExecute() {
             ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Activity.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
             if (networkInfo == null || !networkInfo.isConnected() ||
                     (networkInfo.getType() != ConnectivityManager.TYPE_WIFI
                             && networkInfo.getType() != ConnectivityManager.TYPE_MOBILE)) {
-                cancel(true);
+                return true;
             }
+            return false;
         }
 
-        protected void onPostExecute(final JSONObject  finalResponse) {
-        int statusCode;
-        mAuthTask = null;
-        showProgress(false);
+        private void onPostExecute() {
+            mAuthTask = null;
+            showProgress(false);
+            finish();
+            Intent it = new Intent(Register.this, LoginActivity.class);
+            startActivity(it);
+        }
 
-        try {
-            statusCode = (int) finalResponse.get("statusCode");
-            if (statusCode == 200) {
-                finish();
-                Intent it = new Intent(Register.this, LoginActivity.class);
-                startActivity(it);
-            } else if(statusCode == 405) {
+        private void onCancelled(Exception e) {
+            mAuthTask = null;
+            showProgress(false);
+            if (e instanceof ServerError) {
+                mNameView.setError(getString(R.string.required_params));
+                mNameView.requestFocus();
+            }else if(e instanceof AuthFailureError){
                 mUserNameView.setError(getString(R.string.userName_Email_used));
+                mEmailView.setError(getString(R.string.userName_Email_used));
                 mUserNameView.requestFocus();
-            }else if (statusCode == -1) {
-                onCancelled();
+            } else if (e instanceof ParseError) {
+                System.out.println("Erro sv");
             }
-        }catch (JSONException e ){
-            onCancelled();
         }
     }
-
-    @Override
-    protected void onCancelled() {
-        mAuthTask = null;
-        showProgress(false);
-        mPasswordView.setError(getString(R.string.unable_to_register));
-        mPasswordView.requestFocus();
-    }
-}
 }
 
 
