@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -21,6 +22,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
@@ -33,28 +36,55 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.util.ArrayList;
 
 
 public class HomePage extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, OnMyLocationButtonClickListener,
+        implements OnMapReadyCallback, OnMyLocationButtonClickListener,
         OnMyLocationClickListener, OnRequestPermissionsResultCallback {
 
     private static final int MY_LOCATION_REQUEST_CODE = 99;
     private GoogleMap map;
     private FusedLocationProviderClient Client;
+    private ArrayList<LatLng> latlngs = new ArrayList<>();
+    private Toolbar bottomToolbar;
+    private ImageView Occorrences;
+    private ImageView Trending;
+
+    private int counter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
-
+        latlngs.add(new LatLng(37.4517, -122.184));
         MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
         mapFragment.getMapAsync(this);
         Client = LocationServices.getFusedLocationProviderClient(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Occorrences = (ImageView) findViewById(R.id.myOccorrences) ;
+        Trending = (ImageView) findViewById(R.id.trending);
+
+        Occorrences.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(HomePage.this, OccurrenceListActivity.class);
+                startActivity(it);
+            }
+        });
+        Trending.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(HomePage.this, OccurrenceListActivity.class);
+                startActivity(it);
+            }
+        });
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -65,19 +95,18 @@ public class HomePage extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        /*DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+        */
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+
 
 
     }
-
-
+    /*
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -87,7 +116,7 @@ public class HomePage extends AppCompatActivity
             super.onBackPressed();
         }
     }
-
+    */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -109,7 +138,7 @@ public class HomePage extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
-
+    /**
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -122,7 +151,7 @@ public class HomePage extends AppCompatActivity
 
         } /*else if (id == R.id.nav_slideshow) {
 
-        }*/ else if (id == R.id.contacts) {
+        } else if (id == R.id.contacts) {
 
         } else if (id == R.id.nav_share) {
 
@@ -133,11 +162,15 @@ public class HomePage extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+
     }
+    */
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -147,10 +180,25 @@ public class HomePage extends AppCompatActivity
                     MY_LOCATION_REQUEST_CODE);
         }
         else {
-            initMapInDeviceCoord();
+            if(counter < 1) {
+                initMapInDeviceCoord();
+                counter++;
+            }
+            else {
 
+            }
         }
 
+        for (int i = 0; i < latlngs.size(); i++) {
+
+            LatLng newMarker = latlngs.get(i);
+            MarkerOptions initialMarkerOptions = new MarkerOptions();
+            initialMarkerOptions.position(newMarker);
+            initialMarkerOptions.title("Mockup Marker");
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(newMarker, 10));
+            map.addMarker(initialMarkerOptions);
+
+        }
         // Add a marker in Sydney and move the camera
         /*LatLng sydney = new LatLng(-34, 151);
         map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
@@ -174,19 +222,23 @@ public class HomePage extends AppCompatActivity
 
                 // Clears the previously touched position
                 //map.clear();
-
-
-                //falta o if se foi criada uma ocorrência (confirmação via Rest adicionar o marker;
-
                 // Animating to the touched position
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 10));
 
                 // Placing a marker on the touched position
                 map.addMarker(markerOptions);
 
+                latlngs.add(point);
+
+
+
+                //falta o if se foi criada uma ocorrência (confirmação via Rest adicionar o marker;
+
                 Intent it = new Intent(HomePage.this, RegistarOcorrencia.class);
                 it.putExtra("Loc", x);
                 startActivity(it);
+
+
             }
         });
 

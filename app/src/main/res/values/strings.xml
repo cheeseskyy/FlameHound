@@ -43,5 +43,7 @@
     <string name="unable_to_register">Register Failed</string>
     <string name="userName_Email_used">Username or email already in use.</string>
     <string name="title_activity_register">Sign Up</string>
+    <string name="title_occurence_list">Occurences</string>
+    <string name="title_occurence_detail">Occurence Detail</string>
 
 </resources>
