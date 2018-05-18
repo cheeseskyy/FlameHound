@@ -6,11 +6,37 @@ import MapContainer from './MapContainer';
 import Occurrences from "./OccurrenceList";
 import "./MapView.css";
 
-function consoleLog(){
-    console.log("message");
-}
-
 class MapView extends Component{
+
+    isLoggedIn(){
+        console.log("checking for login");
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "rest/utils/validLogin", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        let username = sessionStorage.getItem('sessionUsername');
+        let token = sessionStorage.getItem('sessionToken');
+        console.log("username: " + username + "token: "+ token);
+        let jsonObj = JSON.stringify({
+            'username': username,
+            'tokenId': token
+        });
+        xhttp.send(jsonObj);
+        xhttp.onreadystatechange = function() {
+            if (xhttp.readyState == 4) {
+                if (xhttp.status == 200) {
+                    console.log("user is logged in");
+                } else if (xhttp.status == 403 || xhttp.status == 500) {
+                    alert("You're not logged in, please do so.");
+                    window.location.replace("/");
+                }
+            }
+
+        };
+        if(xhttp.status == 500){
+            alert("You're not logged in, please do so.");
+            window.location.replace("/");
+        }
+    }
 
     consolelog(){
         console.log("this");
@@ -22,6 +48,8 @@ class MapView extends Component{
             height: '100vh', // 75vh similarly will take up roughly 75% of the height of the screen. px also works.
             zIndex: '1'
         }
+
+        this.isLoggedIn();
 
         return (
             <div>
