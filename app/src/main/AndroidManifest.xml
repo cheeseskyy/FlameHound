@@ -72,8 +72,8 @@
                 android:value="com.example.hvale.loginapp.LoginActivity" />
         </activity>
         <activity
-            android:name=".RegistarOcorrencia"
-            android:label="@string/title_activity_registar_ocorrencia"
+            android:name=".RegistOccurrence"
+            android:label="@string/title_activity_regist_occurrence"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Register"
@@ -83,7 +83,7 @@
             android:label="@string/title_occurence_list"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
-            android:name=".OccurenceDetailActivity"
+            android:name=".OccurrenceDetailActivity"
             android:label="@string/title_occurence_detail"
             android:parentActivityName=".OccurrenceListActivity"
             android:theme="@style/AppTheme.NoActionBar">

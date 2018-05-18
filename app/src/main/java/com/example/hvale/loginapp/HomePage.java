@@ -6,24 +6,17 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback;
 import android.util.Log;
 import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
@@ -36,7 +29,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
@@ -90,7 +82,7 @@ public class HomePage extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent it = new Intent(HomePage.this, RegistarOcorrencia.class);
+                Intent it = new Intent(HomePage.this, RegistOccurrence.class);
                 startActivity(it);
             }
         });
@@ -234,7 +226,7 @@ public class HomePage extends AppCompatActivity
 
                 //falta o if se foi criada uma ocorrência (confirmação via Rest adicionar o marker;
 
-                Intent it = new Intent(HomePage.this, RegistarOcorrencia.class);
+                Intent it = new Intent(HomePage.this, RegistOccurrence.class);
                 it.putExtra("Loc", x);
                 startActivity(it);
 

@@ -6,9 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".RegistarOcorrencia"
+    tools:context=".RegistOccurrence"
     tools:layout_editor_absoluteY="205dp"
-    tools:showIn="@layout/activity_registar_ocorrencia">
+    tools:showIn="@layout/activity_regist_occurrence">
     app:layout_constraintTop_toTopOf="parent"
     tools:layout_constraintEnd_toEndOf="parent"
     tools:layout_constraintStart_toStartOf="parent">

@@ -16,12 +16,12 @@ import android.view.MenuItem;
  * item details are presented side-by-side with a list of items
  * in a {@link OccurrenceListActivity}.
  */
-public class OccurenceDetailActivity extends AppCompatActivity {
+public class OccurrenceDetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_occurence_detail);
+        setContentView(R.layout.activity_occurrence_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
 
@@ -53,9 +53,9 @@ public class OccurenceDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putString(OccurenceDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(OccurenceDetailFragment.ARG_ITEM_ID));
-            OccurenceDetailFragment fragment = new OccurenceDetailFragment();
+            arguments.putString(OccurrenceDetailFragment.ARG_ITEM_ID,
+                    getIntent().getStringExtra(OccurrenceDetailFragment.ARG_ITEM_ID));
+            OccurrenceDetailFragment fragment = new OccurrenceDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.occurence_detail_container, fragment)

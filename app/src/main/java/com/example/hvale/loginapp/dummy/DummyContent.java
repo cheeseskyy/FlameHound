@@ -25,6 +25,9 @@ public class DummyContent {
 
     private static final int COUNT = 25;
 
+    private static final String OCCURRENCE = "Occurrence description ";
+    private static final String OCCURRENCE_TITLE = "Occurrence's Title ";
+
     static {
         // Add some sample items.
         for (int i = 1; i <= COUNT; i++) {
@@ -38,7 +41,7 @@ public class DummyContent {
     }
 
     private static DummyItem createDummyItem(int position) {
-        return new DummyItem(String.valueOf(position), "Item " + position, makeDetails(position));
+        return new DummyItem(String.valueOf(OCCURRENCE_TITLE), OCCURRENCE + position, makeDetails(position));
     }
 
     private static String makeDetails(int position) {

@@ -22,7 +22,7 @@ import java.util.List;
  * An activity representing a list of Occurences. This activity
  * has different presentations for handset and tablet-size devices. On
  * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link OccurenceDetailActivity} representing
+ * lead to a {@link OccurrenceDetailActivity} representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
@@ -33,6 +33,7 @@ public class OccurrenceListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,16 +82,16 @@ public class OccurrenceListActivity extends AppCompatActivity {
                 DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
-                    arguments.putString(OccurenceDetailFragment.ARG_ITEM_ID, item.id);
-                    OccurenceDetailFragment fragment = new OccurenceDetailFragment();
+                    arguments.putString(OccurrenceDetailFragment.ARG_ITEM_ID, item.id);
+                    OccurrenceDetailFragment fragment = new OccurrenceDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
                             .replace(R.id.occurence_detail_container, fragment)
                             .commit();
                 } else {
                     Context context = view.getContext();
-                    Intent intent = new Intent(context, OccurenceDetailActivity.class);
-                    intent.putExtra(OccurenceDetailFragment.ARG_ITEM_ID, item.id);
+                    Intent intent = new Intent(context, OccurrenceDetailActivity.class);
+                    intent.putExtra(OccurrenceDetailFragment.ARG_ITEM_ID, item.id);
 
                     context.startActivity(intent);
                 }
@@ -108,7 +109,7 @@ public class OccurrenceListActivity extends AppCompatActivity {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.occurence_list_content, parent, false);
+                    .inflate(R.layout.occurrence_list_content, parent, false);
             return new ViewHolder(view);
         }
 
