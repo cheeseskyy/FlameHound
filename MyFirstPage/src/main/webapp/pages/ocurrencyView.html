@@ -23,7 +23,7 @@
 		var id = document.getElementById("imageID").value;
 		alert(id);
 		var xhttp = new XMLHttpRequest();
-	    xhttp.open("POST", "/rest/occurrency/getImage/png/" + id, true);
+	    xhttp.open("POST", "/rest/occurrency/getImage/"+extension+"/" + id, true);
 	    xhttp.setRequestHeader("Content-type", "application/json");
 	    var username = sessionStorage.getItem('sessionUsername');
 	    var token = sessionStorage.getItem('sessionToken');

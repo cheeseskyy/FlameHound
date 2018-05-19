@@ -3,6 +3,7 @@ package pt.unl.fct.di.apdc.firstwebapp.resources;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -163,17 +164,23 @@ public class OccurrencyResource extends HttpServlet{
 			LOG.info("Attempt to get user: " + session.username);
 			Entity user = datastore.get(userKey);
 			LOG.info("Got user");
-			if(!user.getProperty("TokenKey").equals(session.tokenId))
+			if(!user.getProperty("TokenKey").equals(session.tokenId)) {
+				txn.rollback();
 				return Response.status(Status.FORBIDDEN).build();
+			}
+			LOG.info("Updating timeout");
 			txn.commit();
 			txn = datastore.beginTransaction();
 			Key timeoutKey = KeyFactory.createKey("timeout", session.username);
 			Entity timeout = datastore.get(timeoutKey);
 			long lastOp = (long) timeout.getProperty("lastOp");
-			if(System.currentTimeMillis() - lastOp > 10*60*1000)
+			if(System.currentTimeMillis() - lastOp > 10*60*1000) {
+				txn.rollback();
 				return Response.status(Status.FORBIDDEN).build();
+			}
 			timeout.setProperty("lastOp", System.currentTimeMillis());
 			datastore.put(timeout);
+			LOG.info("User is logged in");
 			txn.commit();
 			return Response.ok(g.toJson(user)).build();
 		}catch (EntityNotFoundException e) {
@@ -200,13 +207,20 @@ public class OccurrencyResource extends HttpServlet{
 		LOG.info("Generating ID");
 		String uuid = Utilities.generateID();
 		try {
-			String[] coords = data.getLocation().substring(1, data.getLocation().length()-2).split(",");
+			LOG.info("Formatting coords");
+			
+			String aux = data.getLocation();
+			LOG.info(aux);
+			aux = aux.substring(2, aux.length()-2);
+			String[] coords = aux.split(", ");
+			LOG.info("Creating occurrency");
 			Entity occurrency = new Entity("Occurrency", uuid);
 			occurrency.setUnindexedProperty("title", data.getTitle());
 			occurrency.setUnindexedProperty("description", data.getDescription());
 			occurrency.setIndexedProperty("user", data.getUser());
-			occurrency.setProperty("locationLat", coords[0].substring(6).trim());
-			occurrency.setProperty("locationLong", coords[1].substring(6).trim());
+			
+			occurrency.setProperty("locationLat", coords[0].trim());
+			occurrency.setProperty("locationLong", coords[1].trim());
 			occurrency.setProperty("type", data.getType().toString());
 			occurrency.setProperty("creationTime", System.currentTimeMillis());
 			occurrency.setProperty("imagesID", data.getMediaURI());
@@ -214,7 +228,7 @@ public class OccurrencyResource extends HttpServlet{
 			LOG.info("Put Occurrency");
 			txn.commit();
 		}catch (Exception e) {
-			
+			LOG.warning(e.getMessage());
 		} finally {
 			if (txn.isActive()) {
 				txn.rollback();
@@ -228,7 +242,7 @@ public class OccurrencyResource extends HttpServlet{
 	@Path("/saveImage/{extension}")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response uploadFileDropbox(byte[] file, @PathParam("extension") String ext, @PathParam("ocID") String ocID) {
+	public Response uploadFileDropbox(byte[] file, @PathParam("extension") String ext) {
 		String uuid = Utilities.generateID();
 		Transaction txn = datastore.beginTransaction();
 		LOG.info("Uploading image");
@@ -249,30 +263,36 @@ public class OccurrencyResource extends HttpServlet{
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-		return Response.ok(g.toJson(uuid)).build();
+		return Response.ok(g.toJson(uuid+"."+ext)).build();
 	}
 	
 	@POST
-	@Path("getImage/{extension}/{imageID}")
+	@Path("getImage/{imageID}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public Response downloadFileDropbox(SessionInfo session, @PathParam("imageID") String imageID, @PathParam("extension") String ext){
+	public Response downloadFileDropbox(SessionInfo session, @PathParam("imageID") String imageID){
 		Response r = checkIsLoggedIn(session);
 		if(r.getStatus() != Response.Status.OK.getStatusCode())
 			return r;
 		byte[] file;
 		try {
-			file = dbIntegration.getFile(imageID, ext);
+			LOG.info("Getting image: " + imageID);
+			int point = imageID.indexOf('.');
+			String name = imageID.substring(0, point);
+			String ext = imageID.substring(name.length()+1);
+			file = dbIntegration.getFile(name, ext);
+			LOG.info("Found file");
 			if(file == null)
 				return Response.status(Status.NOT_FOUND).build();
 			
 		}catch(Exception e) {
+			LOG.warning(e.getMessage());
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 		return Response.ok(file).build();
 	}
 	
-	@GET
+	@POST
 	@Path("getOccurrency/{ocID}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -283,15 +303,32 @@ public class OccurrencyResource extends HttpServlet{
 			return r;
 		
 		Transaction txn = datastore.beginTransaction();
-		Key ocKey = KeyFactory.createKey("Ocurrency", ocurrencyID);
+		if(ocurrencyID.equals("all")) {
+			LOG.info("Got general request, querying all occurrencies");
+			Query q = new Query("Occurrency");
+			PreparedQuery pQ = datastore.prepare(q);
+			Iterator<Entity> it = pQ.asIterator();
+			LOG.info("Got all");
+			List<OccurrencyData> ocList = new ArrayList<OccurrencyData>();
+			LOG.info("Converting all to readable format");
+			while(it.hasNext()) {
+				ocList.add(convertOcToOcData(it.next()));
+			}
+			return Response.ok(g.toJson(ocList)).build();
+		}
+		
+		Key ocKey = KeyFactory.createKey("Occurrency", ocurrencyID);
 		try {
 			LOG.info("Attempt to get ocurrency: " + ocurrencyID);
 			Entity ocurrency = datastore.get(txn, ocKey);
 			LOG.info("Got ocurrency");
 			txn.commit();
-			return Response.ok(ocurrency).build();
+			LOG.info("Converting occurrency to readable format");
+			OccurrencyData oc = convertOcToOcData(ocurrency);
+			return Response.ok(g.toJson(oc)).build();
 		}catch (EntityNotFoundException e) {
 			LOG.warning("Failed to locate ocurrency: " + ocurrencyID);
+			txn.rollback();
 			return Response.status(Status.NOT_FOUND).build();
 		} finally {
 			if (txn.isActive()) {
@@ -299,5 +336,18 @@ public class OccurrencyResource extends HttpServlet{
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private OccurrencyData convertOcToOcData(Entity ocurrency) {
+		String coordinates = ocurrency.getProperty("locationLat") + "," + ocurrency.getProperty("locationLong");
+		OccurrencyData oc = new OccurrencyData(
+				(String)ocurrency.getProperty("title"),
+				(String)ocurrency.getProperty("description"),
+				(String)ocurrency.getProperty("user"),
+				coordinates,
+				(String)ocurrency.getProperty("type"),
+				(List<String>) ocurrency.getProperty("imagesID"));
+		return oc;
 	}
 }
