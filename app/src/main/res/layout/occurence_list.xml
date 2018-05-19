@@ -6,8 +6,8 @@
     android:name="com.example.hvale.loginapp.OccurenceListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
+    android:layout_marginLeft="0dp"
+    android:layout_marginRight="0dp"
     app:layoutManager="android.support.v7.widget.LinearLayoutManager"
     tools:context=".OccurrenceListActivity"
     tools:listitem="@layout/occurrence_list_content" />
