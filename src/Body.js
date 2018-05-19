@@ -14,7 +14,12 @@ import SubmitOcccurrence from "./SubmitOccurrence";
 
 class Body extends Component {
 
+    constructor(props){
+        super(props);
+    }
+
     render() {
+
         return (
             <Router>
                 <div>

@@ -64,6 +64,9 @@ export default class MapContainer extends Component {
                     infoWindow = new globalGoogle.maps.InfoWindow({
                         content: '<a href="/submitOccurrence">Submit Occurrence?</a>'
                     });
+
+                    sessionStorage.setItem('selectedLocation', e.latLng);
+
                     marker = new maps.Marker({
                         position: e.latLng,
                         map: googleMap

@@ -1,27 +1,72 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 // import the Google Maps API Wrapper from google-maps-react
-import { GoogleApiWrapper } from 'google-maps-react'
+import {GoogleApiWrapper} from 'google-maps-react'
 // import child component
 import MapContainer from './MapContainer';
 import Occurrences from "./OccurrenceList";
 import "./MapView.css";
 
-class MapView extends Component{
+function getOcImage(id) {
+    //var id = document.getElementById("imageID").value;
+    alert(id);
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/getImage/gif/" + id, true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    var username = sessionStorage.getItem('sessionUsername');
+    var token = sessionStorage.getItem('sessionToken');
+    var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+    xhttp.responseType = "arraybuffer";
+    xhttp.send(jSonObj);
+    xhttp.onreadystatechange = function () {
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+            var arrayBufferView = new Uint8Array(xhttp.response);
+            var blob = new Blob([arrayBufferView], {type: "image/gif"});
+            var urlCreator = window.URL || window.webkitURL;
+            var imageUrl = urlCreator.createObjectURL(blob);
+            var img = document.getElementById("ItemPreview");
+            img.src = imageUrl;
+        }
+    };
+}
 
-    isLoggedIn(){
+function getOc(id) {
+    console.log("Getting OC");
+    var xhttp = new XMLHttpRequest();
+
+    xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/getOccurrency/" + id, true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+
+    var username = sessionStorage.getItem('sessionUsername');
+    var token = sessionStorage.getItem('sessionToken');
+    var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+
+    xhttp.send(jSonObj);
+    xhttp.onreadystatechange = function () {
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+            console.log("Good response");
+            var response = JSON.parse(xhttp.response);
+            console.log(response);
+            return response;
+        }
+    };
+}
+
+class MapView extends Component {
+
+    isLoggedIn() {
         console.log("checking for login");
         let xhttp = new XMLHttpRequest();
         xhttp.open("POST", "rest/utils/validLogin", true);
         xhttp.setRequestHeader("Content-type", "application/json");
         let username = sessionStorage.getItem('sessionUsername');
         let token = sessionStorage.getItem('sessionToken');
-        console.log("username: " + username + "token: "+ token);
+        console.log("username: " + username + "token: " + token);
         let jsonObj = JSON.stringify({
             'username': username,
             'tokenId': token
         });
         xhttp.send(jsonObj);
-        xhttp.onreadystatechange = function() {
+        xhttp.onreadystatechange = function () {
             if (xhttp.readyState == 4) {
                 if (xhttp.status == 200) {
                     console.log("user is logged in");
@@ -32,13 +77,13 @@ class MapView extends Component{
             }
 
         };
-        if(xhttp.status == 500){
+        if (xhttp.status == 500) {
             alert("You're not logged in, please do so.");
             window.location.replace("/");
         }
     }
 
-    consolelog(){
+    consolelog() {
         console.log("this");
     }
 
@@ -47,14 +92,19 @@ class MapView extends Component{
             width: '50vw', // 90vw basically means take up 90% of the width screen. px also works.
             height: '100vh', // 75vh similarly will take up roughly 75% of the height of the screen. px also works.
             zIndex: '1'
-        }
+        };
 
         this.isLoggedIn();
 
+        //const occurrence = getOc("555c69f5-17c1-493f-9493-f34ebb317b91");
+        //console.log(occurrence);
+
         return (
+
             <div>
+
                 <div style={style} className="Column">
-                    <MapContainer google={this.props.google}/>
+                    <MapContainer google={this.props.google} />
                 </div>
                 <Occurrences/>
             </div>

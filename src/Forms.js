@@ -2,6 +2,78 @@ import React, {Component} from 'react';
 import {BrowserRouter as Router, Route, Link} from "react-router-dom";
 import {OccurrenceTips} from "./TipsPanels";
 
+function uploadOc(mediaURI, username) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/saveOccurrency", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    getCodedAddress(document.getElementById("location").value, xhttp, mediaURI, username);
+
+    xhttp.onreadystatechange = function () {
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+            alert("Saved Occurrency");
+        }
+    };
+}
+
+function getCodedAddress(addr, xhttp, mediaURI, username) {
+    var list = [];
+    //list.append(mediaURI);
+    var jSonInfo = JSON.stringify({
+        "title": document.getElementById("title3").value,
+        "description": document.getElementById("description").value,
+        "user": username,
+        "location": JSON.stringify(sessionStorage.getItem("selectedLocation")),
+        "type": document.getElementById("type").value,
+        "mediaURI": [mediaURI]
+    });
+    xhttp.send(jSonInfo);
+}
+
+function saveOc() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/utils/validLogin", true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    var username = sessionStorage.getItem('sessionUsername');
+    var token = sessionStorage.getItem('sessionToken');
+    var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+    xhttp.send(jSonObj);
+    xhttp.onreadystatechange = function () {
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+            var fileInput = document.getElementById("imageFile");
+            var files = fileInput.files;
+
+            console.log(files);
+            let filesUploaded = true;
+            if (files != null) {
+                var file = files[0];
+                filesUploaded = false;
+                var extension = file.name.split(".")[1];
+                var reader = new FileReader();
+                var xhttp2 = new XMLHttpRequest();
+
+                reader.readAsArrayBuffer(file);
+                reader.onloadstart = console.log("Starting to read");
+                xhttp2.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/saveImage/" + extension, true);
+                xhttp2.setRequestHeader("Content-type", "application/octet-stream");
+                var uri;
+                reader.onloadend = function () {
+                    console.log("Sending file");
+                    var result = reader.result;
+                    xhttp2.send(result);
+                };
+                xhttp2.onreadystatechange = function () {
+                    if (xhttp2.readyState == 4 && xhttp.status == 200) {
+                        console.log(JSON.parse(xhttp2.response));
+                        uploadOc(JSON.parse(xhttp2.response), username);
+                    }
+                };
+            }
+            else
+                uploadOc("", username);
+        }
+    };
+}
+
 export class RegisterForm extends Component {
     register(){
         let userInfo = {"name": document.getElementById("name").value,
@@ -143,6 +215,7 @@ export class LoginForm extends Component {
         return (
             <Router>
                 <div className="loginForm">
+                    {console.log(this.props.match)}
                     <label htmlFor="uname"><b>Username</b></label><br/>
 
                     <input type="text" placeholder="Enter Username" name="uname" id="un" required></input><br/>
@@ -227,10 +300,10 @@ export class OccurrenceForm extends Component{
                         <input type="text" size="40"  placeholder="Enter the type" id="type" required></input><br/>
                         <br/><br/>
 
-                        <input type="file" placeholder="Submit an image" id="image" required></input><br/>
+                        <input type="file" placeholder="Submit an image" id="imageFile"></input><br/>
                         <br/><br/>
 
-                        <button type="button" onClick="saveOc()">Submit</button>
+                        <button type="button" onClick={saveOc}>Submit</button>
 
                         <button onClick={this.props.history.goBack}>Back</button>
                     </div>
