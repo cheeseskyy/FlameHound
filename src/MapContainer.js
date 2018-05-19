@@ -11,7 +11,7 @@ let infoWindow;
 export default class MapContainer extends Component {
 
     constructor(props) {
-        super();
+        super(props);
         this.state = {
             locations: []
         }
@@ -82,6 +82,8 @@ export default class MapContainer extends Component {
             });
 
 
+
+
             // ==================
             // ADD MARKERS TO MAP
             // ==================
@@ -89,13 +91,16 @@ export default class MapContainer extends Component {
                 name: "New York County Supreme Court",
                 location: {lat: 40.7143033, lng: -74.0036919}
             });*/
-            this.state.locations.forEach(location => { // iterate through locations saved in state
-                const marker = new google.maps.Marker({ // creates a new Google maps Marker object.
-                    position: {lat: location.location.lat, lng: location.location.lng}, // sets position of marker to specified location
+            /*this.props.markers.forEach(marker => { // iterate through locations saved in state
+
+                    const coord = marker.location.split("'");
+
+                    new google.maps.Marker({ // creates a new Google maps Marker object.
+                    position: {lat: coord.x, lng: coord.y}, // sets position of marker to specified location
                     map: this.map, // sets markers to appear on the map we just created on line 35
-                    title: location.name // the title of the marker is set to the name of the location
+                    title: marker.title // the title of the marker is set to the name of the location
                 });
-            });
+            });*/
         }
     }
 
@@ -107,6 +112,7 @@ export default class MapContainer extends Component {
 
         return ( // in our return function you must return a div with ref='map' and style.
             <div ref="map" style={style}>
+                {console.log("markers props: " + this.props.markers)}
                 loading map...
             </div>
         )

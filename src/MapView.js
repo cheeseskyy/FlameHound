@@ -29,11 +29,11 @@ function getOcImage(id) {
     };
 }
 
-function getOc(id) {
+function getOc() {
     console.log("Getting OC");
     var xhttp = new XMLHttpRequest();
 
-    xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/getOccurrency/" + id, true);
+    xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/getOccurrency/all", true);
     xhttp.setRequestHeader("Content-type", "application/json");
 
     var username = sessionStorage.getItem('sessionUsername');
@@ -43,15 +43,55 @@ function getOc(id) {
     xhttp.send(jSonObj);
     xhttp.onreadystatechange = function () {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
-            console.log("Good response");
             var response = JSON.parse(xhttp.response);
-            console.log(response);
             return response;
         }
     };
 }
 
 class MapView extends Component {
+
+    constructor(props){
+        super(props);
+        this.state = {
+            markers: [
+
+            ]
+        }
+    }
+
+    getOc() {
+        console.log("Getting OC");
+        var xhttp = new XMLHttpRequest();
+
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/getOccurrency/all", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        var response;
+        var func = this.setState;
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = function () {
+            if (xhttp.readyState == 4 && xhttp.status == 200) {
+                console.log("Got Occurrence");
+                response = JSON.parse(xhttp.response);
+                func({markers: response});
+                console.log(response);
+                return response;
+            }
+        };
+        this.setState({markers: response});
+        this.render();
+        console.log("response: " + response);
+    }
+
+
+    changeState(){
+
+    }
+
 
     isLoggedIn() {
         console.log("checking for login");
@@ -87,6 +127,11 @@ class MapView extends Component {
         console.log("this");
     }
 
+    componentDidMount(){
+        this.getOc();
+        console.log("state markers:" + this.state.markers);
+    }
+
     render() {
         const style = { // MUST specify dimensions of the Google map or it will not work. Also works best when style is specified inside the render function and created as an object
             width: '50vw', // 90vw basically means take up 90% of the width screen. px also works.
@@ -96,15 +141,16 @@ class MapView extends Component {
 
         this.isLoggedIn();
 
-        //const occurrence = getOc("555c69f5-17c1-493f-9493-f34ebb317b91");
-        //console.log(occurrence);
+        const response = this.getOc();
+        while(!response){
+            console.log("waiting for " + response);
+        }
 
         return (
 
             <div>
-
                 <div style={style} className="Column">
-                    <MapContainer google={this.props.google} />
+                    <MapContainer google={this.props.google} markers={this.state.markers} />
                 </div>
                 <Occurrences/>
             </div>

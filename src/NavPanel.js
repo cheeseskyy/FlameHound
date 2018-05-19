@@ -39,7 +39,7 @@ class NavPanel extends Component {
                     <nav>
                         <Switch>
                         <Route path="/register" component={RegisterForm}/>
-                        <Route path={this.props.match.url + '/login'} component={LoginForm}/>
+                        <Route path='/login' component={LoginForm}/>
                         <Route path="/logout" onEnter={()=>
                             this.logout()}/>
 
@@ -55,7 +55,7 @@ class NavPanel extends Component {
                             <Route path='/'
                                    render={({match}) =>
                                        <div>
-                                           <p><Link to={match.url + '/login'}>Login </Link></p>
+                                           <p><Link to='/login'>Login </Link></p>
                                            <p><Link to="/register">Register</Link></p>
                                            <p><Link to="/about">About</Link></p>
                                            <Link to="/contact">Contact</Link>
