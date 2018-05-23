@@ -26,7 +26,6 @@ h1{
     float: left;
     width: 84%;
     padding: 0px;
-
 }
 
 #NavPanel{
@@ -106,7 +105,7 @@ a:active {
 }
 
 
-#title1{
+#title{
     border-style: double;
     margin-top: 100px;
     margin-bottom: 100px;
@@ -116,9 +115,9 @@ a:active {
 }
 
 #text{
-    position: center;
     text-align: justify;
-    text-indent: 50px;
+    margin-left: 45px;
+    margin-right: 30px;
 }
 
 #msg{
