@@ -17,15 +17,10 @@ class OccurrenceList extends Component {
                 <h2>Lista de Ocorrências</h2>
               </div>
 
-              <div className="OccurrenceImage">
-                  <img src={pick1}/>
-              </div>
+
 
               <div className="TextOccurrence">
-                  <OccurrencePreview title = "Título: Fogo"/>
-                  <OccurrencePreview user = "Utilizador: António Batata" />
-                  <OccurrencePreview description = "Descrição: Pequeno incêncio na mata"  />
-                  <OccurrencePreview location = "Localização: Parque da Paz"  />
+                  <OccurrencePreview title = "Título: Fogo" user = "Utilizador: António Batata" description = "Descrição: Pequeno incêncio na mata" location = "Localização: Parque da Paz" image={pick1}/>
               </div>
             </div>
 

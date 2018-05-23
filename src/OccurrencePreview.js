@@ -10,10 +10,13 @@ class OccurrencePreview extends Component{
         const user = this.props.user;
         const location = this.props.location;
         const description = this.props.description;
-        const media = this.props.media;
+        const media = this.props.image;
 
         return(
             <div>
+                <div className="OccurrenceImage">
+                    <img src={this.props.image}/>
+                </div>
                 <p> {this.props.title}</p>
                 <p> {this.props.user}</p>
                 <p> {this.props.description}</p>
@@ -23,8 +26,6 @@ class OccurrencePreview extends Component{
     }
 }
 
-export class Occurence extends Component{
 
-}
 
 export default OccurrencePreview
