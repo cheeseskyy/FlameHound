@@ -13,7 +13,9 @@ export default class MapContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            locations: []
+            locations: [
+
+            ]
         }
     }
 
@@ -50,8 +52,8 @@ export default class MapContainer extends Component {
             const node = ReactDOM.findDOMNode(mapRef); // finds the 'map' div in the React DOM, names it node
 
             const mapConfig = Object.assign({}, {
-                center: {lat: 40.7485722, lng: -74.0068633}, // sets center of google map to NYC.
-                zoom: 11, // sets zoom. Lower numbers are zoomed further out.
+                center: {lat: 38.675929, lng: -9.164885}, // sets center of google map to NYC.
+                zoom: 17, // sets zoom. Lower numbers are zoomed further out.
                 mapTypeId: 'roadmap' // optional main map layer. Terrain, satellite, hybrid or roadmap--if unspecified, defaults to roadmap.
             })
             this.map = new maps.Map(node, mapConfig); // creates a new Google map on the specified node (ref='map') with the specified configuration set above.
@@ -87,20 +89,20 @@ export default class MapContainer extends Component {
             // ==================
             // ADD MARKERS TO MAP
             // ==================
-            /*this.state.locations.push({
+            this.state.locations.push({
                 name: "New York County Supreme Court",
-                location: {lat: 40.7143033, lng: -74.0036919}
-            });*/
-            /*this.props.markers.forEach(marker => { // iterate through locations saved in state
-
-                    const coord = marker.location.split("'");
+                location: {lat: 38.675929, lng: -9.164885}
+            });
+            this.state.locations.forEach(marker => { // iterate through locations saved in state
+                    console.log(marker);
+                    const coord = marker.location;
 
                     new google.maps.Marker({ // creates a new Google maps Marker object.
-                    position: {lat: coord.x, lng: coord.y}, // sets position of marker to specified location
+                    position: {lat: coord.lat, lng: coord.lng}, // sets position of marker to specified location
                     map: this.map, // sets markers to appear on the map we just created on line 35
                     title: marker.title // the title of the marker is set to the name of the location
                 });
-            });*/
+            });
         }
     }
 

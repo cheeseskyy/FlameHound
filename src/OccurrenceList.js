@@ -25,7 +25,7 @@ class OccurrenceList extends Component {
             </div>
 
               <div>
-                  <p><Link to = "/ocurrencePreview"> Adicionar Ocorrência </Link></p>
+                  <p><Link to = "/ocurrencePreview"> Adicionar Ocorrência... </Link></p>
               </div>
 
           </div>

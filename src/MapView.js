@@ -128,7 +128,7 @@ class MapView extends Component {
     }
 
     componentDidMount(){
-        this.getOc();
+        //this.getOc();
         console.log("state markers:" + this.state.markers);
     }
 
@@ -140,11 +140,6 @@ class MapView extends Component {
         };
 
         this.isLoggedIn();
-
-        const response = this.getOc();
-        while(!response){
-            console.log("waiting for " + response);
-        }
 
         return (
 
