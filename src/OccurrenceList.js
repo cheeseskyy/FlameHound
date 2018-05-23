@@ -22,15 +22,12 @@ class OccurrenceList extends Component {
               </div>
 
               <div className="TextOccurrence">
-                  <OccurrencePreview title = "Título: Fogo"/>
-                  <OccurrencePreview user = "Utilizador: António Batata" />
-                  <OccurrencePreview description = "Descrição: Pequeno incêncio na mata"  />
-                  <OccurrencePreview location = "Localização: Parque da Paz"  />
+                  <OccurrencePreview title = "Título: Fogo" user = "João Seco" description = "Exemplo de uma descrição" location = "Almada"/>
               </div>
             </div>
 
               <div>
-                  <p><Link to = "/ocurrencePreview"> Adicionar Ocorrência </Link></p>
+                  <p><Link to = "/ocurrencePreview"> Adicionar Ocorrência... </Link></p>
               </div>
 
           </div>
