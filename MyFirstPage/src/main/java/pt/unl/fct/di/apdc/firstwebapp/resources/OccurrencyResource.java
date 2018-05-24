@@ -259,7 +259,6 @@ public class OccurrencyResource extends HttpServlet{
 			dbIntegration.putFile(uuid, file , ext);
 			LOG.info("Uploaded image with id "+uuid);
 			txn.commit();
-			return Response.ok().build();
 	} catch (IOException | DbxException e) {
 		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 	} catch (Exception e) {
