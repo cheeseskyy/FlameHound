@@ -224,9 +224,18 @@ public class OccurrencyResource extends HttpServlet{
 			occurrency.setProperty("type", data.getType().toString());
 			occurrency.setProperty("creationTime", System.currentTimeMillis());
 			occurrency.setProperty("imagesID", data.getMediaURI());
+			occurrency.setProperty("confirmed", "no");
 			datastore.put(txn, occurrency);
 			LOG.info("Put Occurrency");
+			
+			Transaction txn2 = datastore.beginTransaction();
+			Key userStatsKey = KeyFactory.createKey("userAppStats", data.getUser());
+			Entity userStatsE = datastore.get(txn, userStatsKey);
+			long stat = ((long) userStatsE.getProperty("occurrenciesPosted"));
+			userStatsE.setProperty("occurrenciesPosted", ++stat);
+			datastore.put(txn2, userStatsE);
 			txn.commit();
+			txn2.commit();
 		}catch (Exception e) {
 			LOG.warning(e.getMessage());
 		} finally {

@@ -107,6 +107,15 @@ public class RegisterResource extends HttpServlet{
 			datastore.put(txn,user);
 			LOG.info("User registered " + data.username);
 			txn.commit();
+			Key userStatsKey = KeyFactory.createKey("userAppStats", data.username);
+			Transaction txn2 = datastore.beginTransaction();
+			Entity userStatsE = new Entity(userStatsKey);
+			userStatsE.setProperty("upvotes", 0);
+			userStatsE.setProperty("downvotes", 0);
+			userStatsE.setProperty("occurrenciesPosted", 0);
+			userStatsE.setProperty("occurrenciesConfirmed", 0);
+			datastore.put(txn2, userStatsE);
+			txn2.commit();
 			return Response.ok().entity(g.toJson(new MessageData("Success"))).build();
 		} finally {
 			if (txn.isActive() ) {
