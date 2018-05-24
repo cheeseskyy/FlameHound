@@ -230,7 +230,7 @@ public class OccurrencyResource extends HttpServlet{
 			
 			Transaction txn2 = datastore.beginTransaction();
 			Key userStatsKey = KeyFactory.createKey("userAppStats", data.getUser());
-			Entity userStatsE = datastore.get(txn, userStatsKey);
+			Entity userStatsE = datastore.get(txn2, userStatsKey);
 			long stat = ((long) userStatsE.getProperty("occurrenciesPosted"));
 			userStatsE.setProperty("occurrenciesPosted", ++stat);
 			datastore.put(txn2, userStatsE);
