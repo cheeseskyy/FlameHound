@@ -18,6 +18,12 @@ public class SessionInfo {
 		this.tokenId = tokenId;
 	}
 	
+	public SessionInfo(String username, String tokenId, List<Object> arguments) {
+		this.username = username;
+		this.tokenId = tokenId;
+		this.arguments = arguments;
+	}
+	
 	public void setArgument(Object object) {
 		arguments.add(object);
 	}

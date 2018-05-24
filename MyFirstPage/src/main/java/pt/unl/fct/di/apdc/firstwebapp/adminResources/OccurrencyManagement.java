@@ -47,6 +47,7 @@ public class OccurrencyManagement {
 		}
 	}
 	
+	
 	public Response deleteOccurrency(DatastoreService datastore, String ocID, Logger LOG) {
 		LOG.info("Deleting occurrency with id: " + ocID);
 		Transaction txn = datastore.beginTransaction();
