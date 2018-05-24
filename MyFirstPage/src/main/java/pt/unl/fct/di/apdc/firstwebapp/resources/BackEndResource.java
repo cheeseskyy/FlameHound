@@ -82,7 +82,6 @@ public class BackEndResource extends HttpServlet {
 		LOG.fine("Attempt to register admin: " + info.username);
 		if(info.username == null || info.password == null)
 			return Response.status(Status.BAD_REQUEST).build();
-		
 		Transaction txn = datastore.beginTransaction();
 		try {
 			// If the entity does not exist an Exception is thrown. Otherwise,
