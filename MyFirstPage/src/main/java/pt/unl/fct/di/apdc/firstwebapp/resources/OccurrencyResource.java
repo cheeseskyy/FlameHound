@@ -248,10 +248,6 @@ public class OccurrencyResource extends HttpServlet{
 		LOG.info("Uploading image");
 		try {
 			dbIntegration.putFile(uuid, file , ext);
-			Entity occurrency = new Entity("OccurrencyImage", uuid);
-			occurrency.setUnindexedProperty("extension", ext);
-			datastore.put(txn, occurrency);
-			txn.commit();
 			LOG.info("Uploaded image with id "+uuid);
 	} catch (IOException | DbxException e) {
 		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
