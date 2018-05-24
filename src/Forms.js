@@ -44,7 +44,7 @@ function saveOc() {
 
             console.log(files);
             let filesUploaded = true;
-            if (files != null) {
+            if (files.length > 0) {
                 var file = files[0];
                 filesUploaded = false;
                 var extension = file.name.split(".")[1];

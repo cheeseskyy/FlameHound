@@ -20,7 +20,7 @@ class OccurrenceList extends Component {
 
 
               <div className="TextOccurrence">
-                  <OccurrencePreview title = "Título: Fogo" user = "Utilizador: António Batata" description = "Descrição: Pequeno incêncio na mata" location = "Localização: Parque da Paz" image={pick1}/>
+                      <OccurrencePreview title = "Título: Fogo em Almada" user = "João Seco" description = "Exemplo de uma descrição" location = "Almada" image={pick1}/>
               </div>
             </div>
 
