@@ -228,14 +228,14 @@ public class OccurrencyResource extends HttpServlet{
 			datastore.put(txn, occurrency);
 			LOG.info("Put Occurrency");
 			
-			Transaction txn2 = datastore.beginTransaction();
+			/*Transaction txn2 = datastore.beginTransaction();
 			Key userStatsKey = KeyFactory.createKey("userAppStats", data.getUser());
 			Entity userStatsE = datastore.get(txn2, userStatsKey);
 			long stat = ((long) userStatsE.getProperty("occurrenciesPosted"));
 			userStatsE.setProperty("occurrenciesPosted", ++stat);
-			datastore.put(txn2, userStatsE);
+			datastore.put(txn2, userStatsE);*/
 			txn.commit();
-			txn2.commit();
+			//txn2.commit();
 		}catch (Exception e) {
 			LOG.warning(e.getMessage());
 		} finally {
