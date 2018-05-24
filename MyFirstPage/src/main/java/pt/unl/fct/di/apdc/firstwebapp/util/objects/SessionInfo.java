@@ -8,7 +8,7 @@ public class SessionInfo {
 	
 	public String username;
 	public String tokenId;
-	private List<Object> arguments;
+	public List<Object> arguments;
 	
 	public SessionInfo() {
 	}
