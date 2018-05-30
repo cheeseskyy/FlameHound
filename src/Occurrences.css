@@ -1,0 +1,24 @@
+#Occurrences{
+    background-color: gainsboro;
+    width: 35%;
+    height: 100vh;
+    display: inline-block;
+}
+
+.TextOccurrence{
+    display:inline;
+    white-space:nowrap;
+}
+
+.OccurrenceImage{
+    float:right;
+    height: 40%;
+    width: 40%;
+    display:inline;
+}
+
+#OccurrencesTitle{
+    text-align: center;
+    font-weight: bold;
+    font-family: "Times New Roman", Times, serif;
+}
