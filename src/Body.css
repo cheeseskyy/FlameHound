@@ -1,0 +1,31 @@
+#location_map {
+    display: inline-block;
+    height: 150px;
+    width: 300px;
+}
+
+#TextConctatos1{
+    padding: 30px;
+    text-align: center;
+}
+
+#TextConctatos2{
+    margin: 0 auto;
+    padding: 50px;
+    display: inline-block;
+}
+
+#title{
+    border-style: double;
+    margin-top: 100px;
+    margin-bottom: 100px;
+    margin-right: 150px;
+    margin-left: 80px;
+    text-align: center;
+}
+
+#text{
+    text-align: justify;
+    margin-left: 45px;
+    margin-right: 30px;
+}
