@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">appauth</string>
+    <string name="action_sign_in">entrar ou registe-se</string>
+    <string name="action_sign_in_short">entrar</string>
+    <string name="error_invalid_email">Email inválido</string>
+    <string name="error_invalid_password">Password Inválida</string>
+    <string name="error_incorrect_password">Password Incorrecta</string>
+    <string name="error_field_required">algo por preencher</string>
+    <string name="permission_rationale">precisamos de acesso aos contactos</string>
+</resources>
