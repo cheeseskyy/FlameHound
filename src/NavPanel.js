@@ -11,6 +11,58 @@ class NavPanel extends Component {
         console.log("clicked");
     }
 
+    constructor(props){
+        super(props);
+        this.state = {
+            isRegister : false,
+            isLogin : false
+        }
+        this.resetForms = this.resetForms.bind(this);
+    }
+
+    resetForms(){
+        console.log("UpdateForms called");
+        this.setState({
+            isRegister : false,
+            isLogin : false
+        });
+    }
+
+    panel = <Switch>
+                <Route path="/map" render={({match}) =>
+                    <div>
+                        <p><Link to={match.url + "/submitOccurrence"}>Criar Ocorrência</Link></p>
+                        <p><Link to="/profile">Perfil </Link></p>
+                        <p><Link to="/logout" onClick={() =>
+                            this.logout()}>Logout </Link></p>
+                    </div>
+                }
+                />
+                <Route path='/'
+                       render={({match}) =>
+                           <div>
+                               <p><a onClick={() => this.setState({isRegister:false, isLogin:true})} >Login </a></p>
+                               <p><a onClick={() => this.setState({isRegister:true, isLogin:false})}>Register</a></p>
+                               <p><Link to="/about">About</Link></p>
+                               <Link to="/contact">Contact</Link>
+                           </div>
+                       }
+                />
+            </Switch>
+
+    showForms(){
+        if(this.state.isLogin){
+            return <LoginForm resetForms = {() => this.resetForms}/>;
+        } else if(this.state.isRegister){
+            return <RegisterForm resetForms = {() => this.resetForms}/>;
+        } else{
+            return this.panel;
+        }
+    }
+
+    isLogin = false;
+    isRegister = false;
+
     logout() {
 
         console.log("Logging out");
@@ -47,32 +99,7 @@ class NavPanel extends Component {
                     </div>
                 </Link>
                 <nav>
-                    <Switch>
-                        <Route path="/register" component={RegisterForm}/>
-                        <Route path='/login' component={LoginForm}/>
-                        <Route path="/logout" onEnter={() =>
-                            this.logout()}/>
-
-                        <Route path="/map" render={({match}) =>
-                            <div>
-                                <p><Link to={match.url + "/submitOccurrence"}>Criar Ocorrência</Link></p>
-                                <p><Link to="/profile">Perfil </Link></p>
-                                <p><Link to="/logout" onClick={() =>
-                                    this.logout()}>Logout </Link></p>
-                            </div>
-                        }
-                        />
-                        <Route path='/'
-                               render={({match}) =>
-                                   <div>
-                                       <p><a>Login </a></p>
-                                       <p><a onClick={() => this.log()}>Register</a></p>
-                                       <p><Link to="/about">About</Link></p>
-                                       <Link to="/contact">Contact</Link>
-                                   </div>
-                               }
-                        />
-                    </Switch>
+                    {this.showForms()}
                 </nav>
                 <img id="ItemPreview"/>
             </div>

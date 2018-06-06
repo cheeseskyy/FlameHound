@@ -170,7 +170,7 @@ export class RegisterForm extends Component {
 
                     <button type="button" onClick={this.register}>Submit</button>
                     <br></br>
-                    <button onClick={this.props.history.goBack}>Back</button>
+                    <button onClick={this.props.resetForms()}>Back</button>
                 </div>
             </Router>
         );
@@ -227,7 +227,7 @@ export class LoginForm extends Component {
                     <button type="submit" onClick={this.login}>Login</button>
 
                     <label> <input type="checkbox" id="rememberMe" name="remember"></input>Remember me</label><br/>
-                    <button onClick={this.props.history.goBack}>Back</button>
+                    <button onClick={this.props.resetForms()}>Back</button>
 
                     <p id="errorMessage"/>
                 </div>
@@ -305,7 +305,7 @@ export class OccurrenceForm extends Component{
 
                         <button type="button" onClick={saveOc}>Submit</button>
 
-                        <button onClick={this.props.history.goBack}>Back</button>
+                        <button onClick={this.props.resetForms()}>Back</button>
                     </div>
                     <OccurrenceTips/>
                 </div>
