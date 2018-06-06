@@ -8,6 +8,7 @@ import placeHolder from './images/placeholders/colegas.png';
 import './Body.css';
 import {OccurrenceForm} from "./Forms";
 import {withScriptjs, withGoogleMap, GoogleMap} from "react-google-maps";
+import EntityPage from "./EntityPage";
 
 const Home = () =>
     <div className="Column">
@@ -111,6 +112,9 @@ class Body extends Component {
                 <Route path="/about" component={About}/>
                 <Route path="/contact" component={Contacts}/>
                 <Route path="/submitOccurrence" component={OccurrenceForm}/>
+                <Route path="/EntityPage" render={(props) =>
+                    <EntityPage name = "Placeholder Name"/>
+                }/>
                 <Route path="/" component={Home}/>
             </Switch>
         );

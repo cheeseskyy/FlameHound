@@ -1,0 +1,9 @@
+#coverImage{
+    width: 100%;
+    min-height: 25vh;
+    border: black solid 0.5px;
+}
+
+#statistics{
+    border: solid black;
+}
