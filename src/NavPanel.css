@@ -8,6 +8,7 @@
     border-right: #FF6E00 solid 5px;
     margin-right: -5px;
     z-index: 99;
+
 }
 
 .logo{
@@ -17,6 +18,11 @@
 
 #image{
     height: 100%;
+}
+
+nav{
+    /*text spacing*/
+    padding-left: 10px;
 }
 
 img {
