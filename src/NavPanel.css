@@ -2,13 +2,12 @@
     color: aliceblue;
     background-color: black;
     height: 100vh;
-    width: 10vw;
+    width: 10%;
     max-height: 100vh;
     min-width: 70px;
     border-right: #FF6E00 solid 5px;
     margin-right: -5px;
     z-index: 99;
-
 }
 
 .logo{

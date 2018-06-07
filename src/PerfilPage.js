@@ -11,9 +11,7 @@ class PerfilPage extends Component{
                     <div id = "coverImage">
                         <img src={this.props.coverImage} alt = {this.props.name + "'s cover image"}/>
                     </div>
-                    <div id = "entityLogo">
-                        <img src={this.props.logo} alt = {this.props.name + "'s logo"} />
-                    </div>
+                   
                     <div id = "nameTitle">
                         {this.props.name}
                     </div>

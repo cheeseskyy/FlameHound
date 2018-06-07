@@ -125,10 +125,11 @@ class MapView extends Component {
 
     render() {
         const style = { // MUST specify dimensions of the Google map or it will not work. Also works best when style is specified inside the render function and created as an object
-            width: '65vw', // 90vw basically means take up 90% of the width screen. px also works.
+            width: '75%', // 90vw basically means take up 90% of the width screen. px also works.
             height: '100vh', // 75vh similarly will take up roughly 75% of the height of the screen. px also works.
-            zIndex: '1'
-        };
+            zIndex: '1',
+            display:'inline-block'
+    };
         this.isLoggedIn();
         //getOcImage("e975a81f-91a2-4854-a8ea-467fd3114e73.png");
 

@@ -9,6 +9,7 @@ import './Body.css';
 import {OccurrenceForm} from "./Forms";
 import {withScriptjs, withGoogleMap, GoogleMap} from "react-google-maps";
 import EntityPage from "./EntityPage";
+import PerfilPage from "./PerfilPage";
 
 const Home = () =>
     <div>
@@ -56,7 +57,11 @@ const Contacts = () =>
                     <li>GNR - Comando Geral: 213 217 000</li>
                 </ul>
 
-                <h4> Nossa localização</h4>
+                <h4> Nós</h4>
+                <div>
+                    flamehoundapdc@gmail.com
+                </div>
+                <br/>
                 <div id="location_map">
                     <FooterMap
                         googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMlXmYjzyVeTm2IpQ6xJY-l2n11u634r4&v=3.exp"
@@ -68,7 +73,6 @@ const Contacts = () =>
 
                 <p>Quinta da Torre, Campus Universitário<br/>
                     2829-516 Caparica</p>
-
             </div>
         </div>
     </div>
@@ -115,6 +119,9 @@ class Body extends Component {
                     <Route path="/submitOccurrence" component={OccurrenceForm}/>
                     <Route path="/EntityPage" render={(props) =>
                         <EntityPage name = "Placeholder Name"/>
+                    }/>
+                    <Route path="/PerfilPage" render={(props) =>
+                        <PerfilPage name = "Placeholder"/>
                     }/>
                     <Route path="/" component={Home}/>
                 </Switch>

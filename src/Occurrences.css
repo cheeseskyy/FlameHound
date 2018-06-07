@@ -1,24 +1,35 @@
-#Occurrences{
+#Occurrences {
+    display: block;
     background-color: #FF6E00;
-    width: 25%;
     height: 100vh;
-    display: inline-block;
-}
-
-.TextOccurrence{
-    display:inline;
-    white-space:nowrap;
+    width: 25%;
+    float: left;
+    padding: 0px;
 }
 
 .OccurrenceImage{
-    float:right;
-    height: 40%;
-    width: 40%;
-    display:inline;
+    display: block;
+}
+
+#occurrence{
+    display: block;
+    background-color: white;
+    border: solid 0.2px;
+    font-size: 12px;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#occurrenceList{
+    overflow-y: scroll;
+    float:left;
+    height: 90vh;
 }
 
 #OccurrencesTitle{
     text-align: center;
     font-weight: bold;
-    font-family: "Times New Roman", Times, serif;
+    background-color: #FF6E00;
+    display: block;
 }
