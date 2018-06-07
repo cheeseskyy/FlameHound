@@ -19,6 +19,10 @@ class EntityPage extends Component{
                   </div>
               </div>
               <div id = "statistics">
+                  <p>Ocorrências tratadas: 9</p>
+                  <p>Taxa de aprovação: 80%</p>
+              </div>
+              <div id = "treatedOcurrences">
 
               </div>
           </div>
