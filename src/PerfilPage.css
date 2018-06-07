@@ -1,0 +1,24 @@
+#coverImage{
+    width: 100%;
+    min-height: 25vh;
+    border: black solid 0.5px;
+}
+
+#nameTitle{
+    display: inline-block;
+    border: solid black;
+    width: 50%;
+}
+
+#entityLogo{
+    display: inline-block;
+    width: 20%;
+    border: solid black;
+}
+
+#statistics{
+    width: 10%;
+    height: 40vh;
+    float:left;
+    border: solid black;
+}
