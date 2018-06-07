@@ -55,9 +55,12 @@ a:active {
   white-space: nowrap;
 }
 
+.Body{
+  width:84%;
+}
+
 .Column{
   height: 100%;
   float: left;
-  width: 84%;
   padding: 0px;
 }

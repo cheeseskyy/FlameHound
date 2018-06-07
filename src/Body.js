@@ -11,7 +11,7 @@ import {withScriptjs, withGoogleMap, GoogleMap} from "react-google-maps";
 import EntityPage from "./EntityPage";
 
 const Home = () =>
-    <div className="Column">
+    <div>
 
         <h1 align="center">FlameHound</h1>
         <br/>
@@ -75,7 +75,7 @@ const Contacts = () =>
 ;
 
 const About = () =>
-    <div className="Column">
+    <div>
         <h1 align="center">FlameHound</h1>
         <br/>
 
@@ -107,16 +107,18 @@ class Body extends Component {
     render() {
 
         return (
-            <Switch>
-                <Route path="/map" component={MapView}/>
-                <Route path="/about" component={About}/>
-                <Route path="/contact" component={Contacts}/>
-                <Route path="/submitOccurrence" component={OccurrenceForm}/>
-                <Route path="/EntityPage" render={(props) =>
-                    <EntityPage name = "Placeholder Name"/>
-                }/>
-                <Route path="/" component={Home}/>
-            </Switch>
+            <div className = "Column Body">
+                <Switch>
+                    <Route path="/map" component={MapView}/>
+                    <Route path="/about" component={About}/>
+                    <Route path="/contact" component={Contacts}/>
+                    <Route path="/submitOccurrence" component={OccurrenceForm}/>
+                    <Route path="/EntityPage" render={(props) =>
+                        <EntityPage name = "Placeholder Name"/>
+                    }/>
+                    <Route path="/" component={Home}/>
+                </Switch>
+            </div>
         );
     }
 }
