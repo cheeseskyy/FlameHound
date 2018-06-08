@@ -23,7 +23,7 @@ class EntityPage extends Component{
                   <p>Taxa de aprovação: 80%</p>
               </div>
               <div id = "treatedOcurrences">
-
+                  <p>Lista de Ocorrências influenciadas:</p>
               </div>
           </div>
         );

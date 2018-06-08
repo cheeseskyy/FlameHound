@@ -9,20 +9,27 @@
 }
 
 #nameTitle{
+    padding-left: 10px;
     display: inline-block;
     border: solid black;
     width: 50%;
 }
 
+
 #entityLogo{
+    width: 200px;
+    height: 200px;
     display: inline-block;
-    width: 20%;
     border: solid black;
 }
 
 #statistics{
-    width: 10%;
+    width: 200%;
     height: 40vh;
     float:left;
     border: solid black;
+}
+
+#treatedOccurrences{
+
 }
