@@ -118,10 +118,10 @@ class Body extends Component {
                     <Route path="/contact" component={Contacts}/>
                     <Route path="/submitOccurrence" component={OccurrenceForm}/>
                     <Route path="/EntityPage" render={(props) =>
-                        <EntityPage name = "Placeholder Name"/>
+                        <EntityPage name = "Placeholder" description = "Placeholder is a company that holds places"/>
                     }/>
                     <Route path="/PerfilPage" render={(props) =>
-                        <PerfilPage name = "Placeholder"/>
+                        <PerfilPage name = "Placeholder" />
                     }/>
                     <Route path="/" component={Home}/>
                 </Switch>
