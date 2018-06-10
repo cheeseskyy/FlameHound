@@ -7,11 +7,11 @@
     padding: 0px;
 }
 
-.OccurrenceImage{
+#OccurrenceImage{
     display: block;
 }
 
-#occurrence{
+.occurrence{
     display: block;
     background-color: white;
     border: solid 0.2px;
@@ -21,11 +21,25 @@
     margin-right: 10px;
 }
 
+.occurrence p{
+    margin-top: 6px;
+    margin-bottom: 6px;
+    padding-left: 3px;
+}
+
+#occurrenceTitle{
+    text-align: center;
+    font-weight: bold;
+    padding-left: 0;
+}
+
 #occurrenceList{
     overflow-y: scroll;
     float:left;
     height: 90vh;
 }
+
+
 
 #OccurrencesTitle{
     text-align: center;

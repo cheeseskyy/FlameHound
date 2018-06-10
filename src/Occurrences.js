@@ -17,13 +17,13 @@ export class OccurrenceList extends Component {
                 </div>
                 <div id="occurrenceList">
 
-                    <OccurrencePreview title="Título: Fogo no Parque da Paz" user="João Batista"
+                    <OccurrencePreview title="Fogo no Parque da Paz" user="João Batista"
                                        description="Incêndio já com algumas dimensões!" location="Almada" image={placeHolder1}/>
-                    <OccurrencePreview title="Título: Ajuda! Fogo na minha casa!" user="Maria Mendes"
+                    <OccurrencePreview title="Ajuda! Fogo na minha casa!" user="Maria Mendes"
                                            description="Incêndio na minha casa, não sei como isto aconteceu..." location="Gaia" image={placeHolder2}/>
-                    <OccurrencePreview title="Título: Limpesa da mata" user="Manuel Batata"
+                    <OccurrencePreview title="Limpesa da mata" user="Manuel Batata"
                                        description="Mata com bastante lixo; o que pode provocar algum incêndio." location="Trafaria" image={placeHolder3}/>
-                    <OccurrencePreview title="Título: Fogo em Pedrogrão Grande " user="Joaquina Martins"
+                    <OccurrencePreview title="Fogo em Pedrogrão Grande " user="Joaquina Martins"
                                        description="Fogo de grandes dimensões. O Fogo já chega à auto estrada!" location="Pedrogão Grande" image={placeHolder4}/>
 
                 </div>
@@ -45,12 +45,12 @@ export class OccurrencePreview extends Component{
         const media = this.props.image;
 
         return(
-            <div id="occurrence">
-                <div className="OccurrenceImage">
+            <div className="occurrence">
+                <div id="OccurrenceImage">
                     <img src={this.props.image}/>
                 </div>
                 <div>
-                    <p> {this.props.title}</p>
+                    <p id = "occurrenceTitle"> {this.props.title}</p>
                     <p> {this.props.user}</p>
                     <p> {this.props.description}</p>
                     <p> {this.props.location}</p>
