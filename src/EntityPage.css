@@ -2,6 +2,12 @@
 
 }
 
+.EntityPage{
+    margin: auto;
+    background-color: white;
+    width: 855px;
+}
+
 #coverImage{
     width: 851px;
     height: 315px;

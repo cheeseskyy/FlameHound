@@ -35,6 +35,7 @@ class EntityPage extends Component{
                   </div>
                   <div id = "treatedOccurrences">
                       <p>Lista de Ocorrências influenciadas:</p>
+
                       <OccurrencePreview title="Título: Fogo no Parque da Paz" user="João Batista"
                                          description="Incêndio já com algumas dimensões!" location="Almada" image={placeHolder1}/>
                       <OccurrencePreview title="Título: Ajuda! Fogo na minha casa!" user="Maria Mendes"
