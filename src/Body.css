@@ -4,7 +4,14 @@
     width: 300px;
 }
 
+.FullBody{
+    height: 100vh;
+    background-color: white;
+}
 
+h1{
+    margin-top:0;   
+}
 
 #TextConctatos1{
     padding: 30px;

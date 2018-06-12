@@ -12,7 +12,7 @@ import EntityPage from "./EntityPage";
 import PerfilPage from "./PerfilPage";
 
 const Home = () =>
-    <div>
+    <div className="FullBody">
 
         <h1 align="center">FlameHound</h1>
         <br/>
@@ -45,7 +45,7 @@ let FooterMap = withScriptjs(withGoogleMap((props) =>
 ));
 
 const Contacts = () =>
-    <div>
+    <div className="FullBody">
         <h1 align="center">Contactos</h1>
         <div id="TextConctatos1">
             <div id="TextConctatos2">
@@ -79,7 +79,7 @@ const Contacts = () =>
 ;
 
 const About = () =>
-    <div>
+    <div className="FullBody">
         <h1 align="center">FlameHound</h1>
         <br/>
 
@@ -107,6 +107,7 @@ class Body extends Component {
     constructor(props) {
         super(props);
     }
+
 
     render() {
 
