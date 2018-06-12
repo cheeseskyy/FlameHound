@@ -55,6 +55,17 @@ export class OccurrencePreview extends Component{
                     <p> {this.props.description}</p>
                     <p> {this.props.location}</p>
                 </div>
+                <div id="occurrenceButtons">
+                    <button>
+                        +1
+                    </button>
+                    <button>
+                        -1
+                    </button>
+                    <button>
+                        flag
+                    </button>
+                </div>
             </div>
         );
     }
