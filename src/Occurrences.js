@@ -4,6 +4,7 @@ import placeHolder2 from './images/placeholders/IncendioCasa.jpg';
 import placeHolder3 from './images/placeholders/LixoFlorestas.jpg';
 import placeHolder4 from './images/placeholders/IncendioEstrada.jpg';
 import './Occurrences.css';
+import {CommentList} from "./Comments";
 
 
 export class OccurrenceList extends Component {
@@ -46,7 +47,7 @@ export class OccurrencePreview extends Component{
 
         return(
             <div className="occurrence">
-                <div id="OccurrenceImage">
+                <div id="occurrenceImage">
                     <img src={this.props.image}/>
                 </div>
                 <div>
@@ -69,4 +70,20 @@ export class OccurrencePreview extends Component{
             </div>
         );
     }
+}
+
+export class OccurrencePage extends Component{
+
+    render(){
+        return(
+            <div className="OccurrencePage">
+                <div id="OccurrenceTitle">
+                    <div id="occurrenceImage">
+                        <img alt="Occurrence Image"/>
+                    </div>
+                </div>
+                <CommentList/>
+            </div>
+    )};
+
 }

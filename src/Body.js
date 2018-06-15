@@ -10,6 +10,8 @@ import {OccurrenceForm} from "./Forms";
 import {withScriptjs, withGoogleMap, GoogleMap} from "react-google-maps";
 import EntityPage from "./EntityPage";
 import PerfilPage from "./PerfilPage";
+import {CommentList} from "./Comments";
+import {OccurrencePage} from "./Occurrences";
 
 const Home = () =>
     <div className="FullBody">
@@ -124,7 +126,9 @@ class Body extends Component {
                     <Route path="/PerfilPage" render={(props) =>
                         <PerfilPage name = "Placeholder" />
                     }/>
-                    <Route path="/" component={Home}/>
+                    <Route path="/OccurrencePage" render={(props) =>
+                        <OccurrencePage/>} />
+                    <Route path="/" comp-onent={Home}/>
                 </Switch>
             </div>
         );
