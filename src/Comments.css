@@ -1,6 +1,22 @@
+.CommentList{
+    height:100%;
+    width:100%;
+
+}
+
 .CommentBox{
     width: 851px;
     background-color: white;
-    height: 100vh;
     margin: auto;
+}
+
+img{
+    max-width: 100%;
+    height: auto;
+}
+
+#authorLogo{
+    display: inline-block;
+    width: 100px;
+    height: 200px;
 }

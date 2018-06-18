@@ -77,9 +77,10 @@ export class OccurrencePage extends Component{
     render(){
         return(
             <div className="OccurrencePage">
-                <div id="OccurrenceTitle">
+                <div >
+                    <p id = "occurrenceTitle"> {this.props.title} </p>
                     <div id="occurrenceImage">
-                        <img alt="Occurrence Image"/>
+                        <img alt="Occurrence Image" src={this.props.image? this.props.image:placeHolder1}/>
                     </div>
                 </div>
                 <CommentList/>

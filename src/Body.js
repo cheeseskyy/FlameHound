@@ -127,8 +127,8 @@ class Body extends Component {
                         <PerfilPage name = "Placeholder" />
                     }/>
                     <Route path="/OccurrencePage" render={(props) =>
-                        <OccurrencePage/>} />
-                    <Route path="/" comp-onent={Home}/>
+                        <OccurrencePage title={"some occurrence"}/>} />
+                    <Route path="/" component={Home}/>
                 </Switch>
             </div>
         );

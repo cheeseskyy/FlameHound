@@ -11,6 +11,11 @@
     display: block;
 }
 
+.OccurrencePage #occurrenceImage{
+    height: 315px;
+    text-align: center;
+}
+
 .occurrence{
     display: block;
     background-color: white;
@@ -26,6 +31,12 @@
     margin-bottom: 6px;
     padding-left: 3px;
 }
+
+.OccurrencePage #occurrenceTitle{
+    margin-top: 0px;
+}
+
+
 
 #occurrenceTitle{
     text-align: center;
