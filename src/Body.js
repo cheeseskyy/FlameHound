@@ -126,7 +126,7 @@ class Body extends Component {
                     <Route path="/PerfilPage" render={(props) =>
                         <PerfilPage name = "Placeholder" />
                     }/>
-                    <Route path="/OccurrencePage" render={(props) =>
+                    <Route path="/Occurrence" render={(props) =>
                         <OccurrencePage title={"some occurrence"}/>} />
                     <Route path="/" component={Home}/>
                 </Switch>

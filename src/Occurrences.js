@@ -5,6 +5,7 @@ import placeHolder3 from './images/placeholders/LixoFlorestas.jpg';
 import placeHolder4 from './images/placeholders/IncendioEstrada.jpg';
 import './Occurrences.css';
 import {CommentList} from "./Comments";
+import {Link} from 'react-router-dom';
 
 
 export class OccurrenceList extends Component {
@@ -46,28 +47,32 @@ export class OccurrencePreview extends Component{
         const media = this.props.image;
 
         return(
-            <div className="occurrence">
-                <div id="occurrenceImage">
-                    <img src={this.props.image}/>
+
+                <div className="occurrence">
+                    <Link to="/occurrence">
+                        <div id="occurrenceImage">
+                            <img src={this.props.image}/>
+                        </div>
+                        <div>
+                            <p id = "occurrenceTitle"> {this.props.title}</p>
+                            <p> {this.props.user}</p>
+                            <p> {this.props.description}</p>
+                            <p> {this.props.location}</p>
+                        </div>
+                    </Link>
+                    <div id="occurrenceButtons">
+                        <button>
+                            +1
+                        </button>
+                        <button>
+                            -1
+                        </button>
+                        <button>
+                            flag
+                        </button>
+                    </div>
                 </div>
-                <div>
-                    <p id = "occurrenceTitle"> {this.props.title}</p>
-                    <p> {this.props.user}</p>
-                    <p> {this.props.description}</p>
-                    <p> {this.props.location}</p>
-                </div>
-                <div id="occurrenceButtons">
-                    <button>
-                        +1
-                    </button>
-                    <button>
-                        -1
-                    </button>
-                    <button>
-                        flag
-                    </button>
-                </div>
-            </div>
+
         );
     }
 }
