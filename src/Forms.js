@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {BrowserRouter as Router, Route, Link} from "react-router-dom";
+import {BrowserRouter as Router, withRouter, Link} from "react-router-dom";
 import {OccurrenceTips} from "./TipsPanels";
 
 function uploadOc(mediaURI, username) {
@@ -75,6 +75,7 @@ function saveOc() {
 }
 
 export class RegisterForm extends Component {
+
     register(){
         let userInfo = {"name": document.getElementById("name").value,
             "username": document.getElementById("username").value,
@@ -95,11 +96,15 @@ export class RegisterForm extends Component {
         xhttp.onreadystatechange = function() {
             if(xhttp.readyState == 4 && xhttp.status == 200){
                 alert("Successful registration.");
-                window.location.replace("/login");
+                //window.location.replace("/login");
+                this.props.history.push("/login");
+                this.props.resetForms();
             }
             if(xhttp.status == 400){
                 alert("Invalid information, please fill the mandatory areas or username already exist.");
-                window.location.replace("/register");
+                //window.location.replace("/register");
+                this.props.history.push("/register");
+                this.props.resetForms();
             }
         };
     }
@@ -170,7 +175,7 @@ export class RegisterForm extends Component {
 
                     <button type="button" onClick={this.register}>Submit</button>
                     <br></br>
-                    <button onClick={this.props.resetForms()}>Back</button>
+                    <button onClick={this.props.resetForms}>Back</button>
                 </div>
             </Router>
         );
@@ -193,15 +198,15 @@ export class LoginForm extends Component {
         xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/login/v2", true);
         xhttp.setRequestHeader("Content-type", "application/json");
         xhttp.send(jSonLoginInfo);
-        xhttp.onreadystatechange = function () {
+        xhttp.onreadystatechange = () => {
 
             if (xhttp.readyState == 4 && xhttp.status == 200) {
                 console.log("200");
-                alert("Successful login. Redirecting to home page...");
                 var sessionInfo = JSON.parse(xhttp.response);
                 sessionStorage.setItem('sessionUsername', sessionInfo.username);
                 sessionStorage.setItem('sessionToken', sessionInfo.tokenId);
-                window.location.replace("/map");
+                {this.props.resetForms()}
+                this.props.history.push("/map");
             }
             if (xhttp.readyState == 4 && xhttp.status == 403) {
                 errorText.innerHTML = "Wrong Username or Password";
@@ -224,46 +229,16 @@ export class LoginForm extends Component {
 
                     <input type="password" placeholder="Enter Password" name="psw" id="pw" required></input><br/>
 
-                    <button type="submit" onClick={this.login}>Login</button>
+                    <button type="submit" onClick={() => this.login()}>Login</button>
 
                     <label> <input type="checkbox" id="rememberMe" name="remember"></input>Remember me</label><br/>
-                    <button onClick={this.props.resetForms()}>Back</button>
+                    <button onClick={this.props.resetForms}>Back</button>
 
                     <p id="errorMessage"/>
                 </div>
             </Router>
         );
     }
-}
-
-
-function login() {
-    console.log("Function login called");
-    /*var usernameV = document.getElementById("un").value;
-    var passwordV = document.getElementById("pw").value;
-    if(document.getElementById('rememberMe').checked == true){
-        localStorage.setItem('rememberUsername', usernameV);
-    }
-    var loginInfo = {"username":usernameV , "password":passwordV};
-    var jSonLoginInfo = JSON.stringify(loginInfo);
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/login/v2", true);
-    xhttp.setRequestHeader("Content-type", "application/json");
-    xhttp.send(jSonLoginInfo);
-    xhttp.onreadystatechange = function() {
-
-        if(xhttp.readyState == 4 && xhttp.status == 200){
-            console.log("200");
-            alert("Successful login. Redirecting to home page...");
-            var sessionInfo = JSON.parse(xhttp.response);
-            sessionStorage.setItem('sessionUsername', sessionInfo.username);
-            sessionStorage.setItem('sessionToken', sessionInfo.tokenId);
-            window.location.replace("/homePage");
-        }
-        if(xhttp.readyState == 4 && xhttp.status == 403){
-            alert("Password or username incorrect");
-        }
-    };*/
 }
 
 export class OccurrenceForm extends Component{
@@ -305,7 +280,7 @@ export class OccurrenceForm extends Component{
 
                         <button type="button" onClick={saveOc}>Submit</button>
 
-                        <button onClick={this.props.resetForms()}>Back</button>
+                        <button onClick={this.props.resetForms}>Back</button>
                     </div>
                     <OccurrenceTips/>
                 </div>

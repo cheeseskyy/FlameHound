@@ -1,10 +1,13 @@
 import React, {Component} from 'react';
-import {BrowserRouter as Router, Route, Link, Switch, matchPath} from "react-router-dom";
-import {RegisterForm, LoginForm} from "./Forms";
+import {BrowserRouter as Router, Route, Link, Switch, withRouter} from "react-router-dom";
+import {RegisterForm as RegForm, LoginForm as LogForm} from "./Forms";
 import logo from "./images/logo/FlameHound Logo with Transparency@2x.png";
 import mapLogo from "./images/logo/FlameHound Logo with Orange Background@2x.png";
 import './NavPanel.css';
 
+
+const LoginForm = withRouter(LogForm);
+const RegisterForm = withRouter(RegForm);
 
 class NavPanel extends Component {
     log() {
@@ -48,13 +51,13 @@ class NavPanel extends Component {
                            </div>
                        }
                 />
-            </Switch>
+            </Switch>;
 
     showForms(){
         if(this.state.isLogin){
-            return <LoginForm resetForms = {() => this.resetForms}/>;
+            return <LoginForm resetForms = {this.resetForms}/>;
         } else if(this.state.isRegister){
-            return <RegisterForm resetForms = {() => this.resetForms}/>;
+            return <RegisterForm resetForms = {this.resetForms}/>;
         } else{
             return this.panel;
         }
@@ -107,4 +110,4 @@ class NavPanel extends Component {
     }
 }
 
-export default NavPanel;
+export default withRouter(NavPanel);
