@@ -1,10 +1,14 @@
 {
-  "main.css": "static/css/main.b8afe5f1.css",
-  "main.css.map": "static/css/main.b8afe5f1.css.map",
-  "main.js": "static/js/main.f4adbde8.js",
-  "main.js.map": "static/js/main.f4adbde8.js.map",
+  "main.css": "static/css/main.2964aa50.css",
+  "main.css.map": "static/css/main.2964aa50.css.map",
+  "main.js": "static/js/main.797e5226.js",
+  "main.js.map": "static/js/main.797e5226.js.map",
+  "static\\media\\FlameHound Logo with Orange Background +Text@2x.png": "static/media/FlameHound Logo with Orange Background +Text@2x.fc4945ed.png",
   "static\\media\\FlameHound Logo with Orange Background@2x.png": "static/media/FlameHound Logo with Orange Background@2x.2e7336a2.png",
   "static\\media\\FlameHound Logo with Transparency@2x.png": "static/media/FlameHound Logo with Transparency@2x.7178ac2f.png",
+  "static\\media\\IncendioCasa.jpg": "static/media/IncendioCasa.afb394f0.jpg",
+  "static\\media\\IncendioEstrada.jpg": "static/media/IncendioEstrada.0e1b5f02.jpg",
+  "static\\media\\LixoFlorestas.jpg": "static/media/LixoFlorestas.9349888b.jpg",
   "static\\media\\colegas.png": "static/media/colegas.d55bb838.png",
   "static\\media\\indo_fire_1.jpg": "static/media/indo_fire_1.aa6bc4b7.jpg"
 }
