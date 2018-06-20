@@ -80,6 +80,22 @@ public class UserResource extends HttpServlet {
 		r.forward(request, response);
 	}
 	
+	
+	@GET
+	@Path("/getRole")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getRole(SessionInfo session) {
+		Entity user;
+		Response r = validLogin(session);
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return r;
+		user = (Entity) r.getEntity();
+		
+		return Response.ok(g.toJson(user.getProperty("role"))).build();
+
+	}
+	
 	public Response validLogin(SessionInfo session) {
 		if (session.tokenId.equals("0")) {
 			LOG.warning("User is not logged in");
