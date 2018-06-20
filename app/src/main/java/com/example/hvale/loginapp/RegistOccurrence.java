@@ -215,6 +215,7 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
             //   showProgress(false);
             try {
                 LogOutSingleton.getInstance(getApplicationContext()).setLoginToken(finalResponse);
+                
                 finish();
                 Intent it = new Intent(RegistOccurrence.this, HomePage.class);
                 startActivity(it);

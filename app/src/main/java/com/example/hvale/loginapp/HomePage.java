@@ -284,8 +284,8 @@ public class HomePage extends AppCompatActivity
             MarkerOptions initialMarkerOptions = new MarkerOptions();
             initialMarkerOptions.position(newMarker);
             initialMarkerOptions.title("Mockup Marker");
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(newMarker, 10));
-            map.addMarker(initialMarkerOptions);
+       //     map.animateCamera(CameraUpdateFactory.newLatLngZoom(newMarker, 10));
+       //     map.addMarker(initialMarkerOptions); FAKE MARKER
 
         }
         // Add a marker in Sydney and move the camera
