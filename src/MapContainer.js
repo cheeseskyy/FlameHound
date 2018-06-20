@@ -112,6 +112,20 @@ export default class MapContainer extends Component {
         });
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot){
+        this.props.markers.forEach(marker => { // iterate through locations saved in state
+            const loc = marker.location;
+            const coord = loc.split(",");
+            console.log(coord[0]);
+            new this.google.maps.Marker({ // creates a new Google maps Marker object.
+                position: {lat: parseFloat(coord[0]), lng: parseFloat(coord[1])}, // sets position of marker to specified location
+                map: this.map, // sets markers to appear on the map we just created on line 35
+                title: marker.title // the title of the marker is set to the name of the location
+            });
+            console.log("added marker at " + coord);
+        });
+    }
+
     render() {
         const style = { // MUST specify dimensions of the Google map or it will not work. Also works best when style is specified inside the render function and created as an object
             width: '100%', // 90vw basically means take up 90% of the width screen. px also works.

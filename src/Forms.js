@@ -7,10 +7,10 @@ function uploadOc(mediaURI, username) {
     xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/saveOccurrency", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     getCodedAddress(document.getElementById("location").value, xhttp, mediaURI, username);
-
+    console.log("Sending Occurrence");
     xhttp.onreadystatechange = function () {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
-            alert("Saved Occurrency");
+            alert("Saved Occurrence");
         }
     };
 }
@@ -197,6 +197,7 @@ export class LoginForm extends Component {
         var xhttp = new XMLHttpRequest();
         xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/login/v2", true);
         xhttp.setRequestHeader("Content-type", "application/json");
+        //xhttp.setRequestHeader("Access-Control-Allow-Origin")
         xhttp.send(jSonLoginInfo);
         xhttp.onreadystatechange = () => {
 
