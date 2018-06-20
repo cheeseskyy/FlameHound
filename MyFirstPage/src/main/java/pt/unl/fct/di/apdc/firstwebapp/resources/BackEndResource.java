@@ -14,8 +14,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -44,6 +46,7 @@ import com.google.api.client.util.store.DataStore;
 import org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
+import pt.unl.fct.di.apdc.firstwebapp.adminResources.OccurrencyManagement;
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.UserRoles;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminRegisterInfo;
@@ -106,6 +109,40 @@ public class BackEndResource extends HttpServlet {
 	}
 	
 	@POST
+	@Path("/addWorker")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addNewWorker(AdminRegisterInfo info) {
+		LOG.fine("Attempt to register worker: " + info.username);
+		if(info.username == null || info.password == null)
+			return Response.status(Status.BAD_REQUEST).build();
+		Transaction txn = datastore.beginTransaction();
+		try {
+			// If the entity does not exist an Exception is thrown. Otherwise,
+			Key userKey = KeyFactory.createKey("UserAdmin", info.username);
+			datastore.get(userKey);
+			txn.rollback();
+			return Response.status(Status.FORBIDDEN).entity("Username").build(); 
+		} catch (EntityNotFoundException e) {
+			Entity user = new Entity("UserWorker", info.username);
+			user.setProperty("password", DigestUtils.sha512Hex(info.password));
+			user.setProperty("ocurrenciesTreated", 0);
+			user.setProperty("approvalRate", 0);
+			user.setProperty("disapprovalRate", 0);
+			user.setProperty("adminPermission", info.registerUsername);
+			user.setProperty("creationTime", new Date());
+			datastore.put(txn,user);
+			LOG.info("Admin registered " + info.username);
+			txn.commit();
+			return Response.ok().build();
+		} finally {
+			if (txn.isActive() ) {
+				txn.rollback();
+			}
+		}
+	}
+	
+	@POST
 	@Path("/validLogin")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response validLogin(SessionInfo session) {
@@ -146,6 +183,7 @@ public class BackEndResource extends HttpServlet {
 			return Response.ok().build();
 		}catch (EntityNotFoundException e) {
 			LOG.warning("Failed to locate username: " + session.username);
+			txn.rollback();
 			return Response.status(Status.FORBIDDEN).build();
 		} finally {
 			if (txn.isActive()) {
@@ -252,7 +290,45 @@ public class BackEndResource extends HttpServlet {
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
 		}
-
+	}
+	
+	/**
+	 * Management Methods:
+	 */
+	
+	@Path("/oM")
+	private class OccurrencyManagementMethods {
+		
+		@Path("/confirm/{ocID}")
+		@PUT
+		@Consumes(MediaType.APPLICATION_JSON)
+		public Response confirmOccurrency(@PathParam("ocID") String ocID, SessionInfo session) {
+			if(validLogin(session) == Response.ok().build())
+				return OccurrencyManagement.confirmOccurrency(datastore, ocID, LOG);
+			else
+				return Response.status(Status.FORBIDDEN).build();
+		}
+		
+		@Path("/delete/{ocID}")
+		@DELETE
+		@Consumes(MediaType.APPLICATION_JSON)
+		public Response deleteOccurrency(@PathParam("ocID") String ocID, SessionInfo session) {
+			if(validLogin(session) == Response.ok().build())
+				return OccurrencyManagement.deleteOccurrency(datastore, ocID, LOG);
+			else
+				return Response.status(Status.FORBIDDEN).build();
+		}
+		
+		@Path("/update/{ocID}")
+		@PUT
+		@Consumes(MediaType.APPLICATION_JSON)
+		public Response updateOccurrency(@PathParam("ocID") String ocID, SessionInfo session) {
+			if(validLogin(session) == Response.ok().build())
+				return OccurrencyManagement.updateOccurrency(session, datastore, ocID, LOG);
+			else
+				return Response.status(Status.FORBIDDEN).build();
+		}
+		
 	}
 
 }

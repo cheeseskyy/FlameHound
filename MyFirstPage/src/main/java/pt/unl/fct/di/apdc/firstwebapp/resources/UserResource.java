@@ -1,9 +1,6 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -17,10 +14,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -50,6 +44,7 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminRegisterInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserStatsData;
 
 @Path("/user")
@@ -65,7 +60,17 @@ public class UserResource extends HttpServlet {
 	private static final Logger LOG = Logger.getLogger(UserResource.class.getName());
 	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+	private static final long TTLE = 5*60*1000; //TTL Entity 5 mins
+	private static final long TTLS = 2*60*1000; //TTL Stats 2 mins
+	
+	private long lastUpdateEntity = 0;
+	private long lastUpdateStats = 0;
 
+	private String username = null;
+	private Entity userEntity = null;
+	private UserStatsData userStats = null;
+	
+	
 	public UserResource() {
 	} // Nothing to be done here...
 
@@ -116,6 +121,13 @@ public class UserResource extends HttpServlet {
 			datastore.put(txn2, timeout);
 			txn.commit();
 			txn2.commit();
+			if(this.username == null)
+				this.username = session.username;
+			if(this.userEntity == null || System.currentTimeMillis() - lastUpdateEntity < TTLE) {
+				this.userEntity = user;
+				lastUpdateEntity = System.currentTimeMillis();
+			}
+			
 			return Response.ok(user).build();
 		} catch (EntityNotFoundException e) {
 			LOG.warning("Failed to locate username: " + session.username);
@@ -137,6 +149,22 @@ public class UserResource extends HttpServlet {
 
 	}
 	
+	@POST
+	@Path("/getAddress")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAddress(SessionInfo session) {
+		
+		Entity user;
+		Response r = validLogin(session);
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return r;
+		user = (Entity) r.getEntity();
+		
+		return Response.ok(g.toJson(user.getProperty("address"))).build();
+		
+	}
+	
 	@GET
 	@Path("/getStats")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -145,27 +173,31 @@ public class UserResource extends HttpServlet {
 		Response r = validLogin(session);
 		if(r.getStatus() != Response.Status.OK.getStatusCode())
 			return Response.status(Status.FORBIDDEN).build();
-		Key userStatsKey = KeyFactory.createKey("userAppStats", session.username);
-		Transaction txn = datastore.beginTransaction();
-		try {
-			Entity userStatsE = datastore.get(txn, userStatsKey);
-			UserStatsData userStats = new UserStatsData(
-					(long) userStatsE.getProperty("upvotes"),
-					(long) userStatsE.getProperty("downvotes"),
-					(long) userStatsE.getProperty("occurrenciesPosted"),
-					(long) userStatsE.getProperty("occurrenciesConfirmed")
-					);
-			return Response.ok().entity(g.toJson(userStats)).build();
-		} catch (EntityNotFoundException e) {
-			LOG.warning("Could not find stats for user: " + session.username);
-			return Response.status(Status.NOT_FOUND).build();
-		}finally {
-			if(txn.isActive()) {
-				txn.rollback();
-				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		if(userStats == null || System.currentTimeMillis() - lastUpdateStats > TTLS) {
+			Key userStatsKey = KeyFactory.createKey("userAppStats", session.username);
+			Transaction txn = datastore.beginTransaction();
+			try {
+				Entity userStatsE = datastore.get(txn, userStatsKey);
+				UserStatsData userStats = new UserStatsData(
+						(long) userStatsE.getProperty("upvotes"),
+						(long) userStatsE.getProperty("downvotes"),
+						(long) userStatsE.getProperty("occurrenciesPosted"),
+						(long) userStatsE.getProperty("occurrenciesConfirmed"));
+				this.userStats = userStats;
+				lastUpdateStats = System.currentTimeMillis();
+				return Response.ok().entity(g.toJson(userStats)).build();
+			} catch (EntityNotFoundException e) {
+				LOG.warning("Could not find stats for user: " + session.username);
+				return Response.status(Status.NOT_FOUND).build();
+			} finally {
+				if (txn.isActive()) {
+					txn.rollback();
+					return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+				}
 			}
 		}
 		
+		return Response.ok().entity(g.toJson(userStats)).build();
 		
 	}
 	
@@ -188,7 +220,33 @@ public class UserResource extends HttpServlet {
 		}
 		datastore.put(txn, user);
 		txn.commit();
+		userEntity = user;
 		return Response.ok().build();
+	}
+	
+	@POST
+	@Path("/getUserInfo")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getUserInfo(SessionInfo session) {
+		
+		Entity userE;
+		Response r = validLogin(session);
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return r;
+		userE = (Entity) r.getEntity();
+		
+		String name = (String) userE.getProperty("user_name");
+		String uN = userE.getKey().toString();
+		uN = uN.substring(6, uN.length()-2);
+		String email = (String) userE.getProperty("email");
+		String hN = (String) userE.getProperty("homeNumber");
+		String pN = (String) userE.getProperty("phoneNumber");
+		String add = (String) userE.getProperty("address");
+		String nif = (String) userE.getProperty("nif");
+		String cc = (String) userE.getProperty("cc");
+		UserInfo user = new UserInfo(name,uN,email,hN,pN,add,nif,cc);
+		return Response.ok(user).build();
 	}
 
 }
