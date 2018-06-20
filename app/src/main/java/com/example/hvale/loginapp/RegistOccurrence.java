@@ -73,7 +73,7 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
             inputLoc.setHintAnimationEnabled(true);*/
 
         }
-
+System.out.print("ola");
         mAuth = null;
         mTitleView = findViewById(R.id.title);
         mLocationView = findViewById(R.id.location);
@@ -215,7 +215,7 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
             //   showProgress(false);
             try {
                 LogOutSingleton.getInstance(getApplicationContext()).setLoginToken(finalResponse);
-                
+
                 finish();
                 Intent it = new Intent(RegistOccurrence.this, HomePage.class);
                 startActivity(it);
