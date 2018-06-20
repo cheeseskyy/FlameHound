@@ -42,11 +42,14 @@ import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.dropbox.core.DbxException;
 import com.google.api.client.util.store.DataStore;
 import org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.adminResources.OccurrencyManagement;
+import pt.unl.fct.di.apdc.firstwebapp.util.Utilities;
+import pt.unl.fct.di.apdc.firstwebapp.util.Enums.OccurrencyFlags;
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.UserRoles;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminRegisterInfo;
@@ -54,9 +57,9 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 
-@Path("/_be/_admin")
+@Path("/_bo/_worker")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-public class BackEndResource extends HttpServlet {
+public class BackOfficeResource extends HttpServlet {
 
 	/**
 	 * 
@@ -64,82 +67,17 @@ public class BackEndResource extends HttpServlet {
 	/**
 	 * A logger object.
 	 */
-	private static final Logger LOG = Logger.getLogger(BackEndResource.class.getName());
+	private static final Logger LOG = Logger.getLogger(BackOfficeResource.class.getName());
 	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-	public BackEndResource() {
+	public BackOfficeResource() {
 	} // Nothing to be done here...
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException , ServletException{
 		RequestDispatcher r = request.getRequestDispatcher("pages/login.html");
 		r.forward(request, response);
-	}
-	
-	@POST
-	@Path("/addAdmin")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response addNewAdmin(AdminRegisterInfo info) {
-		LOG.fine("Attempt to register admin: " + info.username);
-		if(info.username == null || info.password == null)
-			return Response.status(Status.BAD_REQUEST).build();
-		Transaction txn = datastore.beginTransaction();
-		try {
-			// If the entity does not exist an Exception is thrown. Otherwise,
-			Key userKey = KeyFactory.createKey("UserAdmin", info.username);
-			datastore.get(userKey);
-			txn.rollback();
-			return Response.status(Status.FORBIDDEN).entity("Username").build(); 
-		} catch (EntityNotFoundException e) {
-			Entity user = new Entity("UserAdmin", info.username);
-			user.setProperty("password", DigestUtils.sha512Hex(info.password));
-			user.setProperty("adminPermission", info.registerUsername);
-			user.setProperty("creationTime", new Date());
-			datastore.put(txn,user);
-			LOG.info("Admin registered " + info.username);
-			txn.commit();
-			return Response.ok().build();
-		} finally {
-			if (txn.isActive() ) {
-				txn.rollback();
-			}
-		}
-	}
-	
-	@POST
-	@Path("/addWorker")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response addNewWorker(AdminRegisterInfo info) {
-		LOG.fine("Attempt to register worker: " + info.username);
-		if(info.username == null || info.password == null)
-			return Response.status(Status.BAD_REQUEST).build();
-		Transaction txn = datastore.beginTransaction();
-		try {
-			// If the entity does not exist an Exception is thrown. Otherwise,
-			Key userKey = KeyFactory.createKey("UserAdmin", info.username);
-			datastore.get(userKey);
-			txn.rollback();
-			return Response.status(Status.FORBIDDEN).entity("Username").build(); 
-		} catch (EntityNotFoundException e) {
-			Entity user = new Entity("UserWorker", info.username);
-			user.setProperty("password", DigestUtils.sha512Hex(info.password));
-			user.setProperty("ocurrenciesTreated", 0);
-			user.setProperty("approvalRate", 0);
-			user.setProperty("disapprovalRate", 0);
-			user.setProperty("adminPermission", info.registerUsername);
-			user.setProperty("creationTime", new Date());
-			datastore.put(txn,user);
-			LOG.info("Admin registered " + info.username);
-			txn.commit();
-			return Response.ok().build();
-		} finally {
-			if (txn.isActive() ) {
-				txn.rollback();
-			}
-		}
 	}
 	
 	@POST
@@ -155,11 +93,11 @@ public class BackEndResource extends HttpServlet {
 		try {
 			LOG.info("Attempt to get user: " + session.username);
 			Entity userN = datastore.get(userKey);
-			if(!userN.getProperty("role").equals(UserRoles.ADMIN.toString()))
+			if(!userN.getProperty("role").equals(UserRoles.WORKER.toString()))
 				return Response.status(Status.FORBIDDEN).build();
 			LOG.info("Got user");
-			Key adminUserKey = KeyFactory.createKey("UserAdmin", session.username);
-			Entity user = datastore.get(adminUserKey);
+			Key workerUserKey = KeyFactory.createKey("UserWorker", session.username);
+			Entity user = datastore.get(workerUserKey);
 			if(!user.getProperty("TokenKey").equals(session.tokenId))
 				return Response.status(Status.FORBIDDEN).build();
 			Key timeoutKey = KeyFactory.createKey("timeout", session.username);
@@ -201,12 +139,12 @@ public class BackEndResource extends HttpServlet {
 		LOG.info("Attempt to login admin user: " + data.username);
 
 		Transaction txn = datastore.beginTransaction();
-		Key userKey = KeyFactory.createKey("UserAdmin", data.username);
+		Key userKey = KeyFactory.createKey("UserWorker", data.username);
 		try {
 			Entity user = datastore.get(userKey);
 			LOG.info("Got AdminUser");
 			// Obtain the user login statistics
-			Query ctrQuery = new Query("AdminUserStats").setAncestor(userKey);
+			Query ctrQuery = new Query("WorkerUserStats").setAncestor(userKey);
 			List<Entity> results = datastore.prepare(ctrQuery).asList(FetchOptions.Builder.withDefaults());
 			Entity ustats = null;
 			LOG.info("Logging stats");
@@ -297,38 +235,95 @@ public class BackEndResource extends HttpServlet {
 	 */
 	
 	@Path("/oM")
-	private class OccurrencyManagementMethods {
-		
-		@Path("/confirm/{ocID}")
-		@PUT
-		@Consumes(MediaType.APPLICATION_JSON)
-		public Response confirmOccurrency(@PathParam("ocID") String ocID, SessionInfo session) {
-			if(validLogin(session) == Response.ok().build())
-				return OccurrencyManagement.confirmOccurrency(datastore, ocID, LOG);
-			else
-				return Response.status(Status.FORBIDDEN).build();
+	public class WorkerOccurrencyManagement {
+
+		private final Gson g = new Gson();
+		private final DropBoxResource dbIntegration = new DropBoxResource();
+
+		public WorkerOccurrencyManagement() {
 		}
 		
-		@Path("/delete/{ocID}")
-		@DELETE
-		@Consumes(MediaType.APPLICATION_JSON)
-		public Response deleteOccurrency(@PathParam("ocID") String ocID, SessionInfo session) {
-			if(validLogin(session) == Response.ok().build())
-				return OccurrencyManagement.deleteOccurrency(datastore, ocID, LOG);
-			else
-				return Response.status(Status.FORBIDDEN).build();
-		}
 		
-		@Path("/update/{ocID}")
+		@Path("tag/{ocID}")
 		@PUT
 		@Consumes(MediaType.APPLICATION_JSON)
-		public Response updateOccurrency(@PathParam("ocID") String ocID, SessionInfo session) {
-			if(validLogin(session) == Response.ok().build())
-				return OccurrencyManagement.updateOccurrency(session, datastore, ocID, LOG);
-			else
-				return Response.status(Status.FORBIDDEN).build();
+		public Response tagOccurrency(@PathParam("ocID") String ocID, SessionInfo session) {
+			Transaction txn = datastore.beginTransaction();
+			Key ocKey = KeyFactory.createKey("Occurrency", ocID);
+			try {
+				LOG.info("Attempt to get ocurrency: " + ocID);
+				Entity occurrency = datastore.get(txn, ocKey);
+				LOG.info("Got occurrency");
+				occurrency.setProperty("flag", OccurrencyFlags.solving);
+				datastore.put(txn, occurrency);
+				txn.commit();
+				return Response.ok().build();
+			} catch (EntityNotFoundException e) {
+				LOG.warning("Failed to locate ocurrency: " + ocID);
+				return Response.status(Status.NOT_FOUND).build();
+			} finally {
+				if (txn.isActive()) {
+					txn.rollback();
+					return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+				}
+			}
+		}
+		
+		@Path("/solve/{ocID}/{imageID}")
+		@POST
+		@Consumes(MediaType.APPLICATION_JSON)
+		public Response solveOccurrency(@PathParam("ocID") String ocID, @PathParam("imageID") String imageID) {
+			Transaction txn = datastore.beginTransaction();
+			Key ocKey = KeyFactory.createKey("Occurrency", ocID);
+			try {
+				LOG.info("Attempt to get ocurrency: " + ocID);
+				Entity occurrency = datastore.get(txn, ocKey);
+				LOG.info("Got occurrency");
+				datastore.delete(ocKey);
+				Key solvedOcKey = KeyFactory.createKey("solvedOccurrency", ocID);
+				Entity solvedOccurrency = new Entity(solvedOcKey);
+				solvedOccurrency.setPropertiesFrom(occurrency);
+				solvedOccurrency.setProperty("imageID", imageID);
+				datastore.put(txn, solvedOccurrency);
+				txn.commit();
+				return Response.ok().build();
+			} catch (EntityNotFoundException e) {
+				LOG.warning("Failed to locate ocurrency: " + ocID);
+				return Response.status(Status.NOT_FOUND).build();
+			} finally {
+				if (txn.isActive()) {
+					txn.rollback();
+					return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+				}
+			}
+		}
+		
+		@POST
+		@Path("/saveImage/{extension}")
+		@Consumes(MediaType.APPLICATION_OCTET_STREAM)
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response uploadFileDropbox(byte[] file, @PathParam("extension") String ext) {
+			String uuid = Utilities.generateID();
+			Transaction txn = datastore.beginTransaction();
+			LOG.info("Uploading image");
+			try {
+				dbIntegration.putFile(uuid, file , ext);
+				LOG.info("Uploaded image with id "+uuid+"."+ext);
+				txn.commit();
+		} catch (IOException | DbxException e) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		} catch (Exception e) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		}finally {
+			if (txn.isActive()) {
+				txn.rollback();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			}
+		}
+			return Response.ok(g.toJson(uuid+"."+ext)).build();
 		}
 		
 	}
+		
 
 }

@@ -58,7 +58,7 @@
   </servlet-mapping>
   <servlet>
     <servlet-name>mapServlet</servlet-name>
-    <servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.MapResource</servlet-class>
+    <servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.OccurrencyResource</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>
