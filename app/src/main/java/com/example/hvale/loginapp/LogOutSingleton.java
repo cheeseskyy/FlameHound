@@ -56,6 +56,10 @@ class LogOutSingleton {
         sessionInfo = null;
     }
 
+    public JSONObject getSessionId(){
+        return sessionInfo;
+    }
+
     public boolean isLoggedIn(){
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL_SERVER + "/utils/validLogin", sessionInfo, new Response.Listener<JSONObject>() {

@@ -46,8 +46,8 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
     private static final String URL_SERVER = "https://my-first-project-196314.appspot.com/rest";
     private static final int RESULT_LOAD_IMAGE = 1;
 
-    ImageView imageToUpload;
-    TextInputLayout inputLoc;
+    private ImageView imageToUpload;
+    private EditText inputLoc;
     private RegisterOcurrenceTask mAuth;
     //private View mOcurrenceFormView;
     private EditText mTitleView;
@@ -66,11 +66,11 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
         if (p != null) {
             String loc = p.getString("Loc", "Localização");
             Log.d("location", loc);
-            inputLoc = findViewById(R.id.Localizacao);
-
-            inputLoc.setHintEnabled(true);
+            mLocationView = findViewById(R.id.location);
+            mLocationView.setText(loc);
+          /*  inputLoc.setHintEnabled(true);
             inputLoc.setHint(loc);
-            inputLoc.setHintAnimationEnabled(true);
+            inputLoc.setHintAnimationEnabled(true);*/
 
         }
 
@@ -101,8 +101,7 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
         // Spinner spinner = (Spinner) findViewById(R.id.spinner);
 
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.types_array, simple_spinner_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.types_array, simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
@@ -152,13 +151,12 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
 
         String title = mTitleView.getText().toString();
         String location = mLocationView.getText().toString();
-        String description = mLocationView.getText().toString();
+        String description = mDescriptionView.getText().toString();
         String type = (String) mTypeView.getSelectedItem();
         List<String > mediaURI = mImage;
         String username = LogOutSingleton.getInstance(getApplicationContext()).getUsername();
         boolean cancel;
         cancel = false;
-
         View focusView = mDescriptionView;
 
         if (cancel) {
@@ -175,12 +173,6 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
 
     public class RegisterOcurrenceTask {
 
-        /*private String mTitle;
-        private String mLocation;
-        private String mDescription;
-        private String mType;
-        private String mUsername;
-        private List<String> mMediaURI;*/
         private OcurrenceData ocurrenceData;
         private JSONObject finalResponse;
 
@@ -196,6 +188,7 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
             try {
                 jsonObject = new JSONObject(jsonImg);
             } catch (JSONException e) {
+                System.out.println("oalal");
                 e.printStackTrace();
             }
 
@@ -203,14 +196,12 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL_SERVER + "/occurrency/saveOccurrency", jsonObject, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    System.out.print("ola");
                     finalResponse = response;
                     onPostExecute(finalResponse);
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    System.out.print("ola2");
                     error.printStackTrace();
                     onCancelled(error);
                 }
@@ -223,7 +214,6 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
             mAuth = null;
             //   showProgress(false);
             try {
-                System.out.print("MUDAR");
                 LogOutSingleton.getInstance(getApplicationContext()).setLoginToken(finalResponse);
                 finish();
                 Intent it = new Intent(RegistOccurrence.this, HomePage.class);

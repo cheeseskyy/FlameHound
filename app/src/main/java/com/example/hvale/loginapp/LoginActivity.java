@@ -12,7 +12,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
@@ -136,7 +135,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         loginPrefsEditor = loginPreferences.edit();
         saveLogin = loginPreferences.getBoolean("saveLogin", false);
 
-        if (saveLogin == true) {
+        if (saveLogin) {
             mUsernameView.setText(loginPreferences.getString("username", ""));
             mPasswordView.setText(loginPreferences.getString("password", ""));
             rememberme.setChecked(true);
@@ -145,7 +144,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         rememberme.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (saveLogin == false) {
+                if (!saveLogin) {
                     saveLogin = true;
                     rememberme.setChecked(true);
                 } else
@@ -400,7 +399,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             jsonObjParam.put("password", mPassword);
             JSONObject jsonObject = new JSONObject(jsonObjParam);
             setProgressBarVisibility(true);
-            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL_SERVER + "/LoginData/v2", jsonObject, new Response.Listener<JSONObject>() {
+            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL_SERVER + "/login/v2", jsonObject, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     finalResponse = response;

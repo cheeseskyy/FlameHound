@@ -20,6 +20,8 @@ public class OcurrenceData {
         this.title = title;
         this.description = description;
         this.user = user;
+        location = "(" + location + ")";
+        location = location.replace(":",", ");
         this.location = location;
         this.type = selectType(type);
         this.mediaURI = mediaURI;
