@@ -194,8 +194,10 @@ public class OccurrencyResource extends HttpServlet{
 				txn.rollback();
 				return Response.status(Status.FORBIDDEN).build();
 			}
-			timeout.setProperty("lastOp", System.currentTimeMillis());
-			datastore.put(timeout);
+			if(System.currentTimeMillis() - lastOp > 60*1000) {
+				timeout.setProperty("lastOp", System.currentTimeMillis());
+				datastore.put(timeout);
+			}
 			LOG.info("User is logged in");
 			txn.commit();
 			return Response.ok(g.toJson(user)).build();
@@ -307,7 +309,7 @@ public class OccurrencyResource extends HttpServlet{
 		Response r = checkIsLoggedIn(session);
 		if(r.getStatus() != Response.Status.OK.getStatusCode())
 			return r;
-		byte[] file;
+		byte[] file;		
 		try {
 			LOG.info("Getting image: " + imageID);
 			int point = imageID.indexOf('.');
@@ -316,8 +318,7 @@ public class OccurrencyResource extends HttpServlet{
 			file = dbIntegration.getFile(name, ext);
 			LOG.info("Found file");
 			if(file == null)
-				return Response.status(Status.NOT_FOUND).build();
-			
+				return Response.status(Status.NOT_FOUND).build();			
 		}catch(Exception e) {
 			LOG.warning(e.getMessage());
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
