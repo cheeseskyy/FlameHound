@@ -5,6 +5,7 @@ import placeHolder3 from './images/placeholders/LixoFlorestas.jpg';
 import placeHolder4 from './images/placeholders/IncendioEstrada.jpg';
 import './Occurrences.css';
 import {CommentList} from "./Comments";
+import {Link} from 'react-router-dom';
 
 
 export class OccurrenceList extends Component {
@@ -98,19 +99,21 @@ export class OccurrencePreview extends Component {
         if(!this.hasImage)
             this.getImage(this.props.image);
 
-        return (
+        return(
             <div className="occurrence">
-                <div id="occurrenceImage">
+                <Link to="/occurrence">
+                        <div id="occurrenceImage">
                     {console.log(image)}
-                    <img id="occurrenceLogo" src={image}/>
+                    <img id="occurrenceLogo"src={image}/>
                 </div>
                 <div>
-                    <p id="occurrenceTitle"> {this.props.title}</p>
+                    <p id = "occurrenceTitle"> {this.props.title}</p>
                     <p> {this.props.user}</p>
                     <p> {this.props.description}</p>
                     <p> {this.props.location}</p>
                 </div>
-                <div id="occurrenceButtons">
+                </Link>
+                    <div id="occurrenceButtons">
                     <button>
                         +1
                     </button>

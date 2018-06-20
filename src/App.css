@@ -30,30 +30,7 @@ Body{
   to { transform: rotate(360deg); }
 }
 
-a {
-  color: white;
-  text-decoration: none;
-}
 
-/* unvisited link */
-a:link {
-  color:white;
-}
-
-/* visited link */
-a:visited {
-  color: white;
-}
-
-/* mouse over link */
-a:hover {
-  color: #FF6E00;
-}
-
-/* selected link */
-a:active {
-  color: blue;
-}
 
 .ColumnLayout{
   white-space: nowrap;
