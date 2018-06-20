@@ -28,78 +28,21 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserInfo;
 
 @Path("/session")
-public class MapResource extends HttpServlet{
+public class SessionResource extends HttpServlet{
 	
 	private static final Response FORBIDDEN = Response.status(Status.FORBIDDEN).build();
 	private static final Response INTERNALSE = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-	private static final Logger LOG = Logger.getLogger(MapResource.class.getName());
+	private static final Logger LOG = Logger.getLogger(SessionResource.class.getName());
 	private final Gson g = new Gson();
 	private static DropBoxResource dbIntegration = new DropBoxResource();	
-	public MapResource() {}
+	public SessionResource() {}
 	
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException , ServletException{
 		RequestDispatcher r = request.getRequestDispatcher("pages/homePage.html");
 		r.forward(request, response);
 	}
-
-	@POST
-	@Path("/getAddress")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAddress(SessionInfo session) {
-		
-		Entity user;
-		Response r = isLoggedIn(session);
-		if(r.getStatus() != Response.Status.OK.getStatusCode())
-			return r;
-		user = (Entity) r.getEntity();
-		
-		return Response.ok(g.toJson(user.getProperty("address"))).build();
-		
-	}
-
-	
-	
-	@POST
-	@Path("/getUserInfo")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUserInfo(SessionInfo session) {
-		
-		Entity userE;
-		Response r = isLoggedIn(session);
-		if(r.getStatus() != Response.Status.OK.getStatusCode())
-			return r;
-		userE = (Entity) r.getEntity();
-		
-		String name = (String) userE.getProperty("user_name");
-		String uN = userE.getKey().toString();
-		uN = uN.substring(6, uN.length()-2);
-		String email = (String) userE.getProperty("email");
-		String hN = (String) userE.getProperty("homeNumber");
-		String pN = (String) userE.getProperty("phoneNumber");
-		String add = (String) userE.getProperty("address");
-		String nif = (String) userE.getProperty("nif");
-		String cc = (String) userE.getProperty("cc");
-		UserInfo user = new UserInfo(name,uN,email,hN,pN,add,nif,cc);
-		return Response.ok(user).build();
-	}
-	
-	@POST
-	@Path("/geocodeAddress")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response geocodeAddress(SessionInfo session) {
-		
-		Response r = isLoggedIn(session);
-		if(r.getStatus() != Response.Status.OK.getStatusCode())
-			return r;
-		return Response.ok().build();
-		
-			
-	}
-	
 	
 	@POST
 	@Path("/logout")

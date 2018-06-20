@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
@@ -22,6 +24,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -45,6 +48,7 @@ import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.gson.Gson;
 import com.sun.research.ws.wadl.Application;
 import pt.unl.fct.di.apdc.firstwebapp.util.Utilities;
+import pt.unl.fct.di.apdc.firstwebapp.util.Enums.OccurrencyFlags;
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.OccurrencyTypes;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
@@ -59,13 +63,16 @@ public class OccurrencyResource extends HttpServlet{
 	private static final Logger LOG = Logger.getLogger(OccurrencyResource.class.getName());
 	private final Gson g = new Gson();
 	private static DropBoxResource dbIntegration = new DropBoxResource();
-	
+	private static final long TTL = 5*1000*60; //5 mins
+	Map<String,OccurrencyData> listCache = new ConcurrentHashMap<String, OccurrencyData>();
+	private long lastUpdate = 0;
 	public OccurrencyResource() {}
 	
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException , ServletException{
 		RequestDispatcher r = request.getRequestDispatcher("pages/occurrencyForm.html");
 		r.forward(request, response);
+		updateCache();
 	}
 	
 	
@@ -79,16 +86,18 @@ public class OccurrencyResource extends HttpServlet{
 		Response r = checkIsLoggedIn(session);
 		if(r.getStatus() != Response.Status.OK.getStatusCode())
 			return Response.status(Status.FORBIDDEN).build();
-			LOG.info("Preparing filter");
-			Filter propertyFilter =
-			    new FilterPredicate("user", FilterOperator.EQUAL, username);
-			LOG.info("Preparing query");
-			Query q = new Query("Occurrency").setFilter(propertyFilter);
-			LOG.info("Executing query");
-			PreparedQuery pQ = datastore.prepare(q);
-			LOG.info("Iterator");
-			List<Entity> it = pQ.asList(FetchOptions.Builder.withDefaults());
-			return Response.ok().entity(g.toJson(it)).build();
+		
+		if(System.currentTimeMillis() - TTL > lastUpdate)
+			updateCache();
+		
+		List<OccurrencyData> list = new ArrayList<OccurrencyData>(listCache.values());
+		for(int i = 0; i < list.size();) {
+			if(!list.get(i).user.equals(username))
+				list.remove(i);
+			else
+				i++;
+		}
+		return Response.ok().entity(g.toJson(list)).build();
 	}
 	
 	@POST
@@ -96,21 +105,25 @@ public class OccurrencyResource extends HttpServlet{
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getOcurrencyByType(SessionInfo session, @PathParam("type") String type) {
-		if(OccurrencyTypes.valueOf(type) == null)
+		OccurrencyTypes t;
+		if((t = OccurrencyTypes.valueOf(type)) == null)
 			return Response.status(Status.BAD_REQUEST).build();
 		Response r = checkIsLoggedIn(session);
 		if(r.getStatus() != Response.Status.OK.getStatusCode())
 			return Response.status(Status.FORBIDDEN).build();
-			LOG.info("Preparing filter");
-			Filter propertyFilter =
-			    new FilterPredicate("type", FilterOperator.EQUAL, type);
-			LOG.info("Preparing query");
-			Query q = new Query("Occurrency").setFilter(propertyFilter);
-			LOG.info("Executing query");
-			PreparedQuery pQ = datastore.prepare(q);
-			LOG.info("Iterator");
-			List<Entity> it = pQ.asList(FetchOptions.Builder.withDefaults());
-			return Response.ok().entity(g.toJson(it)).build();
+		
+		if(System.currentTimeMillis() - TTL > lastUpdate)
+			updateCache();
+		
+		List<OccurrencyData> list = new ArrayList<OccurrencyData>(listCache.values());
+		for(int i = 0; i < list.size();) {
+			if(!list.get(i).type.equals(t))
+				list.remove(i);
+			else
+				i++;
+		}
+		
+		return Response.ok().entity(g.toJson(list)).build();
 	}
 	
 	@PUT
@@ -120,7 +133,6 @@ public class OccurrencyResource extends HttpServlet{
 		Response r = checkIsLoggedIn(session);
 		if(r.getStatus() != Response.Status.OK.getStatusCode())
 			return Response.status(Status.FORBIDDEN).build();
-		Entity user = (Entity) r.getEntity();
 		Transaction txn = datastore.beginTransaction();
 		Key ocKey = KeyFactory.createKey("Ocurrency", ocID);
 		try {
@@ -132,14 +144,18 @@ public class OccurrencyResource extends HttpServlet{
 				Response.status(Status.FORBIDDEN).build();
 			}
 			
+			LOG.info("Replacing values");
 			@SuppressWarnings("unchecked")
 			Iterator<String> it = ((List<String>) session.getArgs().get(0)).iterator();
 			while(it.hasNext()) {
 				String param = it.next();
 				String[] line = param.split(":");
+				if(line[0].trim().equals("type") && OccurrencyTypes.valueOf(line[1].trim()) == null)
+					throw new WebApplicationException(Status.BAD_REQUEST);
 				occurrency.setProperty(line[0].trim(), line[1].trim());
 			}
 			datastore.put(txn, occurrency);
+			listCache.put(occurrency.getKey().toString(), convertOcToOcData(occurrency));
 			txn.commit();
 			return Response.ok().build();
 		}catch (EntityNotFoundException e) {
@@ -204,6 +220,7 @@ public class OccurrencyResource extends HttpServlet{
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response saveOccurrency(OccurrencyData data) {
 		Transaction txn = datastore.beginTransaction();
+		Transaction txn2 = datastore.beginTransaction();
 		LOG.info("Generating ID");
 		String uuid = Utilities.generateID();
 		try {
@@ -224,18 +241,28 @@ public class OccurrencyResource extends HttpServlet{
 			occurrency.setProperty("type", data.getType().toString());
 			occurrency.setProperty("creationTime", System.currentTimeMillis());
 			occurrency.setProperty("imagesID", data.getMediaURI());
-			occurrency.setProperty("confirmed", "no");
+			occurrency.setProperty("flag", OccurrencyFlags.unconfirmed.toString());
 			datastore.put(txn, occurrency);
 			LOG.info("Put Occurrency");
+			listCache.put(occurrency.getKey().toString(), convertOcToOcData(occurrency));
 			
-			/*Transaction txn2 = datastore.beginTransaction();
 			Key userStatsKey = KeyFactory.createKey("userAppStats", data.getUser());
 			Entity userStatsE = datastore.get(txn2, userStatsKey);
 			long stat = ((long) userStatsE.getProperty("occurrenciesPosted"));
 			userStatsE.setProperty("occurrenciesPosted", ++stat);
-			datastore.put(txn2, userStatsE);*/
+			datastore.put(txn2, userStatsE);
 			txn.commit();
-			//txn2.commit();
+			txn2.commit();
+		}catch (EntityNotFoundException e) {
+			Key userStatsKey = KeyFactory.createKey("userAppStats", data.getUser());
+			Entity userStatsE = new Entity(userStatsKey);
+			userStatsE.setProperty("downvotes", 0);
+			userStatsE.setProperty("upvotes", 0);
+			userStatsE.setProperty("occurrenciesConfirmed", 0);
+			userStatsE.setProperty("occurrenciesPosted", 1);
+			datastore.put(txn2, userStatsE);
+			txn2.commit();
+			txn.commit();
 		}catch (Exception e) {
 			LOG.warning(e.getMessage());
 		} finally {
@@ -298,6 +325,20 @@ public class OccurrencyResource extends HttpServlet{
 		return Response.ok(file).build();
 	}
 	
+	public void updateCache() {
+		LOG.info("Got general request, querying all occurrencies");
+		Query q = new Query("Occurrency");
+		PreparedQuery pQ = datastore.prepare(q);
+		Iterator<Entity> it = pQ.asIterator();
+		LOG.info("Got all");
+		LOG.info("Converting all to readable format");
+		while(it.hasNext()) {
+			Entity oc = it.next();
+			listCache.put(oc.getKey().toString(), convertOcToOcData(oc));
+		}
+		lastUpdate = System.currentTimeMillis();
+	}
+	
 	@POST
 	@Path("getOccurrency/{ocID}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -308,39 +349,21 @@ public class OccurrencyResource extends HttpServlet{
 		if(r.getStatus() != Response.Status.OK.getStatusCode())
 			return r;
 		
-		Transaction txn = datastore.beginTransaction();
+		if(System.currentTimeMillis() - TTL > lastUpdate)
+			updateCache();
+		
 		if(ocurrencyID.equals("all")) {
-			LOG.info("Got general request, querying all occurrencies");
-			Query q = new Query("Occurrency");
-			PreparedQuery pQ = datastore.prepare(q);
-			Iterator<Entity> it = pQ.asIterator();
-			LOG.info("Got all");
-			List<OccurrencyData> ocList = new ArrayList<OccurrencyData>();
-			LOG.info("Converting all to readable format");
-			while(it.hasNext()) {
-				ocList.add(convertOcToOcData(it.next()));
-			}
-			return Response.ok(g.toJson(ocList)).build();
+			return Response.ok(g.toJson(listCache.values())).build();
 		}
 		
-		Key ocKey = KeyFactory.createKey("Occurrency", ocurrencyID);
 		try {
-			LOG.info("Attempt to get ocurrency: " + ocurrencyID);
-			Entity ocurrency = datastore.get(txn, ocKey);
-			LOG.info("Got ocurrency");
-			txn.commit();
-			LOG.info("Converting occurrency to readable format");
-			OccurrencyData oc = convertOcToOcData(ocurrency);
+			OccurrencyData oc = listCache.get(ocurrencyID);
+			if(oc == null)
+				throw new EntityNotFoundException(null);
 			return Response.ok(g.toJson(oc)).build();
 		}catch (EntityNotFoundException e) {
 			LOG.warning("Failed to locate ocurrency: " + ocurrencyID);
-			txn.rollback();
 			return Response.status(Status.NOT_FOUND).build();
-		} finally {
-			if (txn.isActive()) {
-				txn.rollback();
-				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-			}
 		}
 	}
 
