@@ -57,7 +57,7 @@ import static android.Manifest.permission.INTERNET;
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
- * A login screen that offers login via email/password.
+ * A LoginData screen that offers LoginData via email/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
@@ -68,7 +68,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private static final int REQUEST_INTERNET = 1;
     private static final String URL_SERVER = "https://my-first-project-196314.appspot.com/rest";
     /**
-     * Keep track of the login task to ensure we can cancel it if requested.
+     * Keep track of the LoginData task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
     private boolean saveLogin;
@@ -118,7 +118,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        //SetUp login form
+        //SetUp LoginData form
         populateAutoComplete();
 
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -249,13 +249,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     /**
-     * Verify if the login was a sucess
+     * Verify if the LoginData was a sucess
      */
 
     /**
-     * Attempts to sign in or register the account specified by the login form.
+     * Attempts to sign in or RegisterData the account specified by the LoginData form.
      * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
+     * errors are presented and no actual LoginData attempt is made.
      */
     private void attemptLogin() {
         if (mAuthTask != null) {
@@ -265,7 +265,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mUsernameView.setError(null);
         mPasswordView.setError(null);
 
-        // Store values at the time of the login attempt.
+        // Store values at the time of the LoginData attempt.
         String username = mUsernameView.getText().toString();
         String password = mPasswordView.getText().toString();
 
@@ -285,12 +285,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
+            // There was an error; don't attempt LoginData and focus the first
             // form field with an error.
             focusView.requestFocus();
         } else {
             // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
+            // perform the user LoginData attempt.
             showProgress(true);
             mAuthTask = new UserLoginTask(username, password);
             mAuthTask.doInBackground();
@@ -298,7 +298,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     /**
-     * Shows the progress UI and hides the login form.
+     * Shows the progress UI and hides the LoginData form.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
@@ -379,7 +379,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
     /**
-     * Represents an asynchronous login/registration task used to authenticate
+     * Represents an asynchronous LoginData/registration task used to authenticate
      * the user.
      */
     public class UserLoginTask {
@@ -400,7 +400,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             jsonObjParam.put("password", mPassword);
             JSONObject jsonObject = new JSONObject(jsonObjParam);
             setProgressBarVisibility(true);
-            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL_SERVER + "/login/v2", jsonObject, new Response.Listener<JSONObject>() {
+            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL_SERVER + "/LoginData/v2", jsonObject, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     finalResponse = response;

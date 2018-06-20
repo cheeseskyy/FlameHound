@@ -42,10 +42,14 @@ class LogOutSingleton {
 
     public void setLoginToken(JSONObject sessionInfo) throws JSONException{
         this.sessionInfo = sessionInfo;
-     //   this.loginToken = sessionInfo.get(TOKEN_ID).toString();
-     //   this.username = sessionInfo.get(USERNAME).toString();
+        this.loginToken = sessionInfo.get(TOKEN_ID).toString();
+        this.username = sessionInfo.get(USERNAME).toString();
     }
 
+    public String getUsername(){
+        return username;
+    }
+    
     public void logOut(){
         loginToken = "0";
         username = "0";

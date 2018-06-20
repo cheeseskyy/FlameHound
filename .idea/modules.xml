@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/FlameHound.iml" filepath="$PROJECT_DIR$/FlameHound.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/loginApp.iml" filepath="$PROJECT_DIR$/loginApp.iml" />
     </modules>
   </component>
 </project>

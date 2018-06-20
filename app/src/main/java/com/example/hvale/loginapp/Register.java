@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A login screen that offers login via email/password.
+ * A LoginData screen that offers LoginData via email/password.
  */
 public class Register extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
@@ -88,7 +88,7 @@ public class Register extends AppCompatActivity implements LoaderCallbacks<Curso
     }
 
     /**
-     * Attempts to sign in or register the account specified by the login form.
+     * Attempts to sign in or RegisterData the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
@@ -271,7 +271,7 @@ public class Register extends AppCompatActivity implements LoaderCallbacks<Curso
             jsonObjParam.put("confirmation", mPasswordConfirmation);
             JSONObject jsonObject = new JSONObject(jsonObjParam);
             setProgressBarVisibility(true);
-            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL_SERVER + "/register/v3", jsonObject, new Response.Listener<JSONObject>() {
+            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL_SERVER + "/RegisterData/v3", jsonObject, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     onPostExecute();
