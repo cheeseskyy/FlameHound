@@ -123,7 +123,7 @@ class Body extends Component {
                     <Route path="/EntityPage" render={(props) =>
                         <EntityPage name = "Placeholder" description = "Placeholder is a company that holds places"/>
                     }/>
-                    <Route path="/PerfilPage" render={(props) =>
+                    <Route path="/profile" render={(props) =>
                         <PerfilPage name = "Placeholder" />
                     }/>
                     <Route path="/Occurrence" render={(props) =>
