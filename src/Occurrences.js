@@ -20,7 +20,7 @@ export class OccurrenceList extends Component {
                                       image={occurrence.mediaURI[0]}
                                       randomProp={console.log("created occurrence " + occurrence.title)}/>
         })
-    }
+    } 
 
     render() {
 
