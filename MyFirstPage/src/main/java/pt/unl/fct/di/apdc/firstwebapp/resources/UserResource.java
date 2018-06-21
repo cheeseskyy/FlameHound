@@ -41,11 +41,13 @@ import com.google.api.client.util.store.DataStore;
 import org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
+import pt.unl.fct.di.apdc.firstwebapp.util.Enums.OccurrencyFlags;
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.UserRoles;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminRegisterInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.OccurrencyStatsData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserStatsData;
@@ -64,7 +66,7 @@ public class UserResource extends HttpServlet {
 	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private static final long TTLE = 5*60*1000; //TTL Entity 5 mins
-	private static final long TTLS = 2*60*1000; //TTL Stats 2 mins
+	private static final long TTLS = 5*60*1000; //TTL Stats 2 mins
 	
 	private long lastUpdateEntity = 0;
 	private long lastUpdateStats = 0;
@@ -85,9 +87,9 @@ public class UserResource extends HttpServlet {
 	
 	
 	@POST
-	@Path("/upvote/{ocId}")
+	@Path("/vote/{operation}/{ocId}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response upvoteOc(SessionInfo session, @PathParam("ocId") String ocID) {
+	public Response voteOc(SessionInfo session, @PathParam("ocId") String ocID, @PathParam("operation") String operation) {
 		Entity user;
 		Response r = validLogin(session);
 		if(r.getStatus() != Response.Status.OK.getStatusCode())
@@ -101,11 +103,11 @@ public class UserResource extends HttpServlet {
 			Entity likedOcs = datastore.get(txn, likedOcKey);
 			
 			@SuppressWarnings("unchecked")
-			List<String> likedOcList = (ArrayList<String>) likedOcs.getProperty("ocurrencies");
+			List<String> likedOcList = (ArrayList<String>) likedOcs.getProperty("occurrencies");
 			
 			likedOcList.add(ocID);
 			
-			likedOcs.setProperty("ocurrencies", likedOcList);
+			likedOcs.setProperty("occurrencies", likedOcList);
 			
 			txn.commit();
 		}catch(EntityNotFoundException e) {
@@ -125,26 +127,60 @@ public class UserResource extends HttpServlet {
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
 		}
-		updateRelatedStats(ocID, "like");
-		return Response.ok().build();
+		return updateRelatedStats(ocID, operation);
 	}
 	
-	private void updateRelatedStats(String ocID, String operation) {
+	private Response updateRelatedStats(String ocID, String operation) {
 		Transaction txn = datastore.beginTransaction();
 		Transaction txn2 = datastore.beginTransaction();
 		
+		Key ocStatsKey = KeyFactory.createKey("OccurrencyStats", ocID);
 		Key ocKey = KeyFactory.createKey("Occurrency", ocID);
 		
+		Entity occurrency = null;
 		try {
-			Entity occurrency = datastore.get(txn, ocKey);
-			String username = (String) occurrency.getProperty("user");
-			Key userKey = KeyFactory.createKey("UserAppStats", username);
-			Entity userStatsEntity = datastore.get(txn2, userKey);
-			
-		}catch(EntityNotFoundException e) {
-			
+			occurrency = datastore.get(txn2, ocKey);
+		} catch (EntityNotFoundException e1) {
 		}
+		txn2.commit();
+		String username = (String) occurrency.getProperty("user");
 		
+		try {
+			Entity occurrencyStats = datastore.get(txn, ocStatsKey);
+			occurrencyStats = updateStats(operation, occurrencyStats);
+			datastore.put(txn, occurrencyStats);
+			txn.commit();
+		}catch(EntityNotFoundException e) {
+			Entity occurrencyStats = new Entity(ocStatsKey);
+			occurrencyStats.setProperty("user", username);
+			occurrencyStats.setProperty("upvotes", 0);
+			occurrencyStats.setProperty("downvotes", 0);
+			occurrencyStats = updateStats(operation, occurrencyStats);
+			txn.commit();
+		} catch(Exception e) {
+			LOG.info(e.getMessage());
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		}
+		finally {
+			if (txn.isActive() || txn2.isActive()) {
+				LOG.info("Transactions still active");
+				txn.rollback();
+				txn2.rollback();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			}
+		}
+		return Response.ok().build();
+	}
+
+	private Entity updateStats(String operation, Entity occurrencyStats) {
+		if(operation.equals("upvote"))
+			occurrencyStats.setProperty("upvotes",
+					(long) occurrencyStats.getProperty("upvotes") + 1);
+		if(operation.equals("downvote"))
+			occurrencyStats.setProperty("upvotes",
+					(long) occurrencyStats.getProperty("downvotes") + 1);
+		
+		return occurrencyStats;
 	}
 
 	@POST
@@ -247,7 +283,7 @@ public class UserResource extends HttpServlet {
 		
 	}
 	
-	@GET
+	@POST
 	@Path("/getStats")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -256,17 +292,27 @@ public class UserResource extends HttpServlet {
 		if(r.getStatus() != Response.Status.OK.getStatusCode())
 			return Response.status(Status.FORBIDDEN).build();
 		if(userStats == null || System.currentTimeMillis() - lastUpdateStats > TTLS) {
+			//Query on posted OC -> sum all params -> Update userAppStats -> Update Cache -> return it
+			// 1 txn                                        2txn                          
+			//total 3 txn (1 query, 1 get, 1 set)
+			UserStatsData uD = calculateUserStats(session.username);
+			
 			Key userStatsKey = KeyFactory.createKey("userAppStats", session.username);
 			Transaction txn = datastore.beginTransaction();
 			try {
 				Entity userStatsE = datastore.get(txn, userStatsKey);
+				userStatsE.setProperty("upvotes", uD.upvotes);
+				userStatsE.setProperty("downvotes", uD.downvotes);
+				datastore.put(txn, userStatsE);
 				UserStatsData userStats = new UserStatsData(
 						(long) userStatsE.getProperty("upvotes"),
 						(long) userStatsE.getProperty("downvotes"),
 						(long) userStatsE.getProperty("occurrenciesPosted"),
 						(long) userStatsE.getProperty("occurrenciesConfirmed"));
+				
 				this.userStats = userStats;
 				lastUpdateStats = System.currentTimeMillis();
+				txn.commit();
 				return Response.ok().entity(g.toJson(userStats)).build();
 			} catch (EntityNotFoundException e) {
 				LOG.warning("Could not find stats for user: " + session.username);
@@ -280,9 +326,29 @@ public class UserResource extends HttpServlet {
 		}
 		
 		return Response.ok().entity(g.toJson(userStats)).build();
-		
 	}
 	
+	private UserStatsData calculateUserStats(String username) {
+		UserStatsData data = new UserStatsData();
+		Filter propertyFilter =
+			    new FilterPredicate("user", FilterOperator.EQUAL, username);
+		Query q = new Query("OccurrencyStats").setFilter(propertyFilter);
+		PreparedQuery pQ = datastore.prepare(q);
+		List<Entity> list = pQ.asList(FetchOptions.Builder.withDefaults());
+		
+		data.occurrenciesPosted = list.size();
+		long upvotes = 0;
+		long downvotes = 0;
+		for(int i = 0; i<list.size(); i++) {
+			Entity e = list.get(i);
+			upvotes += (long) e.getProperty("upvotes");
+			downvotes += (long) e.getProperty("downvotes");
+		}
+		data.downvotes = downvotes;
+		data.upvotes = upvotes;
+		return data;
+	}
+
 	@POST
 	@Path("/updateProfile")
 	@Consumes(MediaType.APPLICATION_JSON)
