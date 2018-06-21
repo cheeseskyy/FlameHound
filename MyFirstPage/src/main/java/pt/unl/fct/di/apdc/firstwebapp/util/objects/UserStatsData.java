@@ -9,7 +9,11 @@ public class UserStatsData {
 	public long userRating;
 	
 	public UserStatsData() {
-		
+		this.upvotes = 0;
+		this.downvotes = 0;
+		this.occurrenciesPosted = 0;
+		this.occurrenciesConfirmed = 0;
+		userRating = 0;
 	}
 	
 	public UserStatsData(long upvotes, long downvotes, long occurrenciesPosted, long occurrenciesConfirmed) {
@@ -17,7 +21,13 @@ public class UserStatsData {
 		this.downvotes = downvotes;
 		this.occurrenciesPosted = occurrenciesPosted;
 		this.occurrenciesConfirmed = occurrenciesConfirmed;
-		userRating = occurrenciesConfirmed/occurrenciesPosted;
+		calculateUserRating();
 	}
 	
+	public void calculateUserRating() {
+		if(occurrenciesPosted > 0)
+			userRating = occurrenciesConfirmed/occurrenciesPosted;
+		else
+			userRating = 0;
+	}
 }

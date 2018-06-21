@@ -67,6 +67,7 @@ public class OccurrencyResource extends HttpServlet{
 	private static final long TTL = 5*1000*60; //5 mins
 	Map<String,OccurrencyData> listCache = new ConcurrentHashMap<String, OccurrencyData>();
 	private long lastUpdate = 0;
+	
 	public OccurrencyResource() {}
 	
 	@Override
@@ -287,6 +288,17 @@ public class OccurrencyResource extends HttpServlet{
 	}
 
 	
+	@POST
+	@Path("/saveImageAndroid/{extension}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response uploadFileDropbox(String json, @PathParam("extension") String ext) {
+		Response r = uploadFileDropbox(json.getBytes(), ext);
+		if(r.getStatus() != 200)
+			return r;
+		String id = r.readEntity(String.class);
+		return Response.ok(new MessageData(id)).build();
+	}
 	
 	@POST
 	@Path("/saveImage/{extension}")

@@ -82,7 +82,7 @@ public class ComputationResource {
 			LOG.info("Got Timeout");
 			long lastOp = (long) timeout.getProperty("lastOp");
 			LOG.info("timeout is Long");
-			if (System.currentTimeMillis() - lastOp > 10 * 60 * 1000) {
+			if (System.currentTimeMillis() - lastOp > 20 * 60 * 1000) {
 				LOG.info("Timed out");
 				user.setProperty("TokenExpirationDate", "");
 				user.setProperty("TokenCreationDate", "");
