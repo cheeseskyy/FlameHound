@@ -1,6 +1,8 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import java.io.IOException;
+import java.nio.file.attribute.UserPrincipalNotFoundException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -14,6 +16,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -81,7 +84,70 @@ public class UserResource extends HttpServlet {
 	}
 	
 	
-	@GET
+	@POST
+	@Path("/upvote/{ocId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response upvoteOc(SessionInfo session, @PathParam("ocId") String ocID) {
+		Entity user;
+		Response r = validLogin(session);
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return r;
+		user = (Entity) r.getEntity();
+		
+		Key likedOcKey = KeyFactory.createKey(user.getKey(), "likedOc", user.getKey().getName()); 
+		
+		Transaction txn = datastore.beginTransaction();
+		try {
+			Entity likedOcs = datastore.get(txn, likedOcKey);
+			
+			@SuppressWarnings("unchecked")
+			List<String> likedOcList = (ArrayList<String>) likedOcs.getProperty("ocurrencies");
+			
+			likedOcList.add(ocID);
+			
+			likedOcs.setProperty("ocurrencies", likedOcList);
+			
+			txn.commit();
+		}catch(EntityNotFoundException e) {
+			List<String> likedOcList = new ArrayList<String>();
+			likedOcList.add(ocID);
+			Entity likedOcs = new Entity(likedOcKey);
+			likedOcs.setProperty("ocurrencies", likedOcList);
+			
+			datastore.put(txn, likedOcs);
+			txn.commit();
+		}catch(Exception e) {
+			LOG.warning(e.getMessage());
+			return Response.status(Status.FORBIDDEN).build();
+		}finally {
+			if (txn.isActive()) {
+				txn.rollback();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			}
+		}
+		updateRelatedStats(ocID, "like");
+		return Response.ok().build();
+	}
+	
+	private void updateRelatedStats(String ocID, String operation) {
+		Transaction txn = datastore.beginTransaction();
+		Transaction txn2 = datastore.beginTransaction();
+		
+		Key ocKey = KeyFactory.createKey("Occurrency", ocID);
+		
+		try {
+			Entity occurrency = datastore.get(txn, ocKey);
+			String username = (String) occurrency.getProperty("user");
+			Key userKey = KeyFactory.createKey("UserAppStats", username);
+			Entity userStatsEntity = datastore.get(txn2, userKey);
+			
+		}catch(EntityNotFoundException e) {
+			
+		}
+		
+	}
+
+	@POST
 	@Path("/getRole")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
