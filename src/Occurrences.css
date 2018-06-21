@@ -36,8 +36,6 @@
     margin-top: 0px;
 }
 
-
-
 #occurrenceTitle{
     text-align: center;
     font-weight: bold;
@@ -49,8 +47,6 @@
     float:left;
     height: 90vh;
 }
-
-
 
 #OccurrencesTitle{
     text-align: center;
@@ -65,3 +61,27 @@
     height: 100vh;
     margin: auto;
 }
+
+#xpto{
+    background-color: gainsboro;
+    width: 70%;
+    height: 100vh;
+    text-align: center;
+    display: block;
+    margin-left: auto;
+}
+
+.OccurrenceTips {
+    display: inline-block;
+
+
+}
+
+.TipsPanel{
+    display: inline-block;
+    text-align: center;
+    width: 30%;
+    float: right;
+}
+
+

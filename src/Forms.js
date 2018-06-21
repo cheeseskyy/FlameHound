@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {BrowserRouter as Router, withRouter, Link} from "react-router-dom";
 import {OccurrenceTips} from "./TipsPanels";
+import './Body.css';
 
 function uploadOc(mediaURI, username) {
     var xhttp = new XMLHttpRequest();
@@ -244,7 +245,7 @@ export class LoginForm extends Component {
 export class OccurrenceForm extends Component{
 
     tipsPanel = <div className="Column">
-        ighoijhuolkjoikl
+
     </div>;
 
 
@@ -258,11 +259,11 @@ export class OccurrenceForm extends Component{
                         <h3>Please fill in the form below to submit an occurrence</h3><br/>
 
                         <label htmlFor="title"><b>Title</b></label><br/>
-                        <input type="text" size="40" placeholder="Enter a title" id="title3" required></input><br/>
+                        <input  type="text" size="40" placeholder="Enter a title" id="title3" required></input><br/>
                         <br/>
 
                         <label htmlFor="description"><b>Description</b></label><br/>
-                        <input type="text"  size="40" placeholder="Describe the occurrence"  id="description"
+                        <input  type="text"  size="40" placeholder="Describe the occurrence"  id="description"
                                required></input><br/>
                         <br/>
 
@@ -281,6 +282,7 @@ export class OccurrenceForm extends Component{
                         <button type="button" onClick={saveOc}>Submit</button>
 
                         <button onClick={this.props.resetForms}>Back</button>
+
                     </div>
                     <OccurrenceTips/>
                 </div>
