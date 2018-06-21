@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {BrowserRouter as Router, withRouter, Link} from "react-router-dom";
+import {BrowserRouter as Router} from "react-router-dom";
 import {OccurrenceTips} from "./TipsPanels";
 import './Body.css';
 
@@ -190,9 +190,7 @@ export class LoginForm extends Component {
         var usernameV = document.getElementById("un").value;
         var passwordV = document.getElementById("pw").value;
         var errorText = document.getElementById("errorMessage");
-        if (document.getElementById('rememberMe').checked == true) {
-            localStorage.setItem('rememberUsername', usernameV);
-        }
+
         var loginInfo = {"username": usernameV, "password": passwordV};
         var jSonLoginInfo = JSON.stringify(loginInfo);
         var xhttp = new XMLHttpRequest();
@@ -203,13 +201,16 @@ export class LoginForm extends Component {
         xhttp.onreadystatechange = () => {
 
             if (xhttp.readyState == 4 && xhttp.status == 200) {
-                console.log("200");
+                console.log("Login successful");
+                if (document.getElementById('rememberMe').checked == true) {
+                    localStorage.setItem('rememberUsername', usernameV);
+                }
                 var sessionInfo = JSON.parse(xhttp.response);
                 sessionStorage.setItem('sessionUsername', sessionInfo.username);
                 sessionStorage.setItem('sessionToken', sessionInfo.tokenId);
                 {this.props.resetForms()}
                 {this.props.getRole()}
-                this.props.history.push("/map");
+                //this.props.history.push("/map");
             }
             if (xhttp.readyState == 4 && xhttp.status == 403) {
                 errorText.innerHTML = "Wrong Username or Password";
@@ -226,7 +227,7 @@ export class LoginForm extends Component {
                     {console.log(this.props.match)}
                     <label htmlFor="uname"><b>Username</b></label><br/>
 
-                    <input type="text" placeholder="Enter Username" name="uname" id="un" required></input><br/>
+                    <input type="text" placeholder="Enter Username" name="uname" id="un" defaultValue={localStorage.getItem('rememberUsername')} required></input><br/>
 
                     <label htmlFor="psw"><b>Password</b></label><br/>
 

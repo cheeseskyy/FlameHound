@@ -8,6 +8,7 @@ import './NavPanel.css';
 
 const LoginForm = withRouter(LogForm);
 const RegisterForm = withRouter(RegForm);
+const navPanelState = ["REGISTER", "LOGIN", "IS_LOGGED_IN"];
 
 class NavPanel extends Component {
     log() {
@@ -29,7 +30,7 @@ class NavPanel extends Component {
                 this.setState(() => ({
                     isRegister: this.state.isRegister,
                     isLogin: this.state.isRegister,
-                    role: 'ADMIN'
+                    role: xhttp.response
                 }));
                 this.forceUpdate();
             }
@@ -80,6 +81,7 @@ class NavPanel extends Component {
             />
             <Route path="/" render={({match}) =>
                 <div>
+                    <p><Link to={"/map"}>Mapa</Link></p>
                     <p><Link to={match.url + "/submitOccurrence"}>Criar Ocorrência</Link></p>
                     <p><Link to="/profile">Perfil </Link></p>
                     {console.log("Running showAdminPanel()")}
