@@ -58,7 +58,7 @@ export class OccurrencePreview extends Component {
         xhttp.onreadystatechange = () => {
             if (xhttp.readyState == 4 && xhttp.status == 200) {
                 var arrayBufferView = new Uint8Array( xhttp.response );
-                var blob = new Blob( [ arrayBufferView ], { type: "image/" + extension } );
+                var blob = new Blob( [ arrayBufferView ], { type: "image/jpeg"} );
                 var urlCreator = window.URL || window.webkitURL;
                 var imageUrl = urlCreator.createObjectURL( blob );
                 this.setState({

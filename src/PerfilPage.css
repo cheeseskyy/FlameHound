@@ -47,7 +47,7 @@
 }
 
 
-#occurrenceList{
+.perfilPage #occurrenceList{
     overflow-y: auto;
     float:left;
     height: 58vh;
@@ -63,7 +63,7 @@
 
 }
 
-.occurrence{
+.perfilPage .occurrence{
     display: block;
     background-color: white;
     border: solid 0.2px;
