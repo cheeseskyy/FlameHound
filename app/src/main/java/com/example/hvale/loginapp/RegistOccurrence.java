@@ -116,16 +116,6 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), RESULT_LOAD_IMAGE);
-
-            /*    if(imageToUpload != null) {
-                    BitmapDrawable bitmapDrawImg = ((BitmapDrawable) imageToUpload.getDrawable());
-                    Bitmap bitmapImg = bitmapDrawImg.getBitmap();
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    bitmapImg.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                    byte[] imageInByte = stream.toByteArray();
-                    ByteArrayInputStream streamImage = new ByteArrayInputStream(imageInByte);
-                    mImage.add(streamImage.toString());
-                }*/
                 break;
             //and other listener events (the info)
         }
@@ -134,10 +124,44 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
-            Uri selectedImage = data.getData();
-            imageToUpload.setImageURI(selectedImage);
-        }
+        if (requestCode == RESULT_LOAD_IMAGE)
+            if (resultCode == RESULT_OK && data != null) {
+                Uri selectedImage = data.getData();
+                imageToUpload.setImageURI(selectedImage);
+                BitmapDrawable bitmapDrawImg = ((BitmapDrawable) imageToUpload.getDrawable());
+                Bitmap bitmapImg = bitmapDrawImg.getBitmap();
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmapImg.compress(Bitmap.CompressFormat.JPEG, 10, stream);
+                byte[] imageInByte = stream.toByteArray();
+
+                ImageData image =  new ImageData(imageInByte);
+                Gson gson = new Gson();
+                String jsonImg = gson.toJson(image);
+                JSONObject jsonObject = null;
+                try {
+                    jsonObject = new JSONObject(jsonImg);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL_SERVER + "/occurrency/saveImageAndroid/jpeg", jsonObject, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try{
+                        String imageId = (String) response.get("message");
+                        String imageIdFinal = imageId.substring(2,imageId.length()-1);
+                        mImage.add(imageIdFinal);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                });
+                VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonRequest);
+            }
     }
 
     public void attemptRegisterOcurrence() {
@@ -210,12 +234,12 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
         private void onPostExecute() {
             mAuth = null;
             //   showProgress(false);
-                String[] result;
-                result = ocurrenceData.getOcuInfo();
-                Intent returnIntent = new Intent();
-                returnIntent.putExtra("result", result);
-                setResult(RegistOccurrence.RESULT_OK, returnIntent);
-                finish();
+            String[] result;
+            result = ocurrenceData.getOcuInfo();
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("result", result);
+            setResult(RegistOccurrence.RESULT_OK, returnIntent);
+            finish();
         }
 
         private void onCancelled(Exception e) {

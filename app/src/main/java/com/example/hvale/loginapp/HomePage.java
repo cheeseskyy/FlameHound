@@ -273,9 +273,6 @@ public class HomePage extends AppCompatActivity
                 initMapInDeviceCoord();
                 counter++;
             }
-            else {
-
-            }
         }
 
         for (int i = 0; i < latlngs.size(); i++) {
@@ -361,7 +358,7 @@ public class HomePage extends AppCompatActivity
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,@NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == MY_LOCATION_REQUEST_CODE) {
             if ((permissions.length == 1) &&
                     permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
