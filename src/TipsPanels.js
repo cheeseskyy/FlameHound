@@ -1,14 +1,19 @@
 import React, {Component} from 'react';
+import './Occurrences.css';
+import './Body.css';
 
 export class OccurrenceTips extends Component{
 
     render(){
-        return(<div className="Column TipsPanel">
-                <h3>PlaceHolder for TipsPanel</h3>
-                <ul>
-                    <p>Alguns exemplos de ocorrências:</p>
-                    <li>Caminho de uma floresta que esteja bloqueado e impeça o caminho das entidades combatentes de fogos.</li>
-                </ul>
+        return(
+
+            <div className= "TipsPanel">
+                    PlaceHolder for TipsPanel
+                <div>
+                    <h4>Alguns exemplos de ocorrências:</h4>
+                    <p>Caminho de uma floresta que esteja bloqueado e impeça o caminho das entidades combatentes de fogos.</p>
+                </div>
+
             </div>
         );
     }
