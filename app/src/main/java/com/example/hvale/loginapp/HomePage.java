@@ -161,7 +161,7 @@ public class HomePage extends AppCompatActivity
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab =  findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -325,12 +325,26 @@ public class HomePage extends AppCompatActivity
 
                     Intent it = new Intent(HomePage.this, RegistOccurrence.class);
                     it.putExtra("Loc", x);
-                    startActivity(it);
+                    startActivityForResult(it, 1);
                 }
 
             }
         });
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 1) {
+            if(resultCode == RegistOccurrence.RESULT_OK){
+                String[] result = data.getStringArrayExtra("result");
+            }
+            if (resultCode == RegistOccurrence.RESULT_CANCELED) {
+                System.out.println("erro");
+                //TODO
+            }
+        }
     }
 
     @Override
@@ -349,11 +363,11 @@ public class HomePage extends AppCompatActivity
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == MY_LOCATION_REQUEST_CODE) {
-            if (permissions.length == 1 &&
-                    permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-                    permissions[1] == Manifest.permission.ACCESS_COARSE_LOCATION &&
-                    grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+            if ((permissions.length == 1) &&
+                    permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
+                    (grantResults[0] == PackageManager.PERMISSION_GRANTED) &&
+                    permissions[1].equals(Manifest.permission.ACCESS_COARSE_LOCATION) &&
+                    (grantResults[1] == PackageManager.PERMISSION_GRANTED)) {
                 initMapInDeviceCoord();
             } else {
                 // Permission was denied. Display an error message.

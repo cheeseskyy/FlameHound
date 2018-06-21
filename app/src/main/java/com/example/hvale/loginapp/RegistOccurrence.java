@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.graphics.Bitmap;
+
 import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import typeClasses.*;
 
 import static android.R.layout.simple_spinner_item;
@@ -47,7 +49,6 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
     private static final int RESULT_LOAD_IMAGE = 1;
 
     private ImageView imageToUpload;
-    private EditText inputLoc;
     private RegisterOcurrenceTask mAuth;
     //private View mOcurrenceFormView;
     private EditText mTitleView;
@@ -73,7 +74,6 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
             inputLoc.setHintAnimationEnabled(true);*/
 
         }
-System.out.print("ola");
         mAuth = null;
         mTitleView = findViewById(R.id.title);
         mLocationView = findViewById(R.id.location);
@@ -153,7 +153,7 @@ System.out.print("ola");
         String location = mLocationView.getText().toString();
         String description = mDescriptionView.getText().toString();
         String type = (String) mTypeView.getSelectedItem();
-        List<String > mediaURI = mImage;
+        List<String> mediaURI = mImage;
         String username = LogOutSingleton.getInstance(getApplicationContext()).getUsername();
         boolean cancel;
         cancel = false;
@@ -163,7 +163,7 @@ System.out.print("ola");
             focusView.requestFocus();
         } else {
             //showProgress(true);
-            OcurrenceData data = new OcurrenceData(title,description,username,location,type,mediaURI);
+            OcurrenceData data = new OcurrenceData(title, description, username, location, type, mediaURI);
             mAuth = new RegisterOcurrenceTask(data);
             mAuth.doInBackground();
         }
@@ -174,7 +174,6 @@ System.out.print("ola");
     public class RegisterOcurrenceTask {
 
         private OcurrenceData ocurrenceData;
-        private JSONObject finalResponse;
 
         RegisterOcurrenceTask(OcurrenceData data) {
             ocurrenceData = data;
@@ -188,7 +187,6 @@ System.out.print("ola");
             try {
                 jsonObject = new JSONObject(jsonImg);
             } catch (JSONException e) {
-                System.out.println("oalal");
                 e.printStackTrace();
             }
 
@@ -196,8 +194,7 @@ System.out.print("ola");
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL_SERVER + "/occurrency/saveOccurrency", jsonObject, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    finalResponse = response;
-                    onPostExecute(finalResponse);
+                    onPostExecute();
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -210,18 +207,15 @@ System.out.print("ola");
             setProgressBarVisibility(false);
         }
 
-        private void onPostExecute(final JSONObject finalResponse) {
+        private void onPostExecute() {
             mAuth = null;
             //   showProgress(false);
-            try {
-                LogOutSingleton.getInstance(getApplicationContext()).setLoginToken(finalResponse);
-
+                String[] result;
+                result = ocurrenceData.getOcuInfo();
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("result", result);
+                setResult(RegistOccurrence.RESULT_OK, returnIntent);
                 finish();
-                Intent it = new Intent(RegistOccurrence.this, HomePage.class);
-                startActivity(it);
-            } catch (JSONException e) {
-                onCancelled(e);
-            }
         }
 
         private void onCancelled(Exception e) {
