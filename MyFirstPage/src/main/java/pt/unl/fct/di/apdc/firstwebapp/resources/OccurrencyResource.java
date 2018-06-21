@@ -52,6 +52,7 @@ import pt.unl.fct.di.apdc.firstwebapp.util.Enums.OccurrencyFlags;
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.OccurrencyTypes;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.MessageData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.OccurrencyData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserInfo;
@@ -196,7 +197,7 @@ public class OccurrencyResource extends HttpServlet{
 			}
 			if(System.currentTimeMillis() - lastOp > 60*1000) {
 				timeout.setProperty("lastOp", System.currentTimeMillis());
-				datastore.put(timeout);
+				datastore.put(txn, timeout);
 			}
 			LOG.info("User is logged in");
 			txn.commit();
@@ -220,6 +221,7 @@ public class OccurrencyResource extends HttpServlet{
 	@POST
 	@Path("/saveOccurrency")
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response saveOccurrency(OccurrencyData data) {
 		Transaction txn = datastore.beginTransaction();
 		Transaction txn2 = datastore.beginTransaction();
@@ -230,7 +232,7 @@ public class OccurrencyResource extends HttpServlet{
 			
 			String aux = data.getLocation();
 			LOG.info(aux);
-			aux = aux.substring(2, aux.length()-2);
+			aux = aux.substring(1, aux.length()-2);
 			String[] coords = aux.split(", ");
 			LOG.info("Creating occurrency");
 			Entity occurrency = new Entity("Occurrency", uuid);
@@ -273,8 +275,18 @@ public class OccurrencyResource extends HttpServlet{
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
 		}
-		return Response.ok(g.toJson(uuid)).build();
+		return Response.ok(g.toJson(new MessageData(uuid))).build();
 	}
+	
+	@POST
+	@Path("/getOccurrencyAndroid/{ocId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getOccurrencyAndroid(SessionInfo[] session, @PathParam("ocId") String occurrencyID) {
+		return getOccurrency(session[0], occurrencyID);
+	}
+
+	
 	
 	@POST
 	@Path("/saveImage/{extension}")
