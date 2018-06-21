@@ -45,6 +45,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONArray;
@@ -52,6 +53,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class HomePage extends AppCompatActivity
@@ -108,35 +110,41 @@ public class HomePage extends AppCompatActivity
         fram_map = findViewById(R.id.fram_map);
 
         fram_map.setOnTouchListener(new View.OnTouchListener() {
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                float x = event.getX();
-                float y = event.getY();
+                if(canMove) {
+                    Random rdm = new Random();
+                    int random = rdm.nextInt();
 
-                int x_co = Math.round(x);
-                int y_co = Math.round(y);
+                    float x = event.getX();
+                    float y = event.getY();
 
-                projection = map.getProjection();
-                Point x_y_points = new Point(x_co, y_co);
-                LatLng latLng = map.getProjection().fromScreenLocation(x_y_points);
-                lat = latLng.latitude;
-                log = latLng.longitude;
+                    int x_co = Math.round(x);
+                    int y_co = Math.round(y);
 
-                int eventaction = event.getAction();
-                switch (eventaction) {
-                    case MotionEvent.ACTION_DOWN:
-                        valuesToDraw.add(new LatLng(lat, log));
-                        break;
+                    projection = map.getProjection();
+                    Point x_y_points = new Point(x_co, y_co);
+                    LatLng latLng = map.getProjection().fromScreenLocation(x_y_points);
+                    lat = latLng.latitude;
+                    log = latLng.longitude;
 
-                    case MotionEvent.ACTION_MOVE:
-                        valuesToDraw.add(new LatLng(lat, log));
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        drawMap();
-                        break;
+                    int eventaction = event.getAction();
+                    switch (eventaction) {
+                        case MotionEvent.ACTION_DOWN:
+                            valuesToDraw.add(new LatLng(lat, log));
+                            break;
+
+                        case MotionEvent.ACTION_MOVE:
+                            if(random % 2 == 0)
+                            valuesToDraw.add(new LatLng(lat, log));
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            drawMap();
+                            break;
+                    }
+
                 }
-
-
                 return canMove;
             }
         });
@@ -191,6 +199,12 @@ public class HomePage extends AppCompatActivity
         rectOptions.strokeWidth(5);
         rectOptions.fillColor(TRANSPARENT);
         Polygon polygon = map.addPolygon(rectOptions);
+        /*
+        PolylineOptions polylineOptions = new PolylineOptions();
+        polylineOptions.add(valuesToDraw.get(valuesToDraw.size()-1));
+        polylineOptions.add(valuesToDraw.get(0));
+        polylineOptions.color(TRANSPARENT);
+        */
         canMove = false;
         valuesToDraw.clear();
 
