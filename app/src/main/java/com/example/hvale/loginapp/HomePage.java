@@ -61,7 +61,8 @@ public class HomePage extends AppCompatActivity
     private static final int MY_LOCATION_REQUEST_CODE = 99;
     private GoogleMap map;
     private FusedLocationProviderClient Client;
-    private ArrayList<LatLng> latlngs = new ArrayList<>();
+    private ArrayList<LatLng> latlngs;
+    private ArrayList<String> titles;
     private ImageView Occorrences;
     private ImageView Trending;
     private ImageView Draw;
@@ -80,29 +81,31 @@ public class HomePage extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
 
-        Cache cache = new DiskBasedCache(getCacheDir(), 1024*1024);
-        Network network = new BasicNetwork( new HurlStack());
+        Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024);
+        Network network = new BasicNetwork(new HurlStack());
+
+        latlngs = new ArrayList<>();
+        titles = new ArrayList<>();
 
         requestQueue = new RequestQueue(cache, network);
         requestQueue.start();
         doInBackGround();
 
         valuesToDraw = new ArrayList<>();
-        latlngs.add(new LatLng(37.4517, -122.184));
 
         MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
         mapFragment.getMapAsync(this);
 
         Client = LocationServices.getFusedLocationProviderClient(this);
 
-        Toolbar toolbar =  findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Occorrences =  findViewById(R.id.myOccorrences) ;
-        Trending =  findViewById(R.id.trending);
-        Draw =  findViewById(R.id.free_Draw);
+        Occorrences = findViewById(R.id.myOccorrences);
+        Trending = findViewById(R.id.trending);
+        Draw = findViewById(R.id.free_Draw);
 
-        fram_map =  findViewById(R.id.fram_map);
+        fram_map = findViewById(R.id.fram_map);
 
         fram_map.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -140,10 +143,10 @@ public class HomePage extends AppCompatActivity
 
         Draw.setOnClickListener(new View.OnClickListener() {
 
-                @Override
-                public void onClick(View v){
-                    canMove = !canMove;
-                }
+            @Override
+            public void onClick(View v) {
+                canMove = !canMove;
+            }
         });
 
         Occorrences.setOnClickListener(new View.OnClickListener() {
@@ -161,7 +164,7 @@ public class HomePage extends AppCompatActivity
             }
         });
 
-        FloatingActionButton fab =  findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -178,20 +181,18 @@ public class HomePage extends AppCompatActivity
         */
 
 
-
-
     }
 
     private void drawMap() {
         int TRANSPARENT = 0x330000FF;
         PolygonOptions rectOptions = new PolygonOptions();
-       rectOptions.addAll(valuesToDraw);
-       rectOptions.strokeColor(TRANSPARENT);
-       rectOptions.strokeWidth(5);
-       rectOptions.fillColor(TRANSPARENT);
-       Polygon polygon = map.addPolygon(rectOptions);
-       canMove = false;
-       valuesToDraw.clear();
+        rectOptions.addAll(valuesToDraw);
+        rectOptions.strokeColor(TRANSPARENT);
+        rectOptions.strokeWidth(5);
+        rectOptions.fillColor(TRANSPARENT);
+        Polygon polygon = map.addPolygon(rectOptions);
+        canMove = false;
+        valuesToDraw.clear();
 
     }
 
@@ -227,33 +228,33 @@ public class HomePage extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
+
     /**
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.minhasOcorrencias) {
-
-        } /*else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.contacts) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-
-    }
-    */
+     * @SuppressWarnings("StatementWithEmptyBody")
+     * @Override public boolean onNavigationItemSelected(MenuItem item) {
+     * // Handle navigation view item clicks here.
+     * int id = item.getItemId();
+     * <p>
+     * if (id == R.id.nav_camera) {
+     * // Handle the camera action
+     * } else if (id == R.id.minhasOcorrencias) {
+     * <p>
+     * } /*else if (id == R.id.nav_slideshow) {
+     * <p>
+     * } else if (id == R.id.contacts) {
+     * <p>
+     * } else if (id == R.id.nav_share) {
+     * <p>
+     * } else if (id == R.id.nav_send) {
+     * <p>
+     * }
+     * <p>
+     * DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+     * drawer.closeDrawer(GravityCompat.START);
+     * return true;
+     * <p>
+     * }
+     */
 
 
     @Override
@@ -264,37 +265,20 @@ public class HomePage extends AppCompatActivity
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-                ActivityCompat.requestPermissions(HomePage.this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},
+            ActivityCompat.requestPermissions(HomePage.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                     MY_LOCATION_REQUEST_CODE);
-        }
-        else {
-            if(counter < 1) {
+        } else {
+            if (counter < 1) {
                 initMapInDeviceCoord();
                 counter++;
             }
         }
 
-        for (int i = 0; i < latlngs.size(); i++) {
-
-            LatLng newMarker = latlngs.get(i);
-            MarkerOptions initialMarkerOptions = new MarkerOptions();
-            initialMarkerOptions.position(newMarker);
-            initialMarkerOptions.title("Mockup Marker");
-       //     map.animateCamera(CameraUpdateFactory.newLatLngZoom(newMarker, 10));
-       //     map.addMarker(initialMarkerOptions); FAKE MARKER
-
-        }
-        // Add a marker in Sydney and move the camera
-        /*LatLng sydney = new LatLng(-34, 151);
-        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        */
-
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
-                if(!canMove) {
+                if (!canMove) {
                     Log.d("latLng", point.latitude + ":" + point.longitude);
                     // Creating a marker
                     MarkerOptions markerOptions = new MarkerOptions();
@@ -334,7 +318,7 @@ public class HomePage extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == 1) {
-            if(resultCode == RegistOccurrence.RESULT_OK){
+            if (resultCode == RegistOccurrence.RESULT_OK) {
                 String[] result = data.getStringArrayExtra("result");
             }
             if (resultCode == RegistOccurrence.RESULT_CANCELED) {
@@ -358,7 +342,7 @@ public class HomePage extends AppCompatActivity
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,@NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == MY_LOCATION_REQUEST_CODE) {
             if ((permissions.length == 1) &&
                     permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
@@ -378,7 +362,7 @@ public class HomePage extends AppCompatActivity
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(HomePage.this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                     MY_LOCATION_REQUEST_CODE);
         }
         map.setMyLocationEnabled(true);
@@ -405,7 +389,7 @@ public class HomePage extends AppCompatActivity
         JSONArray ocurence = new JSONArray();
         ocurence.put(loginInfo);
         setProgressBarVisibility(true);
-        JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST,url + "occurrency/getOccurrencyAndroid/all",ocurence, new Response.Listener<JSONArray>() {
+        JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.POST, url + "occurrency/getOccurrencyAndroid/all", ocurence, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 finalResponse = response;
@@ -426,21 +410,38 @@ public class HomePage extends AppCompatActivity
 
     private void onPostExecute(JSONArray finalResponse) {
 
-        for(int i=0; i<finalResponse.length(); i++) {
+        for (int i = 0; i < finalResponse.length(); i++) {
+            String[] coord = null;
+            String title = null;
             try {
                 JSONObject jsonObject = finalResponse.getJSONObject(i);
-                String[] coord = jsonObject.getString("location").split(",");
+                coord = jsonObject.getString("location").split(",");
                 LatLng current = new LatLng(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]));
+                title = jsonObject.getString("title");
+
+
                 latlngs.add(current);
+                titles.add(title);
             } catch (JSONException e) {
                 onCancelled(e);
             }
+        }
+        System.out.println(titles.size() + " " + latlngs.size());
+        for (int j = 0; j < latlngs.size(); j++) {
+
+            LatLng newMarker = latlngs.get(j);
+            MarkerOptions initialMarkerOptions = new MarkerOptions();
+            initialMarkerOptions.position(newMarker);
+            initialMarkerOptions.title(titles.get(j));
+            //map.animateCamera(CameraUpdateFactory.newLatLngZoom(newMarker, 10));
+            map.addMarker(initialMarkerOptions);
+
         }
     }
 
     private void onCancelled(Exception e) {
 
-         if (e instanceof ParseError) {
+        if (e instanceof ParseError) {
             System.out.println("Erro sv");
         }
     }
