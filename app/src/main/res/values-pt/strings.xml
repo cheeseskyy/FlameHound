@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">appauth</string>
+    <string name="action_sign_in">Entrar ou registe-se</string>
+    <string name="action_sign_in_short">eEtrar</string>
+    <string name="error_invalid_email">Email inválido</string>
+    <string name="error_invalid_password">Password Inválida</string>
+    <string name="error_incorrect_password">Password Incorrecta</string>
+    <string name="error_field_required">algo por preencher</string>
+    <string name="permission_rationale">precisamos de acesso aos contactos</string>
+    <string name="prompt_email">Nome de utilizador</string>
+    <string name="prompt_password">Palavra-chave</string>
+    <string name="prompt_name">Nome</string>
+    <string name="prompt_address">Morada</string>
+    <string name="prompt_pw_confirmation">Confirme a palavra-chave</string>
+    <string name="title_activity_maps">Mapa</string>
+    <string name="title_activity_home_page">Página Inicial</string>
+    <string name="navigation_drawer_open">Abrir navegação</string>
+    <string name="navigation_drawer_close">Fechar navegação</string>
+    <string name="action_settings">Opções</string>
+    <string name="title_activity_regist_occurrence">Nova occurência</string>
+    <string name="register_button">Registar</string>
+    <string name="email_exists">Email em uso</string>
+    <string name="username_text">Nome de utilizador</string>
+    <string name="prompt_username">Nome de utilizador</string>
+    <string name="email_in_use">Email em uso</string>
+    <string name="unable_to_register">Registo falhou</string>
+</resources>
