@@ -36,6 +36,8 @@
     margin-top: 0px;
 }
 
+
+
 #occurrenceTitle{
     text-align: center;
     font-weight: bold;
@@ -47,6 +49,8 @@
     float:left;
     height: 90vh;
 }
+
+
 
 #OccurrencesTitle{
     text-align: center;
@@ -109,3 +113,28 @@
 }
 
 
+
+
+.occurrence a {
+    text-decoration: none;
+}
+
+/* unvisited link */
+.occurrence a:link {
+    color: black;
+}
+
+/* visited link */
+.occurrence a:visited {
+    color: black;
+}
+
+/* mouse over link */
+.occurrence a:hover {
+    color: #FF6E00;
+}
+
+/* selected link */
+.occurrence a:active {
+    color: black;
+}
