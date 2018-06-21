@@ -110,13 +110,20 @@ class Body extends Component {
         super(props);
     }
 
-
     render() {
+
+
+
+        let role;
+
+        console.log("this user's role is: " + this.props.role);
 
         return (
             <div className = "Column Body">
                 <Switch>
-                    <Route path="/map" component={MapView}/>
+                    <Route path="/map" component={(props) =>
+                        <MapView/>
+                    }/>
                     <Route path="/about" component={About}/>
                     <Route path="/contact" component={Contacts}/>
                     <Route path="/submitOccurrence" component={OccurrenceForm}/>

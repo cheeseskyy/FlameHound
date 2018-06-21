@@ -98,7 +98,7 @@ export default class MapContainer extends Component {
         }
     }
 
-    componentWillReceiveProps(nextProps){
+    /*componentWillReceiveProps(nextProps){
         nextProps.markers.forEach(marker => { // iterate through locations saved in state
             const loc = marker.location;
             const coord = loc.split(",");
@@ -110,7 +110,7 @@ export default class MapContainer extends Component {
             });
             console.log("added marker at " + coord);
         });
-    }
+    }*/
 
     componentDidUpdate(prevProps, prevState, snapshot){
         this.props.markers.forEach(marker => { // iterate through locations saved in state

@@ -131,9 +131,6 @@ class MapView extends Component {
             display:'inline-block'
     };
         this.isLoggedIn();
-        //getOcImage("e975a81f-91a2-4854-a8ea-467fd3114e73.png");
-
-        console.log(this.state);
 
         return (
 

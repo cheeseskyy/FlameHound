@@ -20,7 +20,7 @@ export class OccurrenceList extends Component {
                                       image={occurrence.mediaURI[0]}
                                       randomProp={console.log("created occurrence " + occurrence.title)}/>
         })
-    } 
+    }
 
     render() {
 
@@ -33,19 +33,6 @@ export class OccurrenceList extends Component {
 
                     {this.renderOccurrences()}
 
-                    <OccurrencePreview title="Fogo no Parque da Paz" user="João Batista"
-                                       description="Incêndio já com algumas dimensões!" location="Almada"
-                                       image={placeHolder1}/>
-                    <OccurrencePreview title="Ajuda! Fogo na minha casa!" user="Maria Mendes"
-                                       description="Incêndio na minha casa, não sei como isto aconteceu..."
-                                       location="Gaia" image={placeHolder2}/>
-                    <OccurrencePreview title="Limpesa da mata" user="Manuel Batata"
-                                       description="Mata com bastante lixo; o que pode provocar algum incêndio."
-                                       location="Trafaria" image={placeHolder3}/>
-                    <OccurrencePreview title="Fogo em Pedrogrão Grande " user="Joaquina Martins"
-                                       description="Fogo de grandes dimensões. O Fogo já chega à auto estrada!"
-                                       location="Pedrogão Grande" image={placeHolder4}/>
-
                 </div>
 
 
@@ -57,15 +44,6 @@ export class OccurrenceList extends Component {
 
 export class OccurrencePreview extends Component {
 
-    componentDidUpdate(prevProps) {
-        document.getElementById("occurrenceLogo").src = this.props.image;
-        console.log("Component " + this.props.title + " Updated");
-        if (prevProps.image !== this.props.image) {
-            console.log("Component " + this.props.title + " re-rendered");
-            this.setState();
-        }
-    }
-
     getImage(mediaURI) {
         this.hasImage = true;
         const extension = mediaURI.split(".")[1];
@@ -75,11 +53,16 @@ export class OccurrencePreview extends Component {
         var username = sessionStorage.getItem('sessionUsername');
         var token = sessionStorage.getItem('sessionToken');
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.responseType ="arraybuffer";
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () => {
             if (xhttp.readyState == 4 && xhttp.status == 200) {
+                var arrayBufferView = new Uint8Array( xhttp.response );
+                var blob = new Blob( [ arrayBufferView ], { type: "image/" + extension } );
+                var urlCreator = window.URL || window.webkitURL;
+                var imageUrl = urlCreator.createObjectURL( blob );
                 this.setState({
-                    image: xhttp.response
+                    image: imageUrl
                 })
             }
         };
@@ -103,8 +86,9 @@ export class OccurrencePreview extends Component {
             <div className="occurrence">
                 <Link to="/occurrence">
                         <div id="occurrenceImage">
-                    {console.log(image)}
-                    <img id="occurrenceLogo"src={image}/>
+                    {console.log(this.props.image)}
+                            {console.log(image)}
+                    <img id="occurrenceLogo" src={image}/>
                 </div>
                 <div>
                     <p id = "occurrenceTitle"> {this.props.title}</p>

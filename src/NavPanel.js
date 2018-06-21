@@ -14,52 +14,99 @@ class NavPanel extends Component {
         console.log("clicked");
     }
 
-    constructor(props){
-        super(props);
-        this.state = {
-            isRegister : false,
-            isLogin : false
-        }
-        this.resetForms = this.resetForms.bind(this);
+    getRole(){
+        console.log("called getRole");
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/user/getRole", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if (xhttp.readyState == 4 && xhttp.status == 200) {
+                console.log("getRole response: " + xhttp.response);
+                this.setState(() => ({
+                    isRegister: this.state.isRegister,
+                    isLogin: this.state.isRegister,
+                    role: 'ADMIN'
+                }));
+                this.forceUpdate();
+            }
+        };
     }
 
-    resetForms(){
+    constructor(props) {
+        super(props);
+        this.state = {
+            isRegister: false,
+            isLogin: false,
+            role: "USER"
+        }
+        this.resetForms = this.resetForms.bind(this);
+        this.getRole = this.getRole.bind(this);
+    }
+
+    resetForms() {
         console.log("UpdateForms called");
         this.setState({
-            isRegister : false,
-            isLogin : false
+            isRegister: false,
+            isLogin: false
         });
     }
 
-    panel = <Switch>
-                <Route path="/map" render={({match}) =>
-                    <div>
-                        <p><Link to={match.url + "/submitOccurrence"}>Criar Ocorrência</Link></p>
-                        <p><Link to="/profile">Perfil </Link></p>
-                        <p><Link to="/logout" onClick={() =>
-                            this.logout()}>Logout </Link></p>
-                    </div>
-                }
-                />
-                <Route path='/'
-                       render={({match}) =>
-                           <div>
-                               <p><a onClick={() => this.setState({isRegister:false, isLogin:true})} >Login </a></p>
-                               <p><a onClick={() => this.setState({isRegister:true, isLogin:false})}>Register</a></p>
-                               <p><Link to="/about">About</Link></p>
-                               <Link to="/contact">Contact</Link>
-                           </div>
-                       }
-                />
-            </Switch>;
+    showAdminPanel(){
+        console.log("role at if: " + this.state.role);
+        if(this.state.role === 'ADMIN'){
+            console.log("User role is ADMIN");
+            return <div>
+                ADMIN
+            </div>
+        }
+    }
 
-    showForms(){
-        if(this.state.isLogin){
-            return <LoginForm resetForms = {this.resetForms}/>;
-        } else if(this.state.isRegister){
-            return <RegisterForm resetForms = {this.resetForms}/>;
-        } else{
-            return this.panel;
+    panel =
+        <Switch>
+
+            <Route exact path='/'
+                   render={({match}) =>
+                       <div>
+                           <p><a onClick={() => this.setState({isRegister: false, isLogin: true, role: "USER"})}>Login </a></p>
+                           <p><a onClick={() => this.setState({isRegister: true, isLogin: false, role: "USER"})}>Register</a></p>
+                           <p><Link to="/about">About</Link></p>
+                           <Link to="/contact">Contact</Link>
+                       </div>
+                   }
+            />
+            <Route path="/" render={({match}) =>
+                <div>
+                    <p><Link to={match.url + "/submitOccurrence"}>Criar Ocorrência</Link></p>
+                    <p><Link to="/profile">Perfil </Link></p>
+                    {console.log("Running showAdminPanel()")}
+                    {this.showAdminPanel()}
+                    <p><Link to="/logout" onClick={() =>
+                        this.logout()}>Logout </Link></p>
+                </div>
+            }
+            />
+
+        </Switch>;
+
+
+    getRoleNav () {
+        console.log("called getRoleNav");
+        this.props.getRole();
+    }
+
+    showForms(panel) {
+        console.log(this.state);
+        if (this.state.isLogin) {
+            return <LoginForm resetForms={this.resetForms} getRole={this.getRole}/>;
+        } else if (this.state.isRegister) {
+            return <RegisterForm resetForms={this.resetForms}/>;
+        } else {
+            console.log("printing navPanel");
+            return panel;
         }
     }
 
@@ -87,6 +134,33 @@ class NavPanel extends Component {
 
     render() {
 
+        const panel =
+            <Switch>
+
+                <Route exact path='/'
+                       render={({match}) =>
+                           <div>
+                               <p><a onClick={() => this.setState({isRegister: false, isLogin: true, role: "USER"})}>Login </a></p>
+                               <p><a onClick={() => this.setState({isRegister: true, isLogin: false, role: "USER"})}>Register</a></p>
+                               <p><Link to="/about">About</Link></p>
+                               <Link to="/contact">Contact</Link>
+                           </div>
+                       }
+                />
+                <Route path="/" render={({match}) =>
+                    <div>
+                        <p><Link to={match.url + "/submitOccurrence"}>Criar Ocorrência</Link></p>
+                        <p><Link to="/profile">Perfil </Link></p>
+                        {console.log("Running showAdminPanel()")}
+                        {this.showAdminPanel()}
+                        <p><Link to="/logout" onClick={() =>
+                            this.logout()}>Logout </Link></p>
+                    </div>
+                }
+                />
+
+            </Switch>;
+
         return (
             <div id="NavPanel" className="Column">
                 <Link to="/">
@@ -102,7 +176,8 @@ class NavPanel extends Component {
                     </div>
                 </Link>
                 <nav>
-                    {this.showForms()}
+                    {console.log("user role at navPanel render is: " + this.state.role)}
+                    {this.showForms(panel)}
                 </nav>
                 <img id="ItemPreview"/>
             </div>

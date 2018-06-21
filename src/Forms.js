@@ -23,7 +23,7 @@ function getCodedAddress(addr, xhttp, mediaURI, username) {
         "title": document.getElementById("title3").value,
         "description": document.getElementById("description").value,
         "user": username,
-        "location": JSON.stringify(sessionStorage.getItem("selectedLocation")),
+        "location": JSON.stringify(sessionStorage.getItem("selectedLocation").substring(1)),
         "type": document.getElementById("type").value,
         "mediaURI": [mediaURI]
     });
@@ -208,6 +208,7 @@ export class LoginForm extends Component {
                 sessionStorage.setItem('sessionUsername', sessionInfo.username);
                 sessionStorage.setItem('sessionToken', sessionInfo.tokenId);
                 {this.props.resetForms()}
+                {this.props.getRole()}
                 this.props.history.push("/map");
             }
             if (xhttp.readyState == 4 && xhttp.status == 403) {
@@ -274,7 +275,12 @@ export class OccurrenceForm extends Component{
                         <br/>
 
                         <label htmlFor="type"><b>Type</b></label><br/>
-                        <input type="text" size="40"  placeholder="Enter the type" id="type" required></input><br/>
+                        <select id="type">
+                            <option value="light">Ligeiro</option>
+                            <option value="important">Importante</option>
+                            <option value="urgent">Urgente</option>
+                            <option value="severe">Severa</option>
+                        </select>
                         <br/><br/>
 
                         <input type="file" placeholder="Submit an image" id="imageFile"></input><br/>
@@ -282,7 +288,7 @@ export class OccurrenceForm extends Component{
 
                         <button type="button" onClick={saveOc}>Submit</button>
 
-                        <button onClick={this.props.resetForms}>Back</button>
+                        <button onClick={this.props.history.goBack}>Back</button>
 
                     </div>
                     <OccurrenceTips/>
