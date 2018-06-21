@@ -62,6 +62,30 @@
     margin: auto;
 }
 
+.occurrence a {
+    text-decoration: none;
+}
+
+/* unvisited link */
+.occurrence a:link {
+    color: black;
+}
+
+/* visited link */
+.occurrence a:visited {
+    color: black;
+}
+
+/* mouse over link */
+.occurrence a:hover {
+    color: #FF6E00;
+}
+
+/* selected link */
+.occurrence a:active {
+    color: black;
+}
+
 #xpto{
     background-color: gainsboro;
     width: 70%;

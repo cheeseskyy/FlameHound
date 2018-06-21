@@ -29,3 +29,28 @@ img {
     max-height: 100%;
     max-width: 100%;
 }
+
+#NavPanel a {
+    color: white;
+    text-decoration: none;
+}
+
+/* unvisited link */
+#NavPanel a:link {
+    color:white;
+}
+
+/* visited link */
+#NavPanel a:visited {
+    color: white;
+}
+
+/* mouse over link */
+#NavPanel a:hover {
+    color: #FF6E00;
+}
+
+/* selected link */
+#NavPanel a:active {
+    color: blue;
+}
