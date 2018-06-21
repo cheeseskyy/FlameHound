@@ -9,7 +9,7 @@ import './Body.css';
 import {OccurrenceForm} from "./Forms";
 import {withScriptjs, withGoogleMap, GoogleMap} from "react-google-maps";
 import EntityPage from "./EntityPage";
-import PerfilPage from "./PerfilPage";
+import {PerfilPage} from "./PerfilPage";
 import {CommentList} from "./Comments";
 import {OccurrencePage} from "./Occurrences";
 
