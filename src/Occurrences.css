@@ -8,7 +8,15 @@
 }
 
 #occurrenceImage{
-    display: block;
+    justify-content: center;
+    width: 100%;
+    max-height: 200px;
+}
+
+#occurrenceImage img{
+    display:block;
+    height: 200px;
+    max-height: 100%;
 }
 
 .OccurrencePage #occurrenceImage{
@@ -18,12 +26,12 @@
 
 .occurrence{
     display: block;
+    width: 80%;
+    margin: auto;
     background-color: white;
     border: solid 0.2px;
     font-size: 12px;
     margin-top: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
 }
 
 .occurrence p{
@@ -45,7 +53,7 @@
 }
 
 #occurrenceList{
-    overflow-y: scroll;
+    overflow-y: auto;
     float:left;
     height: 90vh;
 }

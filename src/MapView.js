@@ -109,6 +109,7 @@ class MapView extends Component {
                 globalMarkers = JSON.parse(xhttp.response);
                 console.log("Response in function: ");
                 console.log(JSON.parse(xhttp.response));
+                sessionStorage.setItem("Occurrences", JSON.parse(xhttp.response));
                 this.setState({markers: JSON.parse(xhttp.response)});
             }
         };

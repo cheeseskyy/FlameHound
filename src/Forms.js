@@ -98,7 +98,7 @@ export class RegisterForm extends Component {
             if(xhttp.readyState == 4 && xhttp.status == 200){
                 alert("Successful registration.");
                 //window.location.replace("/login");
-                this.props.history.push("/login");
+                //this.props.history.push("/login");
                 this.props.resetForms();
             }
             if(xhttp.status == 400){
@@ -210,7 +210,7 @@ export class LoginForm extends Component {
                 sessionStorage.setItem('sessionToken', sessionInfo.tokenId);
                 {this.props.resetForms()}
                 {this.props.getRole()}
-                //this.props.history.push("/map");
+                this.props.history.push("/map");
             }
             if (xhttp.readyState == 4 && xhttp.status == 403) {
                 errorText.innerHTML = "Wrong Username or Password";
