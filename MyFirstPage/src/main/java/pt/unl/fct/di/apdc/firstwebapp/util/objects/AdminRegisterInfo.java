@@ -5,12 +5,14 @@ public class AdminRegisterInfo {
 	public String password;
 	public String registerUsername;
 	public String registerToken;
+	public String tokenId;
 	
 	public AdminRegisterInfo() {
 
 	}
 
-	public AdminRegisterInfo(String username, String password, String registerUsername, String registerToken) {
+	public AdminRegisterInfo(String tokenId, String username, String password, String registerUsername, String registerToken) {
+		this.tokenId = tokenId;
 		this.username = username;
 		this.password = password;
 		this.registerToken = registerToken;

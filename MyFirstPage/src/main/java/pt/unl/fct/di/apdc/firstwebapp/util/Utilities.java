@@ -7,5 +7,5 @@ public class Utilities {
 	public static String generateID() {
 		return UUID.randomUUID().toString();
 	}
-	
+
 }
