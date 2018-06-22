@@ -51,11 +51,13 @@ import pt.unl.fct.di.apdc.firstwebapp.util.Utilities;
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.OccurrencyFlags;
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.OccurrencyTypes;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.ImageData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.MessageData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.OccurrencyData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserInfo;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.ZoneCoordsData;
 
 @Path("/occurrency")
 public class OccurrencyResource extends HttpServlet{
@@ -77,6 +79,56 @@ public class OccurrencyResource extends HttpServlet{
 		updateCache();
 	}
 	
+	@POST
+	@Path("/occurrencyByZone")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getOcurrencyByZone(ZoneCoordsData zone) {
+		if(zone == null)
+			return Response.status(Status.BAD_REQUEST).build();
+		Response r = checkIsLoggedIn(new SessionInfo(zone.username, zone.tokenId));
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return Response.status(Status.FORBIDDEN).build();
+		
+		if(System.currentTimeMillis() - TTL > lastUpdate)
+			updateCache();
+		List<OccurrencyData> list = new ArrayList<OccurrencyData>(listCache.values());
+		for(int i = 0; i < list.size();) {
+			String[] coords = list.get(i).location.split(",");
+			long x = Long.parseLong(coords[0]);
+			long y = Long.parseLong(coords[1]);
+			
+			if(y < zone.topY || y > zone.botY || x > zone.topX || x < zone.topY)
+				list.remove(i);
+			else
+				i++;
+		}
+		return Response.ok().entity(g.toJson(list)).build();
+	}
+	
+	@POST
+	@Path("/occurrencyByFlag/{flag}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getOcurrencyByFlag(SessionInfo session, @PathParam("username") String flag ) {
+		if(flag == null)
+			return Response.status(Status.BAD_REQUEST).build();
+		Response r = checkIsLoggedIn(session);
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return Response.status(Status.FORBIDDEN).build();
+		
+		if(System.currentTimeMillis() - TTL > lastUpdate)
+			updateCache();
+		
+		List<OccurrencyData> list = new ArrayList<OccurrencyData>(listCache.values());
+		for(int i = 0; i < list.size();) {
+			if(!list.get(i).flag.toString().equals(flag))
+				list.remove(i);
+			else
+				i++;
+		}
+		return Response.ok().entity(g.toJson(list)).build();
+	}
 	
 	@POST
 	@Path("/occurrencyByUser/{username}")
@@ -292,12 +344,12 @@ public class OccurrencyResource extends HttpServlet{
 	@Path("/saveImageAndroid/{extension}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response uploadFileDropbox(String json, @PathParam("extension") String ext) {
-		Response r = uploadFileDropbox(json.getBytes(), ext);
+	public Response uploadFileDropbox(ImageData img, @PathParam("extension") String ext) {
+		Response r = uploadFileDropbox(img.image, ext);
 		if(r.getStatus() != 200)
 			return r;
-		String id = r.readEntity(String.class);
-		return Response.ok(new MessageData(id)).build();
+		String id = (String) r.getEntity();
+		return Response.ok(g.toJson(new MessageData(id))).build();
 	}
 	
 	@POST

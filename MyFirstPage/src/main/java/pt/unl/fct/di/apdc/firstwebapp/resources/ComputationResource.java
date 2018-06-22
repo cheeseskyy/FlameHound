@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -124,5 +125,4 @@ public class ComputationResource {
 		LOG.fine("Replying to date request.");
 		return Response.ok().entity(g.toJson(fmt.format(new Date()))).build();
 	}
-
 }

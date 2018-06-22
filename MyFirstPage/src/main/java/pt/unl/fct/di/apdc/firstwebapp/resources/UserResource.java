@@ -292,9 +292,7 @@ public class UserResource extends HttpServlet {
 		if(r.getStatus() != Response.Status.OK.getStatusCode())
 			return Response.status(Status.FORBIDDEN).build();
 		if(userStats == null || System.currentTimeMillis() - lastUpdateStats > TTLS) {
-			//Query on posted OC -> sum all params -> Update userAppStats -> Update Cache -> return it
-			// 1 txn                                        2txn                          
-			//total 3 txn (1 query, 1 get, 1 set)
+			
 			UserStatsData uD = calculateUserStats(session.username);
 			
 			Key userStatsKey = KeyFactory.createKey("userAppStats", session.username);
