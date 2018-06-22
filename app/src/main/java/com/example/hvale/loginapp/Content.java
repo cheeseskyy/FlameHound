@@ -1,30 +1,28 @@
-package com.example.hvale.loginapp.dummy;
+package com.example.hvale.loginapp;
+
+import com.android.volley.Cache;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.DiskBasedCache;
+import com.example.hvale.loginapp.dummy.DummyContent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import typeClasses.OcurrenceData;
+public class Content {
 
-/**
- * Helper class for providing sample content for user interfaces created by
- * Android template wizards.
- * <p>
- * TODO: Replace all uses of this class before publishing your app.
- */
-public class DummyContent {
 
     /**
      * An array of sample (dummy) items.
      */
 
-    public static final List<DummyItem> ITEMS = new ArrayList<DummyItem>();
+    public static final List<Content.DummyItem> ITEMS = new ArrayList<Content.DummyItem>();
 
     /**
      * A map of sample (dummy) items, by ID.
      */
-    public static final Map<String, DummyItem> ITEM_MAP = new HashMap<String, DummyItem>();
+    public static final Map<String, Content.DummyItem> ITEM_MAP = new HashMap<String, Content.DummyItem>();
 
     private static final int COUNT = 5;
 
@@ -38,14 +36,19 @@ public class DummyContent {
         }
     }
 
-    private static void addItem(DummyItem item) {
+    private void doInBackGround() {
+
+    }
+    private static void addItem(Content.DummyItem item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);
     }
 
-    private static DummyItem createDummyItem(int position) {
-        return new DummyItem(String.valueOf(OCCURRENCE_TITLE), OCCURRENCE + position, makeDetails(position));
+    private static Content.DummyItem createDummyItem(int position) {
+        return new Content.DummyItem(String.valueOf(OCCURRENCE_TITLE), OCCURRENCE + position, makeDetails(position));
     }
+
+
 
     private static String makeDetails(int position) {
         StringBuilder builder = new StringBuilder();
@@ -75,4 +78,5 @@ public class DummyContent {
             return content;
         }
     }
+
 }

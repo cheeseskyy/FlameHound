@@ -77,6 +77,9 @@ public class HomePage extends AppCompatActivity
     private static final String url = "https://my-first-project-196314.appspot.com/rest/";
     RequestQueue requestQueue;
     JSONArray finalResponse = null;
+    String[] ocurrencys = new String[20];
+    String[] result = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,6 +164,7 @@ public class HomePage extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Intent it = new Intent(HomePage.this, OccurrenceListActivity.class);
+                it.putExtra("ocurrencys", ocurrencys);
                 startActivity(it);
             }
         });
@@ -303,24 +307,24 @@ public class HomePage extends AppCompatActivity
                     // Setting the title for the marker.
                     // This will be displayed on taping the marker
                     String x = point.latitude + ":" + point.longitude;
-                    markerOptions.title(x);
+                    //markerOptions.title(x);
 
                     // Clears the previously touched position
                     //map.clear();
                     // Animating to the touched position
-                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 10));
+                   // map.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 10));
 
                     // Placing a marker on the touched position
-                    map.addMarker(markerOptions);
-
-                    latlngs.add(point);
-
 
                     //falta o if se foi criada uma ocorrência (confirmação via Rest adicionar o marker;
 
                     Intent it = new Intent(HomePage.this, RegistOccurrence.class);
                     it.putExtra("Loc", x);
                     startActivityForResult(it, 1);
+
+
+
+
                 }
 
             }
@@ -334,6 +338,26 @@ public class HomePage extends AppCompatActivity
         if (requestCode == 1) {
             if (resultCode == RegistOccurrence.RESULT_OK) {
                 String[] result = data.getStringArrayExtra("result");
+                for(int i = 0; i < result.length; i++) {
+                    System.out.println("hiiiiiiii" + "  " + result[i]);
+                }
+
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.title(result[0]);
+               String[] Brutepoint = result[3].split(",");
+
+               System.out.println(Brutepoint[0].substring(1)+ " " + Brutepoint[1]);
+               Double x = Double.parseDouble(Brutepoint[0].substring(1));
+               Double y = Double.parseDouble(Brutepoint[1]);
+               LatLng point = new LatLng(x,y);
+               markerOptions.position(point);
+
+                map.addMarker(markerOptions);
+
+                latlngs.add(point);
+                titles.add(Brutepoint[1]);
+
+
             }
             if (resultCode == RegistOccurrence.RESULT_CANCELED) {
                 System.out.println("erro");
@@ -429,6 +453,7 @@ public class HomePage extends AppCompatActivity
             String title = null;
             try {
                 JSONObject jsonObject = finalResponse.getJSONObject(i);
+                ocurrencys[i] = finalResponse.getJSONObject(i).toString();
                 coord = jsonObject.getString("location").split(",");
                 LatLng current = new LatLng(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]));
                 title = jsonObject.getString("title");
