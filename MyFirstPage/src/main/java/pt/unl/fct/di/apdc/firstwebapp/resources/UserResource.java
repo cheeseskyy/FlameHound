@@ -37,10 +37,12 @@ import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.dropbox.core.DbxException;
 import com.google.api.client.util.store.DataStore;
 import org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
+import pt.unl.fct.di.apdc.firstwebapp.util.Utilities;
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.OccurrencyFlags;
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.UserRoles;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminInfo;
@@ -48,6 +50,7 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminRegisterInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.OccurrencyStatsData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.ReportInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserStatsData;
@@ -68,6 +71,8 @@ public class UserResource extends HttpServlet {
 	private static final long TTLE = 5*60*1000; //TTL Entity 5 mins
 	private static final long TTLS = 5*60*1000; //TTL Stats 2 mins
 	
+	private static DropBoxResource dbIntegration = new DropBoxResource();
+	
 	private long lastUpdateEntity = 0;
 	private long lastUpdateStats = 0;
 
@@ -85,6 +90,34 @@ public class UserResource extends HttpServlet {
 		r.forward(request, response);
 	}
 	
+	
+	@POST
+	@Path("/report/{userReported}/{ocId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response reportUser(@PathParam("ocId") String ocID, @PathParam("userReported") String usernameR, ReportInfo session) {
+		Response r = validLogin(new SessionInfo(session.username, session.tokenId));
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return r;
+		Key userReportKey = KeyFactory.createKey("UserReport", usernameR + "_" + System.currentTimeMillis());
+		Transaction txn = datastore.beginTransaction();
+		try {
+			Entity userReport = new Entity(userReportKey);
+			userReport.setIndexedProperty("ReporterInfo", session.username);
+			userReport.setUnindexedProperty("Description", session.description);
+			userReport.setIndexedProperty("ReportOc", ocID);
+			datastore.put(txn ,  userReport);
+			txn.commit();
+		}catch(Exception e) {
+			LOG.warning(e.getMessage());
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		}finally {
+			if (txn.isActive()) {
+				txn.rollback();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			}
+		}
+		return Response.ok().build();
+	}
 	
 	@POST
 	@Path("/vote/{operation}/{ocId}")
@@ -128,6 +161,63 @@ public class UserResource extends HttpServlet {
 			}
 		}
 		return updateRelatedStats(ocID, operation);
+	}
+	
+	@POST
+	@Path("/saveProfileImage/{extension}")
+	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response uploadFileDropbox(byte[] file, @PathParam("extension") String ext) {
+		if(username == null)
+			return Response.status(Status.FORBIDDEN).build();
+		String uuid = Utilities.generateID();
+		LOG.info("Uploading image");
+		try {
+			dbIntegration.putFile(uuid, file , ext);
+			LOG.info("Uploaded image with id "+uuid);
+	} catch (IOException | DbxException e) {
+		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+	} catch (Exception e) {
+		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+	}
+		Transaction txn = datastore.beginTransaction();
+		Key profileKey = KeyFactory.createKey("ProfilePicture", username);
+		try {
+			Entity profilePicE = datastore.get(txn, profileKey);
+			profilePicE.setUnindexedProperty("Picture", uuid+"."+ext);
+			datastore.put(txn, profilePicE);
+		}catch(EntityNotFoundException e) {
+			Entity profilePicE = new Entity(profileKey);
+			profilePicE.setUnindexedProperty("Picture", uuid+"."+ext);
+			datastore.put(txn, profilePicE);
+		}
+		txn.commit();
+		return Response.ok().build();
+	}
+	
+	@POST
+	@Path("getImage/{imageID}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public Response downloadFileDropbox(SessionInfo session, @PathParam("imageID") String imageID){
+		Response r = validLogin(session);
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return r;
+		byte[] file;		
+		try {
+			LOG.info("Getting image: " + imageID);
+			int point = imageID.indexOf('.');
+			String name = imageID.substring(0, point);
+			String ext = imageID.substring(name.length()+1);
+			file = dbIntegration.getFile(name, ext);
+			LOG.info("Found file");
+			if(file == null)
+				return Response.status(Status.NOT_FOUND).build();			
+		}catch(Exception e) {
+			LOG.warning(e.getMessage());
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		}
+		return Response.ok(file).build();
 	}
 	
 	private Response updateRelatedStats(String ocID, String operation) {
@@ -369,6 +459,7 @@ public class UserResource extends HttpServlet {
 		userEntity = user;
 		return Response.ok().build();
 	}
+	
 	
 	@POST
 	@Path("/getUserInfo")
