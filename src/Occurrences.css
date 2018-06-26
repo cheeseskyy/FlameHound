@@ -15,8 +15,7 @@
 
 #occurrenceImage img{
     display:block;
-    height: 200px;
-    max-height: 100%;
+    max-height: 200px;
 }
 
 .OccurrencePage #occurrenceImage{
@@ -56,6 +55,7 @@
     overflow-y: auto;
     float:left;
     height: 90vh;
+    width: 100%;
 }
 
 
