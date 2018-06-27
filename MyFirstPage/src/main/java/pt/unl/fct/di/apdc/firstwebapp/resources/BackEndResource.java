@@ -535,6 +535,11 @@ public class BackEndResource extends HttpServlet {
 		
 	}
 	
+	
+	/**
+	 * Report Management Methods:
+	 */
+	
 	@Path("/rM")
 	private class ReportManagementMethods {
 		
@@ -546,6 +551,7 @@ public class BackEndResource extends HttpServlet {
 		@Path("/getReport/{repId}")
 		@POST
 		@Consumes(MediaType.APPLICATION_JSON)
+		@Produces(MediaType.APPLICATION_JSON)
 		public Response getReports(@PathParam("repID") String repID, SessionInfo session) {
 			Response r = validAdminLogin(new SessionInfo(session.username, session.tokenId));
 			if(r.getStatus() != 200)
@@ -572,6 +578,7 @@ public class BackEndResource extends HttpServlet {
 		@Path("/getReportByReported/{reportedUsername}")
 		@POST
 		@Consumes(MediaType.APPLICATION_JSON)
+		@Produces(MediaType.APPLICATION_JSON)
 		public Response getReportsByReported(@PathParam("reportedUsername") String reportedUsername, SessionInfo session) {
 			Response r = validAdminLogin(new SessionInfo(session.username, session.tokenId));
 			if(r.getStatus() != 200)
@@ -596,6 +603,7 @@ public class BackEndResource extends HttpServlet {
 		@Path("/getReportByReporter/{reporterUsername}")
 		@POST
 		@Consumes(MediaType.APPLICATION_JSON)
+		@Produces(MediaType.APPLICATION_JSON)
 		public Response getReportsByReporter(@PathParam("reporterUsername") String reporterUsername, SessionInfo session) {
 			Response r = validAdminLogin(new SessionInfo(session.username, session.tokenId));
 			if(r.getStatus() != 200)
@@ -620,6 +628,7 @@ public class BackEndResource extends HttpServlet {
 		@Path("/getReportByOccurrency/{ocId}")
 		@POST
 		@Consumes(MediaType.APPLICATION_JSON)
+		@Produces(MediaType.APPLICATION_JSON)
 		public Response getReportsByOccurrency(@PathParam("ocId") String ocId, SessionInfo session) {
 			Response r = validAdminLogin(new SessionInfo(session.username, session.tokenId));
 			if(r.getStatus() != 200)
