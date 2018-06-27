@@ -173,7 +173,7 @@ public class BackEndResource extends HttpServlet {
 		Transaction txn = datastore.beginTransaction();
 		try {
 			// If the entity does not exist an Exception is thrown. Otherwise,
-			Key userKey = KeyFactory.createKey("UserAdmin", info.username);
+			Key userKey = KeyFactory.createKey("UserWorker", info.username);
 			datastore.get(userKey);
 			txn.rollback();
 			return Response.status(Status.FORBIDDEN).entity("Username").build(); 
@@ -186,7 +186,7 @@ public class BackEndResource extends HttpServlet {
 			user.setProperty("adminPermission", info.registerUsername);
 			user.setProperty("creationTime", new Date());
 			datastore.put(txn,user);
-			LOG.info("Admin registered " + info.username);
+			LOG.info("Worker registered " + info.username);
 			txn.commit();
 			return Response.ok().build();
 		} finally {
@@ -220,7 +220,7 @@ public class BackEndResource extends HttpServlet {
 				user.setProperty("TokenExpirationDate", "");
 				user.setProperty("TokenCreationDate", "");
 				user.setProperty("TokenKey", 0);
-				datastore.put(txn, user);
+				datastore.put(txn2, user);
 				txn.commit();
 				txn2.commit();
 				return Response.status(Status.FORBIDDEN).build();
@@ -271,7 +271,7 @@ public class BackEndResource extends HttpServlet {
 				user.setProperty("TokenExpirationDate", "");
 				user.setProperty("TokenCreationDate", "");
 				user.setProperty("TokenKey", 0);
-				datastore.put(txn, user);
+				datastore.put(txn2, user);
 				txn.commit();
 				txn2.commit();
 				return Response.status(Status.FORBIDDEN).build();
