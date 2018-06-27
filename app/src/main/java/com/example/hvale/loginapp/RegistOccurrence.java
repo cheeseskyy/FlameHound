@@ -149,7 +149,7 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
                     public void onResponse(JSONObject response) {
                         try{
                         String imageId = (String) response.get("message");
-                        String imageIdFinal = imageId.substring(2,imageId.length()-1);
+                        String imageIdFinal = imageId.substring(1,imageId.length()-1);
                         mImage.add(imageIdFinal);
                         } catch (JSONException e) {
                             e.printStackTrace();

@@ -25,8 +25,9 @@
     <ProgressBar
         android:id="@+id/list_progress"
         style="?android:attr/progressBarStyleLarge"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_width="wrap_cont"
+        android:layout_height="match_parent"
+        android:layout_marginVertical=""
         android:layout_marginBottom="8dp"
         android:visibility="gone" />
 
