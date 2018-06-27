@@ -5,6 +5,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,9 +31,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * An activity representing a list of Occurences. This activity
@@ -52,6 +56,7 @@ public class OccurrenceListActivity extends AppCompatActivity {
     private static final String url = "https://my-first-project-196314.appspot.com/rest/";
     private JSONArray finalResponse = null;
     public final List<OccurrenceItem> ocurrencys = new LinkedList<OccurrenceItem>();
+    private final List<LatLng> locations = new LinkedList<LatLng>();
     private boolean rested = false;
     private View mProgressView;
     private FrameLayout fram_l;
@@ -145,9 +150,12 @@ public class OccurrenceListActivity extends AppCompatActivity {
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mIdView.setText(mValues.get(position).id);
             holder.mContentView.setText(mValues.get(position).content);
+            holder.mLocation.setText(mValues.get(position).location);
 
             holder.itemView.setTag(mValues.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
+
+
         }
 
         @Override
@@ -158,11 +166,13 @@ public class OccurrenceListActivity extends AppCompatActivity {
         class ViewHolder extends RecyclerView.ViewHolder {
             final TextView mIdView;
             final TextView mContentView;
+            final TextView mLocation;
 
             ViewHolder(View view) {
                 super(view);
                 mIdView = (TextView) view.findViewById(R.id.id_text);
                 mContentView = (TextView) view.findViewById(R.id.content);
+                mLocation = (TextView) view.findViewById(R.id.location);
             }
         }
     }
@@ -197,6 +207,9 @@ public class OccurrenceListActivity extends AppCompatActivity {
             String[] coord = null;
             String title = null;
             String description = null;
+            String address = "";
+            Geocoder geocoder = new Geocoder(getBaseContext(), Locale.getDefault());
+
             try {
                 JSONObject jsonObject = finalResponse.getJSONObject(i);
                 coord = jsonObject.getString("location").split(",");
@@ -204,12 +217,23 @@ public class OccurrenceListActivity extends AppCompatActivity {
                 title = jsonObject.getString("title");
                 description = jsonObject.getString("description");
                 System.out.println(title + "---" + description) ;
-                ocurrencys.add(new OccurrenceItem(title, description, description ));
+                System.out.println(Double.parseDouble(coord[0]) + "---" + Double.parseDouble(coord[1]));
+                List<Address> addresses = geocoder.getFromLocation(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]), 1);
+                System.out.println("SIZE: " + addresses.size() + "---" + addresses.get(0));
+
+                if(addresses.size() > 0) {
+                    address = addresses.get(0).getAddressLine(0);
+
+                }
+                System.out.println("passou aqui " + address);
+                ocurrencys.add(new OccurrenceItem(title, description, description, address));
 
 
 
             } catch (JSONException e) {
                 onCancelled(e);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         showProgress(false);
@@ -261,11 +285,13 @@ public class OccurrenceListActivity extends AppCompatActivity {
         public final String id;
         public final String content;
         public final String details;
+        public final String location;
 
-        public OccurrenceItem(String id, String content, String details) {
+        public OccurrenceItem(String id, String content, String details, String location) {
             this.id = id;
             this.content = content;
             this.details = details;
+            this.location = location;
         }
 
         @Override
