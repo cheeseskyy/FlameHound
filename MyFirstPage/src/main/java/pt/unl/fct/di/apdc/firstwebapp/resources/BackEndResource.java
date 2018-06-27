@@ -205,14 +205,9 @@ public class BackEndResource extends HttpServlet {
 			return Response.status(Status.FORBIDDEN).build();
 		}
 		Transaction txn = datastore.beginTransaction();
-		Key userKey = KeyFactory.createKey("UserAdmin", session.username);
+		Key adminUserKey = KeyFactory.createKey("UserAdmin", session.username);
 		try {
 			LOG.info("Attempt to get user: " + session.username);
-			Entity userN = datastore.get(userKey);
-			if(!userN.getProperty("role").equals(UserRoles.ADMIN.toString()))
-				return Response.status(Status.FORBIDDEN).build();
-			LOG.info("Got user");
-			Key adminUserKey = KeyFactory.createKey("UserAdmin", session.username);
 			Entity user = datastore.get(adminUserKey);
 			if(!user.getProperty("TokenKey").equals(session.tokenId))
 				return Response.status(Status.FORBIDDEN).build();
