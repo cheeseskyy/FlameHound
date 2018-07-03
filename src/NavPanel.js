@@ -28,8 +28,7 @@ class NavPanel extends Component {
             if (xhttp.readyState == 4 && xhttp.status == 200) {
                 console.log("getRole response: " + JSON.parse(xhttp.response));
                 this.setState(() => ({
-                    isRegister: this.state.isRegister,
-                    isLogin: this.state.isRegister,
+                    navState: navPanelState[0], //REGULAR
                     role: JSON.parse(xhttp.response)
                 }));
             }
@@ -114,10 +113,10 @@ class NavPanel extends Component {
                 <Route path = '/admin'
                        render={() =>
                            <div>
-                               <p><a>Utilizadores</a></p>
-                               <p><a>Ocorrências</a></p>
-                               <p><a>Reports</a></p>
-                               <p><a>Registos</a></p>
+                               <p><Link to={"/admin/users"}>Utilizadores</Link></p>
+                               <p><Link to={"/admin/occurrences"}>Ocorrências</Link></p>
+                               <p><Link to={"/admin/reports"}>Reports</Link></p>
+                               <p><Link to={"/admin/logs"}>Registos</Link></p>
                            </div>
                        }
                 />

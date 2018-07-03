@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {Switch, Route} from 'react-router-dom';
 import "./Admin.css";
 
 export class AdminArea extends Component{
@@ -10,7 +11,20 @@ export class AdminArea extends Component{
         return(
             <div className={"AdminPage"}>
                 <h1>Página de Moderação</h1>
-                <Report/>
+                <Switch>
+                    <Route path={"/admin/reports"}>
+                        <Report/>
+                    </Route>
+                    <Route path={"/admin/users"}>
+                        <Users/>
+                    </Route>
+                    <Route path={"/admin/logs"}>
+
+                    </Route>
+                    <Route path={"/admin/occurrences"}>
+
+                    </Route>
+                </Switch>
             </div>
         )
     }
