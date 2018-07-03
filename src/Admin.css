@@ -28,6 +28,10 @@
     width: 25%;
 }
 
+.User{
+    width: 50%;
+}
+
 .RowEntry.LastEntry{
     border-right: none;
 }
