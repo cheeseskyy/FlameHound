@@ -11,11 +11,13 @@
     justify-content: center;
     width: 100%;
     max-height: 200px;
+    background-color: darkgrey;
 }
 
 #occurrenceImage img{
     display:block;
     max-height: 200px;
+    margin:auto;
 }
 
 .OccurrencePage #occurrenceImage{
@@ -70,8 +72,10 @@
 .OccurrencePage{
     width: 851px;
     background-color: white;
+    opacity: 1;
     height: 100vh;
     margin: auto;
+    z-index: 3;
 }
 
 .occurrence a {
