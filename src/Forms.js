@@ -301,3 +301,55 @@ export class OccurrenceForm extends Component{
 
 }
 
+export class AdminLogin extends Component{
+
+    adminLogin() {
+        console.log("Function adminLogin called");
+        var usernameV = document.getElementById("un").value;
+        var passwordV = document.getElementById("pw").value;
+        var errorText = document.getElementById("errorMessage");
+
+        var loginInfo = {"username": usernameV, "password": passwordV};
+        var jSonLoginInfo = JSON.stringify(loginInfo);
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_be/_admin/loginAdmin", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        //xhttp.setRequestHeader("Access-Control-Allow-Origin")
+        xhttp.send(jSonLoginInfo);
+        xhttp.onreadystatechange = () => {
+
+            if (xhttp.readyState == 4 && xhttp.status == 200) {
+                console.log("Login successful");
+                var sessionInfo = JSON.parse(xhttp.response);
+                {this.props.resetForms()}
+                this.props.history.push("/admin");
+            }
+            if (xhttp.readyState == 4 && xhttp.status == 403) {
+                errorText.innerHTML = "Wrong Username or Password";
+            }
+        };
+    }
+
+    render(){
+        return(<Router>
+                <div className="loginForm">
+                    {console.log(this.props.match)}
+                    <label htmlFor="uname"><b>Admin Username</b></label><br/>
+
+                    <input type="text" placeholder="Enter Username" name="uname" id="un" defaultValue={localStorage.getItem('rememberUsername')} required></input><br/>
+
+                    <label htmlFor="psw"><b>Admin Password</b></label><br/>
+
+                    <input type="password" placeholder="Enter Password" name="psw" id="pw" required></input><br/>
+
+                    <button type="submit" onClick={() => this.adminLogin()}>Login</button>
+                    <button onClick={this.props.resetForms}>Back</button>
+
+                    <p id="errorMessage"/>
+                </div>
+            </Router>
+        );
+    }
+
+}
+

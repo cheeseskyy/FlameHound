@@ -1,14 +1,14 @@
 import React, {Component} from 'react';
 import {BrowserRouter as Router, Route, Link, Switch, withRouter} from "react-router-dom";
-import {RegisterForm as RegForm, LoginForm as LogForm} from "./Forms";
+import {RegisterForm as RegForm, LoginForm as LogForm, AdminLogin as AdmLogin} from "./Forms";
 import logo from "./images/logo/FlameHound Logo with Transparency@2x.png";
 import mapLogo from "./images/logo/FlameHound Logo with Orange Background@2x.png";
 import './NavPanel.css';
 
-
+const AdminLogin = withRouter(AdmLogin);
 const LoginForm = withRouter(LogForm);
 const RegisterForm = withRouter(RegForm);
-const navPanelState = ["REGISTER", "LOGIN", "IS_LOGGED_IN"];
+const navPanelState = ["REGULAR", "REGISTER", "LOGIN", "ADMIN_LOGIN"];
 
 class NavPanel extends Component {
     log() {
@@ -40,10 +40,9 @@ class NavPanel extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isRegister: false,
-            isLogin: false,
+            navState: navPanelState[0], //REGULAR
             role: "USER"
-        }
+        };
         this.resetForms = this.resetForms.bind(this);
         this.getRole = this.getRole.bind(this);
     }
@@ -51,8 +50,8 @@ class NavPanel extends Component {
     resetForms() {
         console.log("UpdateForms called");
         this.setState({
-            isRegister: false,
-            isLogin: false
+            navState: navPanelState[0],
+            role: this.state.role
         });
     }
 
@@ -61,38 +60,10 @@ class NavPanel extends Component {
         if(this.state.role === 'ADMIN'){
             console.log("User role is ADMIN");
             return <div>
-                ADMIN
+                <p><a onClick={() => this.setState({navState: navPanelState[3], role: this.state.role})}>Login as Admin...</a></p>
             </div>
         }
     }
-
-    panel =
-        <Switch>
-
-            <Route exact path='/'
-                   render={({match}) =>
-                       <div>
-                           <p><a onClick={() => this.setState({isRegister: false, isLogin: true, role: "USER"})}>Login </a></p>
-                           <p><a onClick={() => this.setState({isRegister: true, isLogin: false, role: "USER"})}>Register</a></p>
-                           <p><Link to="/about">About</Link></p>
-                           <Link to="/contact">Contact</Link>
-                       </div>
-                   }
-            />
-            <Route path="/" render={({match}) =>
-                <div>
-                    <p><Link to={"/map"}>Mapa</Link></p>
-                    <p><Link to={match.url + "/submitOccurrence"}>Criar Ocorrência</Link></p>
-                    <p><Link to="/profile">Perfil </Link></p>
-                    {console.log("Running showAdminPanel()")}
-                    {this.showAdminPanel()}
-                    <p><Link to="/logout" onClick={() =>
-                        this.logout()}>Logout </Link></p>
-                </div>
-            }
-            />
-
-        </Switch>;
 
 
     getRoleNav () {
@@ -102,9 +73,11 @@ class NavPanel extends Component {
 
     showForms(panel) {
         console.log(this.state);
-        if (this.state.isLogin) {
+        if (this.state.navState === navPanelState[3]){
+            return <AdminLogin resetForms={this.resetForms}/>
+        } else if (this.state.navState === navPanelState[2]) { //LOGIN
             return <LoginForm resetForms={this.resetForms} getRole={this.getRole}/>;
-        } else if (this.state.isRegister) {
+        } else if (this.state.navState === navPanelState[1]) { //REGISTER
             return <RegisterForm resetForms={this.resetForms}/>;
         } else {
             console.log("printing navPanel");
@@ -139,11 +112,21 @@ class NavPanel extends Component {
         const panel =
             <Switch>
 
+                <Route path = '/admin'
+                       render={() =>
+                           <div>
+                               <p><a>Utilizadores</a></p>
+                               <p><a>Ocorrências</a></p>
+                               <p><a>Reports</a></p>
+                               <p><a>Registos</a></p>
+                           </div>
+                       }
+                />
                 <Route exact path='/'
                        render={({match}) =>
                            <div>
-                               <p><a onClick={() => this.setState({isRegister: false, isLogin: true, role: "USER"})}>Login </a></p>
-                               <p><a onClick={() => this.setState({isRegister: true, isLogin: false, role: "USER"})}>Register</a></p>
+                               <p><a onClick={() => this.setState({navState: navPanelState[2], role: this.state.role})}>Login </a></p>
+                               <p><a onClick={() => this.setState({navState: navPanelState[1], role: this.state.role})}>Register</a></p>
                                <p><Link to="/about">About</Link></p>
                                <Link to="/contact">Contact</Link>
                            </div>
@@ -151,6 +134,7 @@ class NavPanel extends Component {
                 />
                 <Route path="/" render={({match}) =>
                     <div>
+                        <p><Link to={"/map"}>Mapa</Link></p>
                         <p><Link to={match.url + "/submitOccurrence"}>Criar Ocorrência</Link></p>
                         <p><Link to="/profile">Perfil </Link></p>
                         {console.log("Running showAdminPanel()")}
