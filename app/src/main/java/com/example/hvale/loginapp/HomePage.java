@@ -68,6 +68,7 @@ public class HomePage extends AppCompatActivity
     private ImageView Occorrences;
     private ImageView Trending;
     private ImageView Draw;
+    private ImageView Profile;
     private FrameLayout fram_map;
     private boolean canMove = false;
     private int counter;
@@ -109,6 +110,7 @@ public class HomePage extends AppCompatActivity
         Occorrences = findViewById(R.id.myOccorrences);
         Trending = findViewById(R.id.trending);
         Draw = findViewById(R.id.free_Draw);
+        Profile = findViewById(R.id.myProfile);
 
         fram_map = findViewById(R.id.fram_map);
 
@@ -172,6 +174,14 @@ public class HomePage extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Intent it = new Intent(HomePage.this, OccurrenceListActivity.class);
+                startActivity(it);
+            }
+        });
+
+        Profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(HomePage.this, ProfileActivity.class);
                 startActivity(it);
             }
         });
