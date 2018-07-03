@@ -30,7 +30,7 @@ class NavPanel extends Component {
                 this.setState(() => ({
                     isRegister: this.state.isRegister,
                     isLogin: this.state.isRegister,
-                    role: xhttp.response
+                    role: JSON.parse(xhttp.response)
                 }));
                 this.forceUpdate();
             }
