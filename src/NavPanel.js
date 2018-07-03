@@ -73,7 +73,7 @@ class NavPanel extends Component {
 
     showForms(panel) {
         console.log(this.state);
-        if (this.state.navState === navPanelState[3]){
+        if (this.state.navState === navPanelState[3]){ //ADMIN_LOGIN
             return <AdminLogin resetForms={this.resetForms}/>
         } else if (this.state.navState === navPanelState[2]) { //LOGIN
             return <LoginForm resetForms={this.resetForms} getRole={this.getRole}/>;
