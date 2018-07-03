@@ -321,6 +321,8 @@ export class AdminLogin extends Component{
             if (xhttp.readyState == 4 && xhttp.status == 200) {
                 console.log("Login successful");
                 var sessionInfo = JSON.parse(xhttp.response);
+                sessionStorage.setItem('sessionUsernameAdmin', sessionInfo.username);
+                sessionStorage.setItem('sessionTokenAdmin', sessionInfo.tokenId);
                 {this.props.resetForms()}
                 this.props.history.push("/admin");
             }

@@ -3,3 +3,31 @@
     height: 100%;
     background-color: white;
 }
+
+.AdminBox{
+    width: 70%;
+    height: 80%;
+    background: grey;
+    margin:auto;
+    border: black solid 1px;
+}
+
+.TableRow{
+    width: 100%;
+    border-bottom: black solid 1px;
+}
+
+.RowEntry{
+    border-right: black solid 1px;
+    margin: -1px;
+    text-align: center;
+    display: inline-block;
+}
+
+.Report{
+    width: 25%;
+}
+
+.RowEntry.LastEntry{
+    border-right: none;
+}
