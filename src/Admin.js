@@ -34,10 +34,8 @@ export class Report extends Component{
         console.log("Getting all reports");
         var xhttp = new XMLHttpRequest();
 
-        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/rM/getReport/all", true);
+        xhttp.open("POST", "/rest/rM/getReport/all", true);
         xhttp.setRequestHeader("Content-type", "application/json");
-
-        //Aqui o username vai ter que ser o username admin (pq podem haver contas com username da conta normal diferente do username admin, se calhar guardas outro username no session storage como usernameAdmin ou assim
 
         var username = sessionStorage.getItem('sessionUsernameAdmin');
         var token = sessionStorage.getItem('sessionTokenAdmin');
@@ -49,7 +47,6 @@ export class Report extends Component{
                 const reports = JSON.parse(xhttp.response);
                 console.log("Response in function: ");
                 console.log(JSON.parse(xhttp.response));
-                //Nao sei o que fazer aqui
                 this.setState({reports: reports});
             }
         };
@@ -82,14 +79,44 @@ export class Report extends Component{
 
 export class Users extends Component{
 
+    constructor(props){
+        super(props);
+        this.state = {
+            users: []
+        }
+    }
+
+    componentDidMount(){
+        this.getUsers();
+    }
+
+    getUsers() {
+        console.log("Getting all users");
+        var xhttp = new XMLHttpRequest();
+
+        xhttp.open("POST", "/rest/UM/getUsers/all", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        var username = sessionStorage.getItem('sessionUsernameAdmin');
+        var token = sessionStorage.getItem('sessionTokenAdmin');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () =>  {
+            if (xhttp.readyState == 4 && xhttp.status == 200) {
+                console.log("Got Users");
+                const users = JSON.parse(xhttp.response);
+                console.log("Response in function: ");
+                console.log(JSON.parse(xhttp.response));
+                this.setState({users: users});
+            }
+        };
+    }
+
     UsersRow = (props) => {
       return(
           <div className={"TableRow"}>
-              <div className={"RowEntry User"}> </div>
-              <div className={"RowEntry User"}> </div>
-              <div className={"RowEntry User"}> </div>
-              <div className={"RowEntry User"}> </div>
-              <div className={"RowEntry User"}> </div>
+              <div className={"RowEntry User"}> {props.user}</div>
+              <div className={"RowEntry LastEntry User"}> {props.user}</div>
           </div>
       )
     };
@@ -98,6 +125,11 @@ export class Users extends Component{
         return(
             <div className="AdminBox">
                 Caixa de Utilizadores
+                {this.state.users.map(user => {
+                    return (
+                        <this.UsersRow user={user.user_name} email={user.email}/>
+                    )
+                })}
             </div>
         )
     }

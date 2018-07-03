@@ -26,13 +26,12 @@ class NavPanel extends Component {
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () => {
             if (xhttp.readyState == 4 && xhttp.status == 200) {
-                console.log("getRole response: " + xhttp.response);
+                console.log("getRole response: " + JSON.parse(xhttp.response));
                 this.setState(() => ({
                     isRegister: this.state.isRegister,
                     isLogin: this.state.isRegister,
                     role: JSON.parse(xhttp.response)
                 }));
-                this.forceUpdate();
             }
         };
     }
