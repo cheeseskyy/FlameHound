@@ -1,14 +1,9 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
@@ -17,12 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -37,29 +28,16 @@ import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.PropertyProjection;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
-import com.google.appengine.api.datastore.Query.Filter;
-import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.api.datastore.Query.FilterPredicate;
-import com.google.appengine.api.datastore.Query.SortDirection;
-import com.google.api.client.util.store.DataStore;
 import org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
-import pt.unl.fct.di.apdc.firstwebapp.adminResources.OccurrencyManagement;
-import pt.unl.fct.di.apdc.firstwebapp.adminResources.ReportManagement;
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.UserRoles;
-import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminRegisterInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.ModeratorRegisterInfo;
-import pt.unl.fct.di.apdc.firstwebapp.util.objects.OccurrencyData;
-import pt.unl.fct.di.apdc.firstwebapp.util.objects.ReportData;
-import pt.unl.fct.di.apdc.firstwebapp.util.objects.ReportInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.WorkerRegisterInfo;
 
@@ -294,6 +272,21 @@ public class BackEndResource extends HttpServlet {
 			}
 		}
 	}
+	
+	@POST
+	@Path("/login")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	public Response doLogin(LoginData data, @Context HttpServletRequest request, @Context HttpServletResponse response, @Context HttpHeaders headers) throws ServletException, IOException {
+		Response r = doAdminLogin(data, request, response, headers);
+		if(r.getStatus() == 200)
+			return r;
+		else
+			if(r.getStatus() == 404)
+				return doModLogin(data, request, response, headers);
+		return r;
+	}
+	
 	
 	@POST
 	@Path("/loginAdmin")

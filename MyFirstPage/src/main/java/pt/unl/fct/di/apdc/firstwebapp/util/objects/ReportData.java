@@ -6,6 +6,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 
 public class ReportData {
 	
+	public String reportId;
 	public String reportedInfo;
 	public String reporterInfo;
 	public String description;
@@ -14,7 +15,8 @@ public class ReportData {
 	public ReportData() {
 	}
 	
-	public ReportData(String reporterInfo, String reportedInfo, String ocID, String description) {
+	public ReportData(String reportId, String reporterInfo, String reportedInfo, String ocID, String description) {
+		this.reportId = reportId;
 		this.reportedInfo = reportedInfo;
 		this.reporterInfo = reporterInfo;
 		this.description = description;

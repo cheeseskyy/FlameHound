@@ -196,7 +196,7 @@ public class UserResource extends HttpServlet {
 	}
 	
 	@POST
-	@Path("getImage/{imageID}")
+	@Path("/getImage/{imageID}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	public Response downloadFileDropbox(SessionInfo session, @PathParam("imageID") String imageID){

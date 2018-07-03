@@ -22,12 +22,16 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Transaction;
 import com.google.gson.Gson;
 
-import pt.unl.fct.di.apdc.firstwebapp.adminResources.ReportManagement;
 import pt.unl.fct.di.apdc.firstwebapp.util.Utilities;
+import pt.unl.fct.di.apdc.firstwebapp.util.Enums.LogOperation;
+import pt.unl.fct.di.apdc.firstwebapp.util.Enums.LogType;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.ReportData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 
@@ -166,6 +170,7 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 			String reportedUsername = report.getKey().getName();
 			reportedUsername = reportedUsername.substring(0, reportedUsername.indexOf("_"));
 			ReportData rep = new ReportData(
+						(String) report.getKey().getName(),
 						(String) report.getProperty("ReporterInfo"),
 						reportedUsername,
 						(String) report.getProperty("ReportOc"),
@@ -181,7 +186,14 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 		public Response deleteReport(@PathParam("repID") String repID, SessionInfo session) {
 			if(ut.validAdminLogin(session).getStatus() == 200) {
 				listCache.remove(repID);
-				return ReportManagement.deleteReport(datastore, repID, LOG);
+				Transaction txn = datastore.beginTransaction();
+				LOG.info("Deleting report with id: " + repID);
+				Key repKey = KeyFactory.createKey("Report", repID);
+				datastore.delete(repKey);
+				txn.commit();
+				LOG.info("Report Deleted");
+				IntegrityLogsResource.insertNewLog(LogOperation.Delete, new String[]{repID}, LogType.Report, session.username);
+				return Response.ok().build();
 			}
 			else
 				return Response.status(Status.FORBIDDEN).build();

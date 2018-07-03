@@ -79,7 +79,7 @@ public class CommentResource {
 	}
 	
 	//GETALL
-	@Path("/{ocID}/post")
+	@Path("/{ocID}/getAll")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -183,19 +183,35 @@ public class CommentResource {
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteComment(@PathParam("commentID") String commentID, SessionInfo session) {
-		String postDate = fmt.format(new Date());
 		Response r = ComputationResource.validLogin(session);
 		if(r.getStatus() != 200)
 			return r;
 		Key commentKey = KeyFactory.createKey("Comment", commentID);
 		Transaction txn = datastore.beginTransaction();
+		datastore.delete(txn, commentKey);
+		return Response.ok().build();
+	}
+	
+	//EDIT
+	public Response editComment(@PathParam("commentID") String commentID, CommentInfoData comment) {
+		String postDate = fmt.format(new Date());
+		Response r = ComputationResource.validLogin(new SessionInfo(comment.user, comment.tokenId));
+		if(r.getStatus() != 200)
+			return r;
+		Key commentKey = KeyFactory.createKey("Comment", commentID);
+		Transaction txn = datastore.beginTransaction();
 		try {
-			Entity comment = datastore.get(txn, commentKey);
+			Entity commentE = datastore.get(txn, commentKey);
+			commentE.setProperty("comment", comment.comment);
+			commentE.setProperty("date", postDate);
+			commentE.setProperty("replyingTo", comment.replyingTo);
+			datastore.put(txn, commentE);
+			txn.commit();
+			return Response.ok().build();
 		}catch(EntityNotFoundException e) {
 			txn.rollback();
 			return Response.status(Status.NOT_FOUND).build();
 		}
-		return Response.ok().build();
 	}
-	//EDIT
+	
 }
