@@ -57,7 +57,7 @@ public class ComputationResource {
 	@POST
 	@Path("/validLogin")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response validLogin(SessionInfo session) {
+	public static Response validLogin(SessionInfo session) {
 		if (session.tokenId.equals("0")) {
 			LOG.warning("User is not logged in");
 			return Response.status(Status.FORBIDDEN).build();
@@ -124,5 +124,43 @@ public class ComputationResource {
 	public Response getCurrentTime() {
 		LOG.fine("Replying to date request.");
 		return Response.ok().entity(g.toJson(fmt.format(new Date()))).build();
+	}
+	
+	@GET
+	@Path("/integrityLogs")
+	public Response checkLogIntegrity(){
+		Transaction txn = datastore.beginTransaction();
+		Key adminLogs = KeyFactory.createKey("OperationLogs", "Logs");
+		Entity logs = null;
+		try {
+			logs = datastore.get(txn, adminLogs);
+		}catch(EntityNotFoundException e) {
+			
+		}
+		txn.commit();
+		String logText = (String) logs.getProperty("logText");
+		String hex = "";
+		String[] lineLogs = logText.split("\n");
+		for(int i = 0; i < lineLogs.length; i++) {
+			LOG.info(lineLogs[i]);
+			hex = DigestUtils.sha512Hex(hex+lineLogs[i]+"\n");
+			LOG.info(hex);
+		}
+		Transaction txn2 = datastore.beginTransaction();
+		Key adminLogsHash = KeyFactory.createKey("OperationLogs", "LogsHash");
+		try {
+			logs = datastore.get(txn2, adminLogsHash);
+		}catch(EntityNotFoundException e) {
+		}
+		txn2.commit();
+		
+		String logsHash = (String) logs.getProperty("logHash");
+		
+		LOG.info(hex);
+		LOG.info(logsHash);
+		
+		if(hex.equals(logsHash))
+			return Response.ok().build();
+		return Response.status(Status.UNAUTHORIZED).build();
 	}
 }

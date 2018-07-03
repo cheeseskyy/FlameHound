@@ -235,18 +235,10 @@ public class BackOfficeResource extends HttpServlet {
 	 * Management Methods:
 	 */
 	
-	@Path("/oM")
-	public class WorkerOccurrencyManagement {
-
-		private final Gson g = new Gson();
 		private final DropBoxResource dbIntegration = new DropBoxResource();
-
-		public WorkerOccurrencyManagement() {
-		}
 		
-		
-		@Path("tag/{ocID}")
 		@PUT
+		@Path("/tag/{ocID}")
 		@Consumes(MediaType.APPLICATION_JSON)
 		public Response tagOccurrency(@PathParam("ocID") String ocID, SessionInfo session) {
 			Transaction txn = datastore.beginTransaction();
@@ -255,9 +247,10 @@ public class BackOfficeResource extends HttpServlet {
 				LOG.info("Attempt to get ocurrency: " + ocID);
 				Entity occurrency = datastore.get(txn, ocKey);
 				LOG.info("Got occurrency");
-				occurrency.setProperty("flag", OccurrencyFlags.solving);
+				occurrency.setProperty("flag", OccurrencyFlags.solving.toString());
 				datastore.put(txn, occurrency);
 				txn.commit();
+				LOG.info("Put in datastore");
 				return Response.ok().build();
 			} catch (EntityNotFoundException e) {
 				LOG.warning("Failed to locate ocurrency: " + ocID);
@@ -280,7 +273,8 @@ public class BackOfficeResource extends HttpServlet {
 				Key solvedOcKey = KeyFactory.createKey("Occurrency", ocID);
 				Entity solvedOccurrency = datastore.get(solvedOcKey);
 				List<String> images = (ArrayList) solvedOccurrency.getProperty("imagesID");
-				images.add(imageID);
+				if(imageID.equals("") || imageID == null)
+					images.add(imageID);
 				solvedOccurrency.setProperty("flag", OccurrencyFlags.solved.toString());
 				datastore.put(txn, solvedOccurrency);
 				txn.commit();
@@ -321,7 +315,4 @@ public class BackOfficeResource extends HttpServlet {
 			return Response.ok(g.toJson(uuid+"."+ext)).build();
 		}
 		
-	}
-		
-
 }
