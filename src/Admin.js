@@ -31,7 +31,7 @@ export class AdminArea extends Component{
 
 }
 
-export class Report extends Component{
+class Report extends Component{
 
     constructor(props){
         super(props);
@@ -91,7 +91,7 @@ export class Report extends Component{
     }
 }
 
-export class Users extends Component{
+class Users extends Component{
 
     constructor(props){
         super(props);
@@ -147,4 +147,54 @@ export class Users extends Component{
             </div>
         )
     }
+}
+
+class Logs extends Component{
+
+    LogsRow = (props) => {
+        return(
+            <div className={"TableEntry"}>
+                <div className={"RowEntry Log"}> {props.user}</div>
+                <div className={"RowEntry LastEntry Log"}> {props.user}</div>
+            </div>
+        )
+    };
+
+    render(){
+        return(
+            <div className="AdminBox">
+                {this.state.logs.map(user => {
+                    return(
+                        <this.LogsRow/>
+                    )
+            })}
+            </div>
+        )
+    }
+
+}
+
+class Occurrences extends Component{
+
+    OccurrencesRow = (props) => {
+        return(
+            <div className={"TableEntry"}>
+                <div className={"RowEntry Occurrences"}> {props.user}</div>
+                <div className={"RowEntry LastEntry Occurrences"}> {props.user}</div>
+            </div>
+        )
+    };
+
+    render(){
+        return(
+            <div className="AdminBox">
+                {this.state.logs.map(user => {
+                    return(
+                        <this.OccurrencesRow/>
+                    )
+                })}
+            </div>
+        )
+    }
+
 }
