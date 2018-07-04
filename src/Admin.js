@@ -48,7 +48,7 @@ export class Report extends Component{
         console.log("Getting all reports");
         var xhttp = new XMLHttpRequest();
 
-        xhttp.open("POST", "/rest/rM/getReport/all", true);
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com//rest/rM/getReport/all", true);
         xhttp.setRequestHeader("Content-type", "application/json");
 
         var username = sessionStorage.getItem('sessionUsernameAdmin');
@@ -68,11 +68,12 @@ export class Report extends Component{
 
     ReportRow = (props) => {
       return (
-          <div className={"TableRow"}>
-              <div className={"RowEntry Report"}>{props.id}</div>
-              <div className={"RowEntry Report"}>{props.reporter}</div>
-              <div className={"RowEntry Report"}>{props.reported}</div>
-              <div className={"RowEntry LastEntry Report"}>{props.ocID}</div>
+          <div className={"TableEntry"}>
+              <div className={"EntryInfo Report"}>{props.id}</div>
+              <div className={"EntryInfo Report"}>{props.reporter}</div>
+              <div className={"EntryInfo Report"}>{props.reported}</div>
+              <div className={"EntryInfo Report"}>{props.description}</div>
+              <div className={"EntryInfo Report"}>{props.ocID}</div>
           </div>
       )
     };
@@ -82,10 +83,9 @@ export class Report extends Component{
             <div className="AdminBox">
                 {this.state.reports.map(report => {
                     return(
-                        <this.ReportRow id = {report.reportId} reporter = {report.reporterInfo} reported = {report.reportedInfo} ocID = {report.ocID}/>
+                        <this.ReportRow key={report} id = {report.reportId} reporter = {report.reporterInfo} reported = {report.reportedInfo} ocID = {report.ocID} description={report.description}/>
                     )
                 })}
-                <this.ReportRow id = "asjdasd" reporter = "cheese" reported = "your mom" ocID="12345"/>
             </div>
         )
     }
@@ -108,7 +108,7 @@ export class Users extends Component{
         console.log("Getting all users");
         var xhttp = new XMLHttpRequest();
 
-        xhttp.open("POST", "/rest/UM/getUsers/all", true);
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com//rest/UM/getUsers/all", true);
         xhttp.setRequestHeader("Content-type", "application/json");
 
         var username = sessionStorage.getItem('sessionUsernameAdmin');
@@ -128,7 +128,7 @@ export class Users extends Component{
 
     UsersRow = (props) => {
       return(
-          <div className={"TableRow"}>
+          <div className={"TableEntry"}>
               <div className={"RowEntry User"}> {props.user}</div>
               <div className={"RowEntry LastEntry User"}> {props.user}</div>
           </div>
