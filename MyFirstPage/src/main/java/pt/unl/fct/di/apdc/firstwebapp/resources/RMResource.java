@@ -51,24 +51,28 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 		@POST
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response getReports(@PathParam("repID") String repID, SessionInfo session) {
+		public Response getReports(@PathParam("repId") String repId, SessionInfo session) {
 			Response r = ut.validAdminLogin(new SessionInfo(session.username, session.tokenId));
+			LOG.info("Getting reports");
 			if(r.getStatus() != 200)
 				return Response.status(Status.FORBIDDEN).build(); 
 			
 			if(System.currentTimeMillis() - TTL > lastUpdate)
 				updateCache();
 			
-			if(repID.equals("all"))
+			LOG.info("Valid login");
+			if(repId.equals("all")) {
+				LOG.info(listCache.size() + "");
 				return Response.ok(g.toJson(listCache.values())).build();
+			}
 			
 			try {
-				ReportData rep = listCache.get(repID);
+				ReportData rep = listCache.get(repId);
 				if(rep == null)
 					throw new EntityNotFoundException(null);
 				return Response.ok(g.toJson(rep)).build();
 			}catch (EntityNotFoundException e) {
-				LOG.warning("Failed to locate report: " + repID);
+				LOG.warning("Failed to locate report: " + repId);
 				return Response.status(Status.NOT_FOUND).build();
 			}
 		}
@@ -149,7 +153,7 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 			return Response.ok().entity(g.toJson(list)).build();
 		}
 		
-		private void updateCache() {
+		public void updateCache() {
 			LOG.info("Got general request, querying all reports");
 			Query q = new Query("UserReport");
 			PreparedQuery pQ = datastore.prepare(q);
@@ -157,10 +161,14 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 			LOG.info("Got all");
 			LOG.info("Converting all to readable format");
 			while(it.hasNext()) {
+				LOG.info("REPORT");
 				Entity rep = it.next();
-				listCache.put(rep.getKey().toString(), convertRepToRepData(rep));
+				ReportData report = convertRepToRepData(rep);
+				LOG.info(report.toString());
+				listCache.put(rep.getKey().toString(), report);
 			}
 			lastUpdate = System.currentTimeMillis();
+			LOG.info(""+listCache.size());
 		}
 
 

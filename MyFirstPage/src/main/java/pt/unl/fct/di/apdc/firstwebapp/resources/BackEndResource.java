@@ -33,6 +33,8 @@ import com.google.appengine.api.datastore.Transaction;
 import org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
+import pt.unl.fct.di.apdc.firstwebapp.util.Enums.LogOperation;
+import pt.unl.fct.di.apdc.firstwebapp.util.Enums.LogType;
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.UserRoles;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminRegisterInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
@@ -90,6 +92,7 @@ public class BackEndResource extends HttpServlet {
 			datastore.put(txn,user);
 			LOG.info("Admin registered " + info.username);
 			txn.commit();
+			IntegrityLogsResource.insertNewLog(LogOperation.ADD, new String[]{"addAdmin with username: ", info.username}, LogType.Other, info.registerUsername);
 			return Response.ok().build();
 		} finally {
 			if (txn.isActive() ) {
@@ -125,6 +128,7 @@ public class BackEndResource extends HttpServlet {
 			datastore.put(txn,user);
 			LOG.info("Moderator registered " + info.username);
 			txn.commit();
+			IntegrityLogsResource.insertNewLog(LogOperation.ADD, new String[]{"addMod with username: ", info.username}, LogType.Other, info.registerUsername);
 			return Response.ok().build();
 		} finally {
 			if (txn.isActive() ) {
@@ -168,6 +172,7 @@ public class BackEndResource extends HttpServlet {
 			datastore.put(txn,user);
 			LOG.info("Worker registered " + info.username);
 			txn.commit();
+			IntegrityLogsResource.insertNewLog(LogOperation.ADD, new String[]{"addWorker with username: ", info.username}, LogType.Other, info.registerUsername);
 			return Response.ok().build();
 		} finally {
 			if (txn.isActive() ) {
