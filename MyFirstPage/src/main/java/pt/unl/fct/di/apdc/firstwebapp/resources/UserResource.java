@@ -120,6 +120,33 @@ public class UserResource extends HttpServlet {
 	}
 	
 	@POST
+	@Path("/voteWorker/{operation}/{workerId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response voteWorker(SessionInfo session, @PathParam("operation") String op, @PathParam("workerId") String workerID) {
+		Response r = validLogin(session);
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return r;
+		
+		Key workerKey = KeyFactory.createKey("UserWorker", workerID);
+		Transaction txn = datastore.beginTransaction();
+		try {
+			Entity worker = datastore.get(workerKey);
+			if(op.equals("upvote"))
+				worker.setProperty("approvalRate", (long) worker.getProperty("approvalRate") + 1);
+			if(op.equals("downvote"))
+				worker.setProperty("disapprovalRate", (long) worker.getProperty("disapprovalRate") + 1);
+			datastore.put(txn, worker);
+			txn.commit();
+			return Response.ok().build();
+		}catch(EntityNotFoundException e) {
+			txn.rollback();
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		
+		
+	}
+	
+	@POST
 	@Path("/vote/{operation}/{ocId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response voteOc(SessionInfo session, @PathParam("ocId") String ocID, @PathParam("operation") String operation) {
@@ -129,6 +156,7 @@ public class UserResource extends HttpServlet {
 			return r;
 		user = (Entity) r.getEntity();
 		
+		if(operation.equals("upvote")) {
 		Key likedOcKey = KeyFactory.createKey(user.getKey(), "likedOc", user.getKey().getName()); 
 		
 		Transaction txn = datastore.beginTransaction();
@@ -159,6 +187,7 @@ public class UserResource extends HttpServlet {
 				txn.rollback();
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
+		}
 		}
 		return updateRelatedStats(ocID, operation);
 	}
