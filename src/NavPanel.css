@@ -9,6 +9,12 @@
     border-right: #FF6E00 solid 5px;
     margin-right: -5px;
     z-index: 99;
+    display: block;
+}
+
+.loginForm{
+   
+
 }
 
 .logo{

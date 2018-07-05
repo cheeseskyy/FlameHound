@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import "./Comments.css";
 import placeholderImg from "./images/placeholders/IncendioCasa.jpg";
-import placeholderLogo from "./images/placeholders/colegas.png";
+import placeholderLogo from "./images/placeholders/FotoUser.png";
 
 export class CommentList extends Component{
 
@@ -10,7 +10,7 @@ export class CommentList extends Component{
         return(
             <div className="CommentList">
                 <div id="mainComment">
-                    <div id="authorLogo">
+                    <div id="authorLogo" >
                         <Link to="/profile"><img src = {this.props.logo? this.props.logo:placeholderLogo} alt = "Author Logo"/></Link>
                     </div>
                     <div style = {{display: "inline", verticalAlign: "middle"}}>
@@ -22,9 +22,9 @@ export class CommentList extends Component{
                         <button>report</button>
                     </div>
                 </div>
-
+                <br/>
                 <CommentBox text={"placeholding all the stuff!"}/>
-
+                <br/>
                 <CommentBox text={"Another placeholder"}/>
             </div>
         )

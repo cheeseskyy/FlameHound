@@ -18,8 +18,7 @@
     max-height: 200px;
 }
 
-.OccurrencePage #occurrenceImage{
-    height: 315px;
+.OccurrencePage {
     text-align: center;
 }
 
@@ -68,7 +67,7 @@
 }
 
 .OccurrencePage{
-    width: 851px;
+    width: 855px;
     background-color: white;
     height: 100vh;
     margin: auto;

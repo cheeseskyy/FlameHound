@@ -133,7 +133,7 @@ class Body extends Component {
                     <Route path="/profile" render={(props) =>
                         <PerfilPage name = "Placeholder" />
                     }/>
-                    <Route path="/occurrence/:id" render={(props) =>
+                    <Route path="/occurrence" render={(props) =>
                         <OccurrencePage title={"some occurrence"}/>} />
                     <Route path="/" component={Home}/>
                 </Switch>
