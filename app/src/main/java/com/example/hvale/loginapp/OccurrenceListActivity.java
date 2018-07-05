@@ -5,6 +5,9 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Build;
@@ -17,25 +20,33 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+
+import typeClasses.*;
 
 /**
  * An activity representing a list of Occurences. This activity
@@ -55,11 +66,13 @@ public class OccurrenceListActivity extends AppCompatActivity {
 
     private static final String url = "https://my-first-project-196314.appspot.com/rest/";
     private JSONArray finalResponse = null;
-    public final List<OccurrenceItem> ocurrencys = new LinkedList<OccurrenceItem>();
+    public final List<OcurrenceData> ocurrencys = new LinkedList<OcurrenceData>();
     private final List<LatLng> locations = new LinkedList<LatLng>();
     private boolean rested = false;
     private View mProgressView;
     private FrameLayout fram_l;
+    private ImageView[] images;
+    byte[] image = null;
 
 
     @Override
@@ -70,7 +83,7 @@ public class OccurrenceListActivity extends AppCompatActivity {
         mProgressView = findViewById(R.id.list_progress);
         fram_l = findViewById(R.id.frameLayout);
         showProgress(true);
-            doInBackGround();
+        doInBackGround();
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -100,19 +113,19 @@ public class OccurrenceListActivity extends AppCompatActivity {
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
         private final OccurrenceListActivity mParentActivity;
-        private final List<OccurrenceItem> mValues;
+        private final List<OcurrenceData> mValues;
         private final boolean mTwoPane;
 
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               // DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
-                OccurrenceItem item = (OccurrenceItem) view.getTag();
+                // DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+                OcurrenceData item = (OcurrenceData) view.getTag();
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
 
-                    arguments.putString(OccurrenceDetailFragment.ARG_ITEM_ID, item.id);
-                    arguments.putString(OccurrenceDetailFragment.ARG_CONTENT, item.content);
+                    arguments.putString(OccurrenceDetailFragment.ARG_ITEM_ID, item.title);
+                    arguments.putString(OccurrenceDetailFragment.ARG_CONTENT, item.description);
                     OccurrenceDetailFragment fragment = new OccurrenceDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -122,8 +135,8 @@ public class OccurrenceListActivity extends AppCompatActivity {
 
                     Context context = view.getContext();
                     Intent intent = new Intent(context, OccurrenceDetailActivity.class);
-                    intent.putExtra(OccurrenceDetailFragment.ARG_ITEM_ID, item.id);
-                    intent.putExtra(OccurrenceDetailFragment.ARG_CONTENT, item.content);
+                    intent.putExtra(OccurrenceDetailFragment.ARG_ITEM_ID, item.title);
+                    intent.putExtra(OccurrenceDetailFragment.ARG_CONTENT, item.description);
 
                     context.startActivity(intent);
                 }
@@ -131,7 +144,7 @@ public class OccurrenceListActivity extends AppCompatActivity {
         };
 
         SimpleItemRecyclerViewAdapter(OccurrenceListActivity parent,
-                                      List<OccurrenceItem> items,
+                                      List<OcurrenceData> items,
                                       boolean twoPane) {
 
             mValues = items;
@@ -148,8 +161,8 @@ public class OccurrenceListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+            holder.mIdView.setText(mValues.get(position).title);
+            holder.mContentView.setText(mValues.get(position).description);
             holder.mLocation.setText(mValues.get(position).location);
 
             holder.itemView.setTag(mValues.get(position));
@@ -204,10 +217,15 @@ public class OccurrenceListActivity extends AppCompatActivity {
     private void onPostExecute(JSONArray finalResponse) {
 
         for (int i = 0; i < finalResponse.length(); i++) {
-            String[] coord = null;
-            String title = null;
-            String description = null;
+            String[] coord;
+            String user;
+            String title;
+            String type;
+            String description;
+            String flag;
+            final List<String> imageListURI = new ArrayList<>();
             String address = "";
+            String imageURI;
             Geocoder geocoder = new Geocoder(getBaseContext(), Locale.getDefault());
 
             try {
@@ -216,18 +234,54 @@ public class OccurrenceListActivity extends AppCompatActivity {
                 LatLng current = new LatLng(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]));
                 title = jsonObject.getString("title");
                 description = jsonObject.getString("description");
-                System.out.println(title + "---" + description) ;
+                user = jsonObject.getString("username");
+                type = jsonObject.getString("type");
+                flag = jsonObject.getString("flag");
+                System.out.println(title + "---" + description);
                 System.out.println(Double.parseDouble(coord[0]) + "---" + Double.parseDouble(coord[1]));
                 List<Address> addresses = geocoder.getFromLocation(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]), 1);
                 System.out.println("SIZE: " + addresses.size() + "---" + addresses.get(0));
 
-                if(addresses.size() > 0) {
+                if (addresses.size() > 0) {
                     address = addresses.get(0).getAddressLine(0);
 
-                }
-                System.out.println("passou aqui " + address);
-                ocurrencys.add(new OccurrenceItem(title, description, description, address));
+                    imageURI = (String) jsonObject.getJSONArray("mediaURI").get(0);
+                    String username = LogOutSingleton.getInstance(getApplicationContext()).getUsername();
+                    String loginToken = LogOutSingleton.getInstance(getApplicationContext()).getLoginToken();
+                    ImageDataRequest imageR = new ImageDataRequest(username, loginToken);
 
+                    Gson gson = new Gson();
+                    String jsonImageURI = gson.toJson(imageR);
+                    JSONObject jsonImage = null;
+                    try {
+                        jsonImage = new JSONObject(jsonImageURI);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    JsonObjectRequest imageObjectRequest = new JsonObjectRequest(Request.Method.POST, url + "occurrency/getImageAndroid/" + imageURI, jsonImage, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                image = (byte[]) response.get("mediaURI");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            imageListURI.add(image.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            error.printStackTrace();
+                        }
+                    });
+                    VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(imageObjectRequest);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
+                    images[i].setImageBitmap(bitmap);
+                }
+
+                System.out.println("passou aqui " + address);
+                ocurrencys.add(new OcurrenceData(title, description, user, address, type, imageListURI, flag));
 
 
             } catch (JSONException e) {
@@ -281,26 +335,8 @@ public class OccurrenceListActivity extends AppCompatActivity {
         }
     }
 
-    public static class OccurrenceItem {
-        public final String id;
-        public final String content;
-        public final String details;
-        public final String location;
 
-        public OccurrenceItem(String id, String content, String details, String location) {
-            this.id = id;
-            this.content = content;
-            this.details = details;
-            this.location = location;
-        }
-
-        @Override
-        public String toString() {
-            return content;
-        }
-    }
-
-    public List<OccurrenceItem> getOcurrencys() {
+    public List<OcurrenceData> getOcurrencys() {
         return ocurrencys;
     }
 }
