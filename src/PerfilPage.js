@@ -66,7 +66,7 @@ export class PerfilPage extends Component{
 
 class ProfileImage extends Component{
 
-    changeImage(){
+    changeImage() {
         var xhttp = new XMLHttpRequest();
         xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/utils/validLogin", true);
         xhttp.setRequestHeader("Content-type", "application/json");
@@ -97,8 +97,10 @@ class ProfileImage extends Component{
                         console.log("Sending file");
                         var result = reader.result;
                     };
+                }
             }
-        };
+            ;
+        }
     }
 
     constructor(props){
