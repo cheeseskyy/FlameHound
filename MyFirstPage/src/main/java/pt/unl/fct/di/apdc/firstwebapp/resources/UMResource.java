@@ -51,7 +51,7 @@ public class UMResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUsers(@PathParam("userID") String userID, SessionInfo session) {
+	public Response getUsers(@PathParam("userId") String userId, SessionInfo session) {
 		Response r = ut.validAdminLogin(new SessionInfo(session.username, session.tokenId));
 		if(r.getStatus() != 200)
 			return Response.status(Status.FORBIDDEN).build(); 
@@ -59,23 +59,23 @@ public class UMResource {
 		if(System.currentTimeMillis() - TTL > lastUpdate)
 			updateCache();
 		
-		if(userID.equals("all"))
+		if(userId.equals("all"))
 			return Response.ok(g.toJson(listCache.values())).build();
 		
 		try {
-			UserInfo user= listCache.get(userID);
+			UserInfo user= listCache.get(userId);
 			if( user == null)
 				throw new EntityNotFoundException(null);
 			return Response.ok(g.toJson(user)).build();
 		}catch (EntityNotFoundException e) {
-			LOG.warning("Failed to locate user: " + userID);
+			LOG.warning("Failed to locate user: " + userId);
 			return Response.status(Status.NOT_FOUND).build();
 		}
 	}
 	
 	private void updateCache() {
 		LOG.info("Got general request, querying all reports");
-		Query q = new Query("UserReport");
+		Query q = new Query("User");
 		PreparedQuery pQ = datastore.prepare(q);
 		Iterator<Entity> it = pQ.asIterator();
 		LOG.info("Got all");
@@ -117,6 +117,7 @@ public class UMResource {
 			txn.commit();
 			LOG.info("User Deleted");
 			IntegrityLogsResource.insertNewLog(LogOperation.Delete, new String[]{userId}, LogType.User, session.username);
+			updateCache();
 			return Response.ok().build();
 		}
 		else

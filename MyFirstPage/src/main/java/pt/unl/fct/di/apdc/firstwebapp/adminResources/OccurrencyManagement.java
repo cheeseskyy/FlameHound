@@ -18,6 +18,7 @@ import pt.unl.fct.di.apdc.firstwebapp.resources.IntegrityLogsResource;
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.LogOperation;
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.LogType;
 import pt.unl.fct.di.apdc.firstwebapp.util.Enums.OccurrencyFlags;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.OccurrencyUpdateData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 
 public class OccurrencyManagement {
@@ -61,7 +62,7 @@ public class OccurrencyManagement {
 	}
 	
 	
-	public static Response updateOccurrency(SessionInfo session, DatastoreService datastore, String ocID, Logger LOG){
+	public static Response updateOccurrency(OccurrencyUpdateData info, DatastoreService datastore, String ocID, Logger LOG){
 		Transaction txn = datastore.beginTransaction();
 		Key ocKey = KeyFactory.createKey("Occurrency", ocID);
 		try {
@@ -69,17 +70,9 @@ public class OccurrencyManagement {
 			Entity occurrency = datastore.get(txn, ocKey);
 			LOG.info("Got occurrency");
 			
-			@SuppressWarnings("unchecked")
-			Iterator<String> it = ((List<String>) session.getArgs().get(0)).iterator();
-			while(it.hasNext()) {
-				String param = it.next();
-				String[] line = param.split(":");
-				LOG.info("Updating parameter " + line[0].trim() + " with value " + line[1].trim());
-				occurrency.setProperty(line[0].trim(), line[1].trim());
-			}
 			datastore.put(txn, occurrency);
 			txn.commit();
-			IntegrityLogsResource.insertNewLog(LogOperation.Update, new String[]{ocID}, LogType.Occurrency, session.username);
+			IntegrityLogsResource.insertNewLog(LogOperation.Update, new String[]{ocID}, LogType.Occurrency, info.username);
 			return Response.ok().build();
 		}catch (EntityNotFoundException e) {
 			LOG.warning("Failed to locate ocurrency: " + ocID);

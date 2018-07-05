@@ -5,8 +5,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -41,10 +44,33 @@ import com.google.apphosting.datastore.DatastoreV4.PropertyFilter;
 import org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
+import pt.unl.fct.di.apdc.firstwebapp.util.Utilities;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.MessageData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.RegisterData;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Properties;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Properties;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Path("/register")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -52,6 +78,13 @@ public class RegisterResource extends HttpServlet{
 
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+	private static final String DEFAULT_MESSAGE =
+			"Obrigado por se registar na nossa aplicação!\n\n"
+			+ "No entanto falta apenas um passo rápido para terminar o seu registo e poder aceder a todas as funcionalidades da nossa aplicação\n"
+			+ "Carregue no seguinte link para confirmar a sua conta:\n"
+			+ "%s \n"
+			+ "Cumprimentos,\n"
+			+ "FlameHound Team";
 	private final Gson g = new Gson();
 	
 	public RegisterResource() { } //Nothing to be done here...
@@ -116,12 +149,35 @@ public class RegisterResource extends HttpServlet{
 			userStatsE.setProperty("occurrenciesConfirmed", 0);
 			datastore.put(txn2, userStatsE);
 			txn2.commit();
+			
+			sendConfirmationEmail(data);
 			return Response.ok().entity(g.toJson(new MessageData("Success"))).build();
 		} finally {
 			if (txn.isActive() ) {
 				txn.rollback();
 			}
 		}
+	}
+	
+	public void sendConfirmationEmail(RegisterData data){
+	    Properties prop = new Properties();
+	    Session session = Session.getDefaultInstance(prop,null);
+	    try{    
+	        Message msg = new MimeMessage(session);
+	        msg.setFrom(new InternetAddress("noreply@my-first-project-196314.appspotmail.com", "FlameHound Team"));	        LOG.info("1");
+	        msg.addRecipient(Message.RecipientType.TO, new InternetAddress(data.email, "Sr./Sra. "+data.name));
+	        msg.setSubject("Account Confirmation");
+	        msg.setText(String.format(DEFAULT_MESSAGE, Utilities.generateID()));
+	        Transport.send(msg);
+	        LOG.info("Email sent");
+	    } catch (AddressException e) {
+	        LOG.info("Exception 1");
+	    } catch (MessagingException e) {
+	    	 LOG.info("Exception 2");
+	    	 LOG.warning(e.getMessage());
+	    } catch (UnsupportedEncodingException e) {
+	    	 LOG.info("Exception 3");
+	    }
 	}
 	
 

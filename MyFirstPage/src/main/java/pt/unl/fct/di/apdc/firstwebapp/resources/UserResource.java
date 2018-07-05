@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -50,10 +51,12 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminRegisterInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.OccurrencyStatsData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.OccurrencyUpdateData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.ReportInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserStatsData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserUpdateData;
 
 @Path("/user")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -193,34 +196,21 @@ public class UserResource extends HttpServlet {
 	}
 	
 	@POST
-	@Path("/saveProfileImage/{extension}")
+	@Path("/saveProfileImage/{name}")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response uploadFileDropbox(byte[] file, @PathParam("extension") String ext) {
-		if(username == null)
-			return Response.status(Status.FORBIDDEN).build();
+	public Response uploadFileDropbox(byte[] file, @PathParam("name") String name) {
 		String uuid = Utilities.generateID();
 		LOG.info("Uploading image");
 		try {
-			dbIntegration.putFile(uuid, file , ext);
-			LOG.info("Uploaded image with id "+uuid);
+			String[] image = name.split(".");
+			dbIntegration.putFile(image[0], file , image[1]);
+			LOG.info("Uploaded image with id "+image[0]);
 	} catch (IOException | DbxException e) {
 		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 	} catch (Exception e) {
 		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 	}
-		Transaction txn = datastore.beginTransaction();
-		Key profileKey = KeyFactory.createKey("ProfilePicture", username);
-		try {
-			Entity profilePicE = datastore.get(txn, profileKey);
-			profilePicE.setUnindexedProperty("Picture", uuid+"."+ext);
-			datastore.put(txn, profilePicE);
-		}catch(EntityNotFoundException e) {
-			Entity profilePicE = new Entity(profileKey);
-			profilePicE.setUnindexedProperty("Picture", uuid+"."+ext);
-			datastore.put(txn, profilePicE);
-		}
-		txn.commit();
 		return Response.ok().build();
 	}
 	
@@ -469,20 +459,20 @@ public class UserResource extends HttpServlet {
 	@POST
 	@Path("/updateProfile")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateProfile(SessionInfo session){
-		Response r = validLogin(session);
+	public Response updateProfile(UserUpdateData info){
+		Response r = validLogin(new SessionInfo(info.username, info.tokenId));
 		if(r.getStatus() != Response.Status.OK.getStatusCode())
 			return Response.status(Status.FORBIDDEN).build();
 		Entity user = (Entity) r.getEntity();
 		Transaction txn = datastore.beginTransaction();
-		@SuppressWarnings("unchecked")
-		Iterator<String> it = ((List<String>) session.getArgs().get(0)).iterator();
-		while(it.hasNext()) {
-			String param = it.next();
-			String[] line = param.split(":");
-			LOG.info("Updating parameter " + line[0].trim() + " with value " + line[1].trim());
-			user.setProperty(line[0].trim(), line[1].trim());
-		}
+		user.setProperty("user_name", info.name);
+		user.setProperty("email", info.email);
+		user.setProperty("homeNumber", info.homeNumber);
+		user.setProperty("phoneNumber", info.phoneNumber);
+		user.setProperty("address", info.address);
+		user.setProperty("nif", info.nif);
+		user.setProperty("cc", info.cc);
+		user.setProperty("user_pwd", DigestUtils.sha512Hex(info.password));
 		datastore.put(txn, user);
 		txn.commit();
 		userEntity = user;
@@ -513,6 +503,54 @@ public class UserResource extends HttpServlet {
 		String cc = (String) userE.getProperty("cc");
 		UserInfo user = new UserInfo(name,uN,email,hN,pN,add,nif,cc);
 		return Response.ok(user).build();
+	}
+	
+	@PUT
+	@Path("/updateOccurrency/{ocID}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateOccurrency(OccurrencyUpdateData data, @PathParam("ocID") String ocID){
+		Response r = validLogin(new SessionInfo(data.username, data.tokenId));
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return Response.status(Status.FORBIDDEN).build();
+		Transaction txn = datastore.beginTransaction();
+		Key ocKey = KeyFactory.createKey("Ocurrency", ocID);
+		try {
+			LOG.info("Attempt to get ocurrency: " + ocID);
+			Entity occurrency = datastore.get(txn, ocKey);
+			LOG.info("Got occurrency");
+			if(!occurrency.getProperty("user").equals(data.username)) {
+				txn.commit();
+				Response.status(Status.FORBIDDEN).build();
+			}
+			
+			LOG.info("Replacing values");
+			String aux = data.getLocation();
+			LOG.info(aux);
+			aux = aux.substring(1, aux.length()-2);
+			String[] coords = aux.split(", ");
+			LOG.info("Creating occurrency");
+			occurrency.setUnindexedProperty("title", data.getTitle());
+			occurrency.setUnindexedProperty("description", data.getDescription());
+			occurrency.setIndexedProperty("user", data.getUser());
+			
+			occurrency.setProperty("locationLat", coords[0].trim());
+			occurrency.setProperty("locationLong", coords[1].trim());
+			occurrency.setProperty("type", data.getType().toString());
+			occurrency.setProperty("creationTime", System.currentTimeMillis());
+			occurrency.setProperty("imagesID", data.getMediaURI());
+			occurrency.setProperty("flag", data.flag.toString());
+			datastore.put(txn, occurrency);
+			txn.commit();
+			return Response.ok().build();
+		}catch (EntityNotFoundException e) {
+			LOG.warning("Failed to locate ocurrency: " + ocID);
+			return Response.status(Status.NOT_FOUND).build();
+		}finally {
+			if (txn.isActive()) {
+				txn.rollback();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			}
+		}
 	}
 
 }

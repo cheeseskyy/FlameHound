@@ -39,6 +39,7 @@ import pt.unl.fct.di.apdc.firstwebapp.util.Enums.UserRoles;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminRegisterInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.MessageData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.ModeratorRegisterInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.WorkerRegisterInfo;
@@ -489,5 +490,30 @@ public class BackEndResource extends HttpServlet {
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
 		}
+	}
+	
+	@Path("/getLogs")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getLogs(SessionInfo session) {
+		Response r = validAdminLogin(session);
+		if(r.getStatus() != 200)
+			return r;
+		Transaction txn = datastore.beginTransaction();
+		Key adminLogs = KeyFactory.createKey("OperationLogs", "Logs");
+		String logText = null;
+		try {
+			Entity logs = datastore.get(txn, adminLogs);
+			logText = (String) logs.getProperty("logText");
+			txn.commit();
+		}catch(EntityNotFoundException e) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		Response integrity = ComputationResource.checkLogIntegrity();
+		if(logText != null && integrity.getStatus() == 200)
+			return Response.ok(new MessageData(logText)).build();
+		else
+			return Response.ok(new MessageData("Logs have been tampered with!\n" + logText)).build();
 	}
 }

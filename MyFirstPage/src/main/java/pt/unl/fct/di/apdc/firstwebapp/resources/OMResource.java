@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.adminResources.OccurrencyManagement;
 import pt.unl.fct.di.apdc.firstwebapp.util.Utilities;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.OccurrencyUpdateData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 
 @Path("/oM")
@@ -50,9 +51,9 @@ public class OMResource {
 	@Path("/update/{ocID}")
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateOccurrency(@PathParam("ocID") String ocID, SessionInfo session) {
-		if(ut.validAdminLogin(session).getStatus() == 200)
-			return OccurrencyManagement.updateOccurrency(session, datastore, ocID, LOG);
+	public Response updateOccurrency(@PathParam("ocID") String ocID, OccurrencyUpdateData info) {
+		if(ut.validAdminLogin(new SessionInfo(info.username, info.tokenId)).getStatus() == 200)
+			return OccurrencyManagement.updateOccurrency(info, datastore, ocID, LOG);
 		else
 			return Response.status(Status.FORBIDDEN).build();
 	}

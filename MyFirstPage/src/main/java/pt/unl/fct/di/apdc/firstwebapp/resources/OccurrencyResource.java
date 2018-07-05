@@ -55,6 +55,8 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.ImageData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.MessageData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.OccurrencyData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.OccurrencyReadableData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.OccurrencyUpdateData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.UserInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.ZoneCoordsData;
@@ -67,7 +69,7 @@ public class OccurrencyResource extends HttpServlet{
 	private final Gson g = new Gson();
 	private static DropBoxResource dbIntegration = new DropBoxResource();
 	private static final long TTL = 5*1000*60; //5 mins
-	Map<String,OccurrencyData> listCache = new ConcurrentHashMap<String, OccurrencyData>();
+	Map<String,OccurrencyReadableData> listCache = new ConcurrentHashMap<String, OccurrencyReadableData>();
 	private long lastUpdate = 0;
 	
 	public OccurrencyResource() {}
@@ -92,7 +94,7 @@ public class OccurrencyResource extends HttpServlet{
 		
 		if(System.currentTimeMillis() - TTL > lastUpdate)
 			updateCache();
-		List<OccurrencyData> list = new ArrayList<OccurrencyData>(listCache.values());
+		List<OccurrencyReadableData> list = new ArrayList<OccurrencyReadableData>(listCache.values());
 		for(int i = 0; i < list.size();) {
 			String[] coords = list.get(i).location.split(",");
 			long x = Long.parseLong(coords[0]);
@@ -120,7 +122,7 @@ public class OccurrencyResource extends HttpServlet{
 		if(System.currentTimeMillis() - TTL > lastUpdate)
 			updateCache();
 		
-		List<OccurrencyData> list = new ArrayList<OccurrencyData>(listCache.values());
+		List<OccurrencyReadableData> list = new ArrayList<OccurrencyReadableData>(listCache.values());
 		for(int i = 0; i < list.size();) {
 			if(!list.get(i).flag.toString().equals(flag))
 				list.remove(i);
@@ -131,7 +133,7 @@ public class OccurrencyResource extends HttpServlet{
 	}
 	
 	@POST
-	@Path("/occurrencyByUser/{username}")
+	@Path("/getByUser/{username}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getOcurrencyByUsername(SessionInfo session, @PathParam("username") String username) {
@@ -144,7 +146,7 @@ public class OccurrencyResource extends HttpServlet{
 		if(System.currentTimeMillis() - TTL > lastUpdate)
 			updateCache();
 		
-		List<OccurrencyData> list = new ArrayList<OccurrencyData>(listCache.values());
+		List<OccurrencyReadableData> list = new ArrayList<OccurrencyReadableData>(listCache.values());
 		for(int i = 0; i < list.size();) {
 			if(!list.get(i).user.equals(username))
 				list.remove(i);
@@ -169,7 +171,7 @@ public class OccurrencyResource extends HttpServlet{
 		if(System.currentTimeMillis() - TTL > lastUpdate)
 			updateCache();
 		
-		List<OccurrencyData> list = new ArrayList<OccurrencyData>(listCache.values());
+		List<OccurrencyReadableData> list = new ArrayList<OccurrencyReadableData>(listCache.values());
 		for(int i = 0; i < list.size();) {
 			if(!list.get(i).type.equals(t))
 				list.remove(i);
@@ -178,49 +180,6 @@ public class OccurrencyResource extends HttpServlet{
 		}
 		
 		return Response.ok().entity(g.toJson(list)).build();
-	}
-	
-	@PUT
-	@Path("/updateOccurrency/{ocID}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updateOccurrency(SessionInfo session, @PathParam("ocID") String ocID){
-		Response r = checkIsLoggedIn(session);
-		if(r.getStatus() != Response.Status.OK.getStatusCode())
-			return Response.status(Status.FORBIDDEN).build();
-		Transaction txn = datastore.beginTransaction();
-		Key ocKey = KeyFactory.createKey("Ocurrency", ocID);
-		try {
-			LOG.info("Attempt to get ocurrency: " + ocID);
-			Entity occurrency = datastore.get(txn, ocKey);
-			LOG.info("Got occurrency");
-			if(!occurrency.getProperty("user").equals(session.username)) {
-				txn.commit();
-				Response.status(Status.FORBIDDEN).build();
-			}
-			
-			LOG.info("Replacing values");
-			@SuppressWarnings("unchecked")
-			Iterator<String> it = ((List<String>) session.getArgs().get(0)).iterator();
-			while(it.hasNext()) {
-				String param = it.next();
-				String[] line = param.split(":");
-				if(line[0].trim().equals("type") && OccurrencyTypes.valueOf(line[1].trim()) == null)
-					throw new WebApplicationException(Status.BAD_REQUEST);
-				occurrency.setProperty(line[0].trim(), line[1].trim());
-			}
-			datastore.put(txn, occurrency);
-			listCache.put(occurrency.getKey().toString(), convertOcToOcData(occurrency));
-			txn.commit();
-			return Response.ok().build();
-		}catch (EntityNotFoundException e) {
-			LOG.warning("Failed to locate ocurrency: " + ocID);
-			return Response.status(Status.NOT_FOUND).build();
-		}finally {
-			if (txn.isActive()) {
-				txn.rollback();
-				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-			}
-		}
 	}
 	
 	private Response checkIsLoggedIn(SessionInfo session) {
@@ -411,7 +370,7 @@ public class OccurrencyResource extends HttpServlet{
 		LOG.info("Converting all to readable format");
 		while(it.hasNext()) {
 			Entity oc = it.next();
-			listCache.put(oc.getKey().toString(), convertOcToOcData(oc));
+			listCache.put(oc.getKey().getName(), convertOcToOcData(oc));
 		}
 		lastUpdate = System.currentTimeMillis();
 	}
@@ -434,7 +393,7 @@ public class OccurrencyResource extends HttpServlet{
 		}
 		
 		try {
-			OccurrencyData oc = listCache.get(ocurrencyID);
+			OccurrencyReadableData oc = listCache.get(ocurrencyID);
 			if(oc == null)
 				throw new EntityNotFoundException(null);
 			return Response.ok(g.toJson(oc)).build();
@@ -445,9 +404,10 @@ public class OccurrencyResource extends HttpServlet{
 	}
 
 	@SuppressWarnings("unchecked")
-	private OccurrencyData convertOcToOcData(Entity ocurrency) {
+	private OccurrencyReadableData convertOcToOcData(Entity ocurrency) {
 		String coordinates = ocurrency.getProperty("locationLat") + "," + ocurrency.getProperty("locationLong");
-		OccurrencyData oc = new OccurrencyData(
+		OccurrencyReadableData oc = new OccurrencyReadableData(
+				ocurrency.getKey().getName(),
 				(String)ocurrency.getProperty("title"),
 				(String)ocurrency.getProperty("description"),
 				(String)ocurrency.getProperty("user"),

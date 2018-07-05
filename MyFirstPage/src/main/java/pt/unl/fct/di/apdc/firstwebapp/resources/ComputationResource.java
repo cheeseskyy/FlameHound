@@ -128,7 +128,7 @@ public class ComputationResource {
 	
 	@GET
 	@Path("/integrityLogs")
-	public Response checkLogIntegrity(){
+	public static Response checkLogIntegrity(){
 		Transaction txn = datastore.beginTransaction();
 		Key adminLogs = KeyFactory.createKey("OperationLogs", "Logs");
 		Entity logs = null;
