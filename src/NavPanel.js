@@ -134,7 +134,7 @@ class NavPanel extends Component {
                     <div>
                         <p><Link to={"/map"}>Mapa</Link></p>
                         <p><Link to={match.url + "/submitOccurrence"}>Criar Ocorrência</Link></p>
-                        <p><Link to="/profile">Perfil </Link></p>
+                        <p><Link to={"/profile/" + sessionStorage.getItem('sessionUsername')}>Perfil </Link></p>
                         {console.log("Running showAdminPanel()")}
                         {this.showAdminPanel()}
                         <p><Link to="/logout" onClick={() =>

@@ -7,7 +7,13 @@
     padding: 0px;
 }
 
+.OccurrencePage #occurrenceImage{
+    margin:auto;
+    width:50%;
+}
+
 #occurrenceImage{
+    background-color: darkgrey;
     justify-content: center;
     width: 100%;
     max-height: 200px;

@@ -44,6 +44,13 @@ export class OccurrenceList extends Component {
 
 export class OccurrencePreview extends Component {
 
+    constructor(props){
+        super(props);
+        this.state = {
+            image: ""
+        }
+    }
+
     getImage(mediaURI) {
         this.hasImage = true;
         const extension = mediaURI.split(".")[1];
@@ -58,7 +65,7 @@ export class OccurrencePreview extends Component {
         xhttp.onreadystatechange = () => {
             if (xhttp.readyState == 4 && xhttp.status == 200) {
                 var arrayBufferView = new Uint8Array( xhttp.response );
-                var blob = new Blob( [ arrayBufferView ], { type: "image/jpeg"} );
+                var blob = new Blob( [ arrayBufferView ], { type: "image/" + extension} );
                 var urlCreator = window.URL || window.webkitURL;
                 var imageUrl = urlCreator.createObjectURL( blob );
                 this.setState({
@@ -67,28 +74,18 @@ export class OccurrencePreview extends Component {
             }
         };
     }
-    hasImage = false;
+
+    componentDidMount(){
+        this.getImage(this.props.image);
+    }
 
     render() {
-
-        let image;
-
-        if(this.state != null && this.state.image != null){
-            image = this.state.image;
-        } else {
-            image = this.props.image;
-        }
-
-        if(!this.hasImage)
-            this.getImage(this.props.image);
 
         return(
             <div className="occurrence">
                 <Link to={"/occurrence/"+this.props.id}>
                         <div id="occurrenceImage">
-                    {console.log(this.props.image)}
-                            {console.log(image)}
-                    <img id="occurrenceLogo" src={image}/>
+                    <img id="occurrenceLogo" src={this.state.image}/>
                 </div>
                 <div>
                     <p id = "occurrenceTitle"> {this.props.title}</p>
@@ -115,6 +112,14 @@ export class OccurrencePreview extends Component {
 
 export class OccurrencePage extends Component {
 
+    constructor(props){
+        super(props);
+        this.state = {
+            info: [],
+            image: ""
+        }
+    }
+
     componentDidMount(){
         this.getOcInfo();
     }
@@ -136,6 +141,35 @@ export class OccurrencePage extends Component {
                 console.log("Got Occurrence");
                 console.log("Response in function: ");
                 console.log(JSON.parse(xhttp.response));
+                this.setState({
+                    info: JSON.parse(xhttp.response),
+                    image: this.state.image
+                });
+                this.getOcImage(this.state.info.mediaURI[0]);
+            }
+        };
+    }
+
+    getOcImage(mediaURI){
+        this.hasImage = true;
+        const extension = mediaURI.split(".")[1];
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/getImage/" + mediaURI, true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.responseType ="arraybuffer";
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if (xhttp.readyState == 4 && xhttp.status == 200) {
+                var arrayBufferView = new Uint8Array( xhttp.response );
+                var blob = new Blob( [ arrayBufferView ], { type: "image/" + extension} );
+                var urlCreator = window.URL || window.webkitURL;
+                var imageUrl = urlCreator.createObjectURL( blob );
+                this.setState({
+                    image: imageUrl
+                })
             }
         };
     }
@@ -144,12 +178,12 @@ export class OccurrencePage extends Component {
         return (
             <div className="OccurrencePage">
                 <div>
-                    <h2 id="occurrenceTitle"> Descrição da Ocorrência: {this.props.title} </h2>
+                    <h2 id="occurrenceTitle"> Descrição da Ocorrência: {this.state.info.title} </h2>
                     <div id="occurrenceImage" align="center">
-                        <img alt="Occurrence Image" src={this.props.image ? this.props.image : placeHolder1}/>
+                        <img alt="Occurrence Image" src={this.state.image ? this.state.image : placeHolder1}/>
                     </div>
                 </div>
-                <CommentList/>
+                <CommentList description={this.state.info.description} user={this.state.info.user}/>
             </div>
         )
     };

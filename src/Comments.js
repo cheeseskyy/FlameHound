@@ -3,6 +3,7 @@ import {Link} from 'react-router-dom';
 import "./Comments.css";
 import placeholderImg from "./images/placeholders/IncendioCasa.jpg";
 import placeholderLogo from "./images/placeholders/FotoUser.png";
+import {ProfileImage} from "./PerfilPage";
 
 export class CommentList extends Component{
 
@@ -11,7 +12,7 @@ export class CommentList extends Component{
             <div className="CommentList">
                 <div id="mainComment">
                     <div id="authorLogo" >
-                        <Link to="/profile"><img src = {this.props.logo? this.props.logo:placeholderLogo} alt = "Author Logo"/></Link>
+                        <Link to="/profile"><ProfileImage user={this.props.user}/></Link>
                     </div>
                     <div style = {{display: "inline", verticalAlign: "middle"}}>
                          {this.props.description? this.props.description:"Main Comment Text"}

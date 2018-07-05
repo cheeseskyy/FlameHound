@@ -14,9 +14,38 @@ export class PerfilPage extends Component{
     constructor(props){
         super(props);
         this.state = {
-            logo: ""
+            logo: "",
+            occurrences: []
         }
     }
+
+    getOccurrences(){
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/getByUser/" + this.props.id , true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = function () {
+            if (xhttp.readyState == 4 && xhttp.status == 200) {
+                return JSON.parse(xhttp.response);
+            }
+        };
+    }
+
+    componentDidMount(){
+        //request Occurrences
+        let occurrences = this.getOccurrences();
+        this.setState(
+            {
+                logo: this.state.logo,
+                occurrences: occurrences
+            }
+        )
+    }
+
+    isHimself = true;
 
     request = "/occurrency/getByUser/"; //{username}
 
@@ -27,7 +56,7 @@ export class PerfilPage extends Component{
                 <div id = "coverImage"></div>
 
                 <div id="separação" style={{height: "30px"}}>
-                    <ProfileImage/>
+                    <ProfileImage id={this.props.id} isHimself={this.isHimself}/>
                 </div>
 
                 <div id="sobreMim">
@@ -44,6 +73,17 @@ export class PerfilPage extends Component{
                 <div id="minhasOcurrencias">
                     <h3 style={{textAlign: "center"}}>Minha Lista de Ocorrências </h3>
                     <div id="occurrenceList">
+
+                        {
+                            this.state.occurrences.map(occurrence => {
+                                return <OccurrencePreview key={""} id={occurrence.id} title={occurrence.title} user={occurrence.user}
+                                                          description={occurrence.description}
+                                                          image={occurrence.mediaURI[0]}
+                                                          randomProp={console.log("created occurrence " + occurrence.title)}/>
+
+                            })
+                        }
+
                         <OccurrencePreview title="Fogo no Parque da Paz"
                                                description="Incêndio já com algumas dimensões!" location="Almada"
                                                image={placeHolder1}/>
@@ -64,9 +104,9 @@ export class PerfilPage extends Component{
     }
 }
 
-class ProfileImage extends Component{
+export class ProfileImage extends Component{
 
-    changeImage() {
+    changeImage(id) {
         var xhttp = new XMLHttpRequest();
         xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/utils/validLogin", true);
         xhttp.setRequestHeader("Content-type", "application/json");
@@ -80,27 +120,28 @@ class ProfileImage extends Component{
                 var files = fileInput.files;
 
                 console.log(files);
-                let filesUploaded = true;
                 if (files.length > 0) {
                     var file = files[0];
-                    filesUploaded = false;
                     var extension = file.name.split(".")[1];
                     var reader = new FileReader();
                     var xhttp2 = new XMLHttpRequest();
 
                     reader.readAsArrayBuffer(file);
                     reader.onloadstart = console.log("Starting to read");
-                    xhttp2.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/saveImage/" + extension, true);
+                    xhttp2.open("POST", "https://my-first-project-196314.appspot.com/rest/user/saveProfileImage/" + id + "." + extension, true);
                     xhttp2.setRequestHeader("Content-type", "application/octet-stream");
-                    var uri;
                     reader.onloadend = function () {
                         console.log("Sending file");
                         var result = reader.result;
+                        xhttp2.send(result);
+                    };
+                    xhttp2.onreadystatechange = function () {
+                        if (xhttp2.readyState == 4 && xhttp.status == 200) {
+                        }
                     };
                 }
             }
-            ;
-        }
+        };
     }
 
     constructor(props){
@@ -110,12 +151,26 @@ class ProfileImage extends Component{
         }
     }
 
+    componentDidMount(){
+        //getImage(this.props.user)
+    }
+
+    imageOptions(){
+        if(this.props.isHimself){
+            return(
+                <div>
+                    <input id = "profileImageInput" type="file" placeholder={"Escolha uma imagem"} required/>
+                    <input type="submit" value={"Submeter"} onClick={() => this.changeImage(this.props.id)}/>
+                </div>
+            )
+        }
+    }
+
     render(){
         return(
             <div id = "UserFoto">
                 <img src={placeHolder}/>
-                <input id = "profileImageInput" type="file" placeholder={"Escolha uma imagem"} required/>
-                <input type="submit"/>
+                {this.imageOptions()}
             </div>
         )
     }

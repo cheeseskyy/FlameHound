@@ -135,7 +135,7 @@ class Body extends Component {
                         <PerfilPage id={match.params.id} name = "Placeholder" />
                     }/>
                     <Route path="/occurrence/:id" render={({match}) =>
-                        <OccurrencePage id={match.params.id} title={"some occurrence"}/>} />
+                        <OccurrencePage id={match.params.id}/>} />
                     <Route path="/admin" component={AdminArea}/>
                     <Route path="/" component={Home}/>
                 </Switch>
