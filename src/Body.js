@@ -12,6 +12,7 @@ import EntityPage from "./EntityPage";
 import {PerfilPage} from "./PerfilPage";
 import {CommentList} from "./Comments";
 import {OccurrencePage} from "./Occurrences";
+import {AdminArea} from "./Admin";
 
 const Home = () =>
     <div className="FullBody">
@@ -135,6 +136,7 @@ class Body extends Component {
                     }/>
                     <Route path="/occurrence" render={(props) =>
                         <OccurrencePage title={"some occurrence"}/>} />
+                    <Route path="/admin" component={AdminArea}/>
                     <Route path="/" component={Home}/>
                 </Switch>
             </div>
