@@ -81,7 +81,7 @@ export class RegisterForm extends Component {
         let userInfo = {"name": document.getElementById("name").value,
             "username": document.getElementById("username").value,
             "email": document.getElementById("email").value,
-            "role": document.getElementById("role").value,
+            "role": "USER",
             "homeNumber": document.getElementById("homeNumber").value,
             "phoneNumber": document.getElementById("phoneNumber").value,
             "address": document.getElementById("address").value,
@@ -115,25 +115,31 @@ export class RegisterForm extends Component {
             <Router>
                 <div className="form">
                     <br/>
-                    <label htmlFor="name"><b>Name</b></label><br/>
+                    <label htmlFor="name"><b>Name*</b></label><br/>
                     <input type="text" placeholder="Enter Name" id="name" required></input>
                     <br></br>
 
-                    <label htmlFor="username"><b>Username</b></label><br/>
+                    <label htmlFor="username"><b>Username*</b></label><br/>
                     <input type="text" placeholder="Enter Username" id="username" required></input>
                     <br></br>
 
-                    <label htmlFor="email"><b>Email</b></label><br/>
+                    <label htmlFor="email"><b>Email*</b></label><br/>
                     <input type="text" placeholder="Enter Email" id="email" required></input>
                     <br></br>
 
-                    <label htmlFor="role"><b>Role</b></label><br/>
-                    <select id="role" defaultValue="USER">
-                        <option value="USER">User</option>
-                        <option value="GBO">Gestor BackOffice</option>
-                        <option value="GS">Gestor Sistema</option>
-                        <option value="OPE">Operacional BackEnd</option>
-                    </select>
+                    <label
+                        htmlFor="psw"><b>Password*</b></label><br/>
+                    <input type="password"
+                           placeholder="Enter Password"
+                           id="psw" required></input>
+                    <br></br>
+
+                    <label
+                        htmlFor="psw-repeat"><b>Repeat Password*</b></label> <br/>
+                    <input type="password"
+                           placeholder="Repeat Password"
+                           id="psw-repeat"
+                           required></input>
                     <br></br>
 
                     <label htmlFor="homeNumber"><b>Home Number</b></label><br/>
@@ -159,20 +165,7 @@ export class RegisterForm extends Component {
                            placeholder="Enter CC" id="cc"></input>
                     <br></br>
 
-                    <label
-                        htmlFor="psw"><b>Password</b></label><br/>
-                    <input type="password"
-                           placeholder="Enter Password"
-                           id="psw" required></input>
-                    <br></br>
 
-                    <label
-                        htmlFor="psw-repeat"><b>Repeat Password</b></label> <br/>
-                    <input type="password"
-                           placeholder="Repeat Password"
-                           id="psw-repeat"
-                           required></input>
-                    <br></br>
 
                     <button type="button" onClick={this.register}>Submit</button>
                     <br></br>

@@ -15,7 +15,7 @@ export class OccurrenceList extends Component {
     renderOccurrences() {
         return this.props.list.map((occurrence, i) => {
             var extension = occurrence.mediaURI[0].split(".")[1];
-            return <OccurrencePreview key={i} title={occurrence.title} user={occurrence.user}
+            return <OccurrencePreview key={i} id={occurrence.id} title={occurrence.title} user={occurrence.user}
                                       description={occurrence.description}
                                       image={occurrence.mediaURI[0]}
                                       randomProp={console.log("created occurrence " + occurrence.title)}/>
@@ -84,7 +84,7 @@ export class OccurrencePreview extends Component {
 
         return(
             <div className="occurrence">
-                <Link to="/occurrence">
+                <Link to={"/occurrence/"+this.props.id}>
                         <div id="occurrenceImage">
                     {console.log(this.props.image)}
                             {console.log(image)}
@@ -114,6 +114,31 @@ export class OccurrencePreview extends Component {
 }
 
 export class OccurrencePage extends Component {
+
+    componentDidMount(){
+        this.getOcInfo();
+    }
+
+    getOcInfo(){
+        console.log("Getting OC");
+        var xhttp = new XMLHttpRequest();
+
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/getOccurrency/" + this.props.id, true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        var result;
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () =>  {
+            if (xhttp.readyState == 4 && xhttp.status == 200) {
+                console.log("Got Occurrence");
+                console.log("Response in function: ");
+                console.log(JSON.parse(xhttp.response));
+            }
+        };
+    }
 
     render() {
         return (
