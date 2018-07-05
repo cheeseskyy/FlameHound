@@ -116,19 +116,19 @@ export class RegisterForm extends Component {
                 <div className="form">
                     <br/>
                     <label htmlFor="name"><b>Name</b></label><br/>
-                    <input type="text" placeholder="Enter Name" id="name" required></input>
+                    <input type="text" placeholder="Enter Name" style={{width: "95%"}} id="name" required></input>
                     <br></br>
 
                     <label htmlFor="username"><b>Username</b></label><br/>
-                    <input type="text" placeholder="Enter Username" id="username" required></input>
+                    <input type="text" placeholder="Enter Username" style={{width: "95%"}}id="username" required></input>
                     <br></br>
 
                     <label htmlFor="email"><b>Email</b></label><br/>
-                    <input type="text" placeholder="Enter Email" id="email" required></input>
+                    <input type="text" placeholder="Enter Email" style={{width: "95%"}} id="email" required></input>
                     <br></br>
 
                     <label htmlFor="role"><b>Role</b></label><br/>
-                    <select id="role" defaultValue="USER">
+                    <select id="role"  defaultValue="USER" style={{width: "98%"}}>
                         <option value="USER">User</option>
                         <option value="GBO">Gestor BackOffice</option>
                         <option value="GS">Gestor Sistema</option>
@@ -137,39 +137,39 @@ export class RegisterForm extends Component {
                     <br></br>
 
                     <label htmlFor="homeNumber"><b>Home Number</b></label><br/>
-                    <input type="text" placeholder="Enter Home Number" id="homeNumber"></input>
+                    <input type="text" placeholder="Enter Home Number" style={{width: "95%"}} id="homeNumber"></input>
                     <br></br>
 
                     <label htmlFor="phoneNumber"><b>Phone Number</b></label><br/>
-                    <input type="text" placeholder="Enter Phone Number"
+                    <input type="text" placeholder="Enter Phone Number" style={{width: "95%"}}
                            id="phoneNumber"></input><br/>
 
                     <label htmlFor="address"><b>Address</b></label><br/>
-                    <input type="text" placeholder="Enter Andress"
+                    <input type="text" placeholder="Enter Andress" style={{width: "95%"}}
                            id="address" required></input>
                     <br></br>
 
                     <label htmlFor="nif"><b>NIF</b></label><br/>
-                    <input type="text" placeholder="Enter NIF"
+                    <input type="text" placeholder="Enter NIF" style={{width: "95%"}}
                            id="nif"></input>
                     <br></br>
 
                     <label htmlFor="cc"><b>CC</b></label><br/>
                     <input type="text"
-                           placeholder="Enter CC" id="cc"></input>
+                           placeholder="Enter CC" style={{width: "95%"}} id="cc"></input>
                     <br></br>
 
                     <label
                         htmlFor="psw"><b>Password</b></label><br/>
                     <input type="password"
-                           placeholder="Enter Password"
+                           placeholder="Enter Password" style={{width: "95%"}}
                            id="psw" required></input>
                     <br></br>
 
                     <label
                         htmlFor="psw-repeat"><b>Repeat Password</b></label> <br/>
                     <input type="password"
-                           placeholder="Repeat Password"
+                           placeholder="Repeat Password" style={{width: "95%"}}
                            id="psw-repeat"
                            required></input>
                     <br></br>
@@ -227,13 +227,13 @@ export class LoginForm extends Component {
                     {console.log(this.props.match)}
                     <label htmlFor="uname"><b>Username</b></label><br/>
 
-                    <input type="text" placeholder="Enter Username" name="uname" id="un" defaultValue={localStorage.getItem('rememberUsername')} required></input><br/>
+                    <input type="text" placeholder="Enter Username" name="uname"  style={{width: "95%"}} id="un" defaultValue={localStorage.getItem('rememberUsername')} required></input><br/>
 
                     <label htmlFor="psw"><b>Password</b></label><br/>
 
-                    <input type="password" placeholder="Enter Password" name="psw" id="pw" required></input><br/>
+                    <input type="password" placeholder="Enter Password" name="psw" style={{width: "95%"}} id="pw" required></input><br/>
 
-                    <button type="submit" onClick={() => this.login()}>Login</button>
+                    <button type="submit" onClick={() => this.login()}>Login</button><br/>
 
                     <label> <input type="checkbox" id="rememberMe" name="remember"></input>Remember me</label><br/>
                     <button onClick={this.props.resetForms}>Back</button>
@@ -259,24 +259,19 @@ export class OccurrenceForm extends Component{
             <Router>
                 <div className="ocurrenceform">
                     <div id="xpto" className="Column">
-                        <h3>Please fill in the form below to submit an occurrence</h3><br/>
+                        <h3>Submeter uma ocorrência: </h3><br/>
 
                         <label htmlFor="title"><b>Title</b></label><br/>
-                        <input  type="text" size="40" placeholder="Enter a title" id="title3" required></input><br/>
+                        <input  type="text" placeholder="Enter a title" size="50" style={{ padding: "12px 40px"}}  id="title3" required></input><br/>
                         <br/>
 
                         <label htmlFor="description"><b>Description</b></label><br/>
-                        <input  type="text"  size="40" placeholder="Describe the occurrence"  id="description"
+                        <input  type="text"  size="50" style={{ padding: "40px 40px"}} placeholder="Describe the occurrence"  id="description"
                                required></input><br/>
                         <br/>
 
-                        <label htmlFor="location"><b>Location</b></label><br/>
-                        <input type="text" size="40" placeholder="Enter the location" id="location"
-                               required></input><br/>
-                        <br/>
-
-                        <label htmlFor="type"><b>Type</b></label><br/>
-                        <select id="type">
+                        <label htmlFor="type" ><b>Type</b></label><br/>
+                        <select id="type"  style={{ padding: "12px 150px"}} >
                             <option value="light">Ligeiro</option>
                             <option value="important">Importante</option>
                             <option value="urgent">Urgente</option>
@@ -338,11 +333,11 @@ export class AdminLogin extends Component{
                     {console.log(this.props.match)}
                     <label htmlFor="uname"><b>Admin Username</b></label><br/>
 
-                    <input type="text" placeholder="Enter Username" name="uname" id="un" defaultValue={localStorage.getItem('rememberUsername')} required></input><br/>
+                    <input type="text" placeholder="Enter Username" name="uname" style={{width: "95%"}} id="un" defaultValue={localStorage.getItem('rememberUsername')} required></input><br/>
 
                     <label htmlFor="psw"><b>Admin Password</b></label><br/>
 
-                    <input type="password" placeholder="Enter Password" name="psw" id="pw" required></input><br/>
+                    <input type="password" placeholder="Enter Password" name="psw" style={{width: "95%"}} id="pw" required></input><br/>
 
                     <button type="submit" onClick={() => this.adminLogin()}>Login</button>
                     <button onClick={this.props.resetForms}>Back</button>

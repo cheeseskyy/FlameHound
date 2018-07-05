@@ -1,0 +1,29 @@
+.occurrence{
+    display: block;
+    width: 80%;
+    margin: auto;
+    background-color: white;
+    border: solid 0.2px;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+#occurrenceList1{
+    float:left;
+    height: 90vh;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.OccurrenceTips {
+    display: inline-block;
+}
+
+.TipsPanel {
+    display: inline-block;
+    text-align: center;
+    width: 30%;
+    float: right;
+    background-color: #FF6E00;
+    height: 100vh;
+}
