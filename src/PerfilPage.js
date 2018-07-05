@@ -33,6 +33,12 @@ export class PerfilPage extends Component{
                 <div id="sobreMim">
                     <h3 style={{textAlign: "center"}}>Info About Me! :) </h3>
                     <Link to={"/profile/changeProfile"}></Link>
+                    <p style={{paddingLeft: "5px"}}>Nome: </p>
+                    <p style={{paddingLeft: "5px"}}>Username:</p>
+                    <p style={{paddingLeft: "5px"}}>Morada:</p>
+                    <p style={{paddingLeft: "5px"}}>Telefone:</p>
+                    <p style={{paddingLeft: "5px"}}>CC:</p>
+                    <p style={{paddingLeft: "5px"}}>NIF:</p>
                 </div>
 
                 <div id="minhasOcurrencias">

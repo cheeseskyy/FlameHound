@@ -144,8 +144,8 @@ export class OccurrencePage extends Component {
         return (
             <div className="OccurrencePage">
                 <div>
-                    <p id="occurrenceTitle"> {this.props.title} </p>
-                    <div id="occurrenceImage">
+                    <h2 id="occurrenceTitle"> Descrição da Ocorrência: {this.props.title} </h2>
+                    <div id="occurrenceImage" align="center">
                         <img alt="Occurrence Image" src={this.props.image ? this.props.image : placeHolder1}/>
                     </div>
                 </div>
