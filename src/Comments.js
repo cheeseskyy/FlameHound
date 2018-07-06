@@ -16,6 +16,29 @@ export class CommentList extends Component{
 
     getComments() {
 
+        const request = "https://my-first-project-196314.appspot.com/rest/social/" + this.props.ocID + "/getAll";
+        const xhttp =  new XMLHttpRequest();
+        xhttp.open("POST", request, true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        const username = sessionStorage.getItem('sessionUsername');
+        const token = sessionStorage.getItem('sessionToken');
+        const jsonObj = JSON.stringify({
+            username: username,
+            tokenId: token
+        });
+        xhttp.send(jsonObj);
+        xhttp.onreadystatechange = () => {
+            if(xhttp.readyState === 4){
+                console.log("getComment response status = " + xhttp.status);
+                if(xhttp.status === 200){
+                    console.log(JSON.parse(xhttp.response));
+                    this.setState({
+                        comments: JSON.parse(xhttp.response)
+                    });
+                }
+            }
+        }
     }
 
     componentDidMount(){
@@ -38,10 +61,12 @@ export class CommentList extends Component{
                         <button>report</button>
                     </div>
                 </div>
-                <br/>
-                <CommentBox text={"placeholding all the stuff!"}/>
-                <br/>
-                <CommentBox text={"Another placeholder"}/>
+                {
+                    this.state.comments.map(comment => {
+                        return <CommentBox author={comment.username} text={comment.comment} postDate={comment.postDate} key={comment.id}/>
+
+                    })
+                }
                 <br/>
                 <AddCommentBox ocID={this.props.ocID} replyingTo={this.props.user}/>
             </div>
@@ -69,6 +94,12 @@ export class AddCommentBox extends Component{
         if(!(e.key === 'Enter')) {
             return;
         }
+
+        const comment = document.getElementById("newCommentInput").value;
+        if(comment === ""){
+            return;
+        }
+
         console.log("Submitted comment");
         const request = "https://my-first-project-196314.appspot.com/rest/social/" + this.props.ocID + "/post";
         const xhttp =  new XMLHttpRequest();
@@ -77,7 +108,6 @@ export class AddCommentBox extends Component{
 
         const username = sessionStorage.getItem('sessionUsername');
         const token = sessionStorage.getItem('sessionToken');
-        const comment = document.getElementById("newCommentInput").value;
         const replyingTo = this.props.replyingTo;
 
         const jsonObj = JSON.stringify({
@@ -92,9 +122,8 @@ export class AddCommentBox extends Component{
             if(xhttp.readyState === 4){
                 console.log("Comment response status = " + xhttp.status);
             }
-        }
-
-    }
+        };
+    };
 
     render(){
         return(
