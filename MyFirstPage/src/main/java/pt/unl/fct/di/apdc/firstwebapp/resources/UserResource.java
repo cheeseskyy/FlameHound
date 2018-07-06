@@ -200,28 +200,39 @@ public class UserResource extends HttpServlet {
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response uploadFileDropbox(byte[] file, @PathParam("name") String name) {
-		String uuid = Utilities.generateID();
 		LOG.info("Uploading image");
+		LOG.info(name);
+		LOG.info(name.substring(0, name.indexOf(".")) +" "+ name.substring(name.indexOf(".")+1));
+		String nameL = name.substring(0, name.indexOf("."));
+		String uuid = Utilities.generateID();
 		try {
-			String[] image = name.split(".");
-			dbIntegration.putFile(image[0], file , image[1]);
-			LOG.info("Uploaded image with id "+image[0]);
+			dbIntegration.putFile(uuid, file , name.substring(name.indexOf(".")+1));
 	} catch (IOException | DbxException e) {
 		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 	} catch (Exception e) {
+		LOG.info(e.getMessage());
 		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 	}
+		Transaction txn = datastore.beginTransaction();
+		Key profileImageKey = KeyFactory.createKey("ProfileImage", nameL);
+		Entity profileImage = new Entity(profileImageKey);
+		profileImage.setProperty("uri", uuid+ name.substring(name.indexOf(".")+1));
+		datastore.put(txn, profileImage);
 		return Response.ok().build();
 	}
 	
 	@POST
-	@Path("/getImage/{imageID}")
+	@Path("/getImage/{username}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public Response downloadFileDropbox(SessionInfo session, @PathParam("imageID") String imageID){
+	public Response downloadFileDropbox(SessionInfo session, @PathParam("username") String username) throws EntityNotFoundException{
 		Response r = validLogin(session);
 		if(r.getStatus() != Response.Status.OK.getStatusCode())
 			return r;
+		String imageID = "";
+		Key profileKey = KeyFactory.createKey("ProfileImage", imageID);
+		Entity picture = datastore.get(profileKey);
+		imageID = (String) picture.getProperty("uri");
 		byte[] file;		
 		try {
 			LOG.info("Getting image: " + imageID);

@@ -226,6 +226,59 @@ public class DropBoxResource {
 
         }
     
+    public void deleteFile(String foldername, byte[] file, String ext) throws Exception {
+        
+        try {
+
+          URL url = new URL("https://content.dropboxapi.com/2/files/upload");
+          HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+          String parameters = "{\"path\": \"" + "/" + foldername + "/" + foldername + "." + ext + "\"}";
+          
+          conn.setRequestProperty("Content-Type", "application/octet-stream");    
+          conn.addRequestProperty ("Authorization", token);
+          conn.addRequestProperty ("Dropbox-API-Arg", parameters);
+          conn.setRequestMethod("DELETE");
+          
+          
+          conn.setDoOutput(true);
+
+
+          DataOutputStream writer = new DataOutputStream(conn.getOutputStream());
+          writer.write(file);
+          writer.flush();
+          
+          if (writer != null)
+              writer.close();
+                      
+          if (conn.getResponseCode() != 200) {
+              LOG.info(conn.getResponseMessage());
+              throw new RuntimeException("Failed : HTTP error code : "
+                      + conn.getResponseCode());
+          }
+
+          BufferedReader br = new BufferedReader(new InputStreamReader(
+              (conn.getInputStream())));
+
+          String output;
+          LOG.info("Output from Server .... \n");
+          while ((output = br.readLine()) != null) {
+              LOG.info(output);
+          }
+
+          conn.disconnect();
+
+        } catch (MalformedURLException e) {
+
+          e.printStackTrace();
+
+        } catch (IOException e) {
+
+          e.printStackTrace();
+
+        }
+
+      }
+    
     public byte[] getFile(String foldername, String ext) throws Exception {
         
           try {
