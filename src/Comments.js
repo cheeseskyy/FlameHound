@@ -7,6 +7,21 @@ import {ProfileImage} from "./PerfilPage";
 
 export class CommentList extends Component{
 
+    constructor(props){
+        super(props);
+        this.state = {
+            comments: []
+        }
+    }
+
+    getComments() {
+
+    }
+
+    componentDidMount(){
+        this.getComments();
+    }
+
     render(){
         return(
             <div className="CommentList">
@@ -27,6 +42,8 @@ export class CommentList extends Component{
                 <CommentBox text={"placeholding all the stuff!"}/>
                 <br/>
                 <CommentBox text={"Another placeholder"}/>
+                <br/>
+                <AddCommentBox ocID={this.props.ocID} replyingTo={this.props.user}/>
             </div>
         )
     };
@@ -42,5 +59,49 @@ export class CommentBox extends Component{
             </div>
         )
     };
+
+}
+
+export class AddCommentBox extends Component{
+
+    sendComment = (e) => {
+
+        if(!(e.key === 'Enter')) {
+            return;
+        }
+        console.log("Submitted comment");
+        const request = "https://my-first-project-196314.appspot.com/rest/social/" + this.props.ocID + "/post";
+        const xhttp =  new XMLHttpRequest();
+        xhttp.open("POST", request, true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        const username = sessionStorage.getItem('sessionUsername');
+        const token = sessionStorage.getItem('sessionToken');
+        const comment = document.getElementById("newCommentInput").value;
+        const replyingTo = this.props.replyingTo;
+
+        const jsonObj = JSON.stringify({
+            user: username,
+            tokenId: token,
+            comment: comment,
+            replyingTo: replyingTo
+        });
+        console.log("Sending Comment");
+        xhttp.send(jsonObj);
+        xhttp.onreadystatechange = function () {
+            if(xhttp.readyState === 4){
+                console.log("Comment response status = " + xhttp.status);
+            }
+        }
+
+    }
+
+    render(){
+        return(
+            <div>
+                <input id={"newCommentInput"} type={"text"} onKeyPress={this.sendComment}/>
+            </div>
+        )
+    }
 
 }
