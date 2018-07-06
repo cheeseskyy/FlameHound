@@ -15,7 +15,8 @@ export class PerfilPage extends Component{
         super(props);
         this.state = {
             logo: "",
-            occurrences: []
+            occurrences: [],
+            info: {}
         }
     }
 
@@ -27,22 +28,22 @@ export class PerfilPage extends Component{
         var token = sessionStorage.getItem('sessionToken');
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
-        xhttp.onreadystatechange = function () {
+        xhttp.onreadystatechange = () => {
             if (xhttp.readyState == 4 && xhttp.status == 200) {
-                return JSON.parse(xhttp.response);
+                this.setState(
+                    {
+                        logo: this.state.logo,
+                        occurrences: JSON.parse(xhttp.response),
+                        info: this.state.info
+                    }
+                )
             }
         };
     }
 
     componentDidMount(){
         //request Occurrences
-        let occurrences = this.getOccurrences();
-        this.setState(
-            {
-                logo: this.state.logo,
-                occurrences: occurrences
-            }
-        )
+        this.getOccurrences();
     }
 
     isHimself = true;
@@ -83,20 +84,6 @@ export class PerfilPage extends Component{
 
                             })
                         }
-
-                        <OccurrencePreview title="Fogo no Parque da Paz"
-                                               description="Incêndio já com algumas dimensões!" location="Almada"
-                                               image={placeHolder1}/>
-                        <OccurrencePreview title="Ajuda! Fogo na minha casa!"
-                                               description="Incêndio na minha casa, não sei como isto aconteceu..."
-                                               location="Gaia" image={placeHolder2}/>
-                        <OccurrencePreview title="Limpesa da mata"
-                                               description="Mata com bastante lixo; o que pode provocar algum incêndio."
-                                               location="Trafaria" image={placeHolder3}/>
-                        <OccurrencePreview title="Fogo em Pedrogrão Grande "
-                                               description="Fogo de grandes dimensões. O Fogo já chega à auto estrada!"
-                                               location="Pedrogão Grande" image={placeHolder4}/>
-
                         </div>
                     </div>
                 </div>
