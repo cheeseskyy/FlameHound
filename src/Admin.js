@@ -189,7 +189,7 @@ class Logs extends Component{
                 const logs = JSON.parse(xhttp.response);
                 console.log("Response in function: ");
                 console.log(JSON.parse(xhttp.response));
-                this.setState({logs: logs});
+                this.setState({logs: logs.message});
             }
         };
     }
@@ -197,15 +197,16 @@ class Logs extends Component{
     LogsRow = (props) => {
         return(
             <div className={"TableEntry"}>
-                <div className={"RowEntry Log"}> {props.logText}</div>
+                <div className={"Log"}> {props.logText}</div>
             </div>
         )
     };
 
     render(){
         return(
-            <div className="AdminBox">
-                {this.state.logs.text}
+            <div className="AdminBox" style={{backgroundColor:"white"}}>
+                <br/>
+                {this.state.logs}
             </div>
         )
     }
