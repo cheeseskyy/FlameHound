@@ -43,6 +43,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
@@ -58,6 +59,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import typeClasses.UniversalImageLoader;
+
+import static java.security.AccessController.getContext;
 
 
 public class HomePage extends AppCompatActivity
@@ -310,6 +313,14 @@ public class HomePage extends AppCompatActivity
 
                 }
 
+            }
+        });
+
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Toast.makeText(getBaseContext(), marker.getTitle(), Toast.LENGTH_LONG).show();
+                return false;
             }
         });
 
