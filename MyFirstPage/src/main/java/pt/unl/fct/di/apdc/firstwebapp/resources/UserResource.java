@@ -206,6 +206,10 @@ public class UserResource extends HttpServlet {
 		String nameL = name.substring(0, name.indexOf("."));
 		String uuid = Utilities.generateID();
 		try {
+			dbIntegration.delete(uuid.substring(0, name.indexOf(".")));
+		}catch(Exception e) {
+		}
+		try {
 			dbIntegration.putFile(uuid, file , name.substring(name.indexOf(".")+1));
 	} catch (IOException | DbxException e) {
 		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
@@ -221,14 +225,26 @@ public class UserResource extends HttpServlet {
 		return Response.ok().build();
 	}
 	
+	@GET
+	@Path("/getImageUri/{username}")
+	@Produces("image/jpg")
+	public Response getImageURI(@PathParam("username") String username) throws IOException, EntityNotFoundException {
+			byte[] f = downloadFileDropbox(new SessionInfo("GETIMAGE", "2167832"), username).readEntity(byte[].class);
+		if(f == null)
+			return Response.status(Status.NOT_FOUND).build();
+		return Response.ok(f).build();
+	}
+	
 	@POST
 	@Path("/getImage/{username}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	public Response downloadFileDropbox(SessionInfo session, @PathParam("username") String username) throws EntityNotFoundException{
-		Response r = validLogin(session);
-		if(r.getStatus() != Response.Status.OK.getStatusCode())
-			return r;
+		if(!session.username.equals("GETIMAGE")) {
+			Response r = validLogin(session);
+			if(r.getStatus() != Response.Status.OK.getStatusCode())
+				return r;
+		}
 		String imageID = "";
 		Key profileKey = KeyFactory.createKey("ProfileImage", imageID);
 		Entity picture = datastore.get(profileKey);

@@ -138,6 +138,14 @@ public class OccurrencyResource extends HttpServlet{
 	}
 	
 	@POST
+	@Path("/getByUserAndroid/{username}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getOcurrencyByUsernameAndroid(SessionInfo session[], @PathParam("username") String username) {
+		return getOcurrencyByUsername(session[0], username);
+	}
+	
+	@POST
 	@Path("/getByUser/{username}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -372,7 +380,8 @@ public class OccurrencyResource extends HttpServlet{
 	@Path("/getImageUri/{image}")
 	@Produces("image/jpg")
 	public Response getImageURI(@PathParam("image") String image) throws IOException {
-		downloadFileDropbox(new SessionInfo("GETIMAGE", "2167832"), image);
+		if(!imageCache.containsKey(image))
+			downloadFileDropbox(new SessionInfo("GETIMAGE", "2167832"), image);
 		if(!imageCache.containsKey(image))
 			return Response.status(Status.NOT_FOUND).build();
 		return Response.ok(imageCache.get(image)).build();
