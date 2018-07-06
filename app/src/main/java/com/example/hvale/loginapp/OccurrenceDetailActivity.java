@@ -24,6 +24,8 @@ import org.json.JSONObject;
 import java.util.LinkedList;
 import java.util.List;
 
+import typeClasses.OcurrenceData;
+
 /**
  * An activity representing a single Occurence detail screen. This
  * activity is only used on narrow width devices. On tablet-size devices,
@@ -34,7 +36,7 @@ public class OccurrenceDetailActivity extends AppCompatActivity {
     private static final String url = "https://my-first-project-196314.appspot.com/rest/";
     private JSONArray finalResponse = null;
     private View mProgressView;
-    private final List<OccurrenceListActivity.OccurrenceItem> ocurrencys = new LinkedList<OccurrenceListActivity.OccurrenceItem>();
+    private final List<OcurrenceData> ocurrencys = new LinkedList<OcurrenceData>();
 
 
     @Override

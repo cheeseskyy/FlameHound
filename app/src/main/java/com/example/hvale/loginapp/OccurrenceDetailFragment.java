@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import com.example.hvale.loginapp.dummy.DummyContent;
 
+import typeClasses.OcurrenceData;
+
 /**
  * A fragment representing a single Occurence detail screen.
  * This fragment is either contained in a {@link OccurrenceListActivity}
@@ -30,7 +32,7 @@ public class OccurrenceDetailFragment extends Fragment {
     /**
      * The dummy content this fragment is presenting.
      */
-    private OccurrenceListActivity.OccurrenceItem mItem;
+    private OcurrenceData mItem;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the

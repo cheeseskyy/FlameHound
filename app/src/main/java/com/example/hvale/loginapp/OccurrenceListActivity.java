@@ -68,11 +68,10 @@ public class OccurrenceListActivity extends AppCompatActivity {
     private JSONArray finalResponse = null;
     public final List<OcurrenceData> ocurrencys = new LinkedList<OcurrenceData>();
     private final List<LatLng> locations = new LinkedList<LatLng>();
-    private boolean rested = false;
     private View mProgressView;
     private FrameLayout fram_l;
-    private ImageView[] images;
-    byte[] image = null;
+    private static Bitmap[] images;
+    private byte[] image = null;
 
 
     @Override
@@ -83,8 +82,8 @@ public class OccurrenceListActivity extends AppCompatActivity {
         mProgressView = findViewById(R.id.list_progress);
         fram_l = findViewById(R.id.frameLayout);
         showProgress(true);
+        System.out.println("Inicio");
         doInBackGround();
-
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -99,10 +98,9 @@ public class OccurrenceListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
-
         View recyclerView = findViewById(R.id.occurence_list);
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+        if (recyclerView != null && ocurrencys.size() > 0)
+            setupRecyclerView((RecyclerView) recyclerView);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -137,7 +135,6 @@ public class OccurrenceListActivity extends AppCompatActivity {
                     Intent intent = new Intent(context, OccurrenceDetailActivity.class);
                     intent.putExtra(OccurrenceDetailFragment.ARG_ITEM_ID, item.title);
                     intent.putExtra(OccurrenceDetailFragment.ARG_CONTENT, item.description);
-
                     context.startActivity(intent);
                 }
             }
@@ -164,6 +161,7 @@ public class OccurrenceListActivity extends AppCompatActivity {
             holder.mIdView.setText(mValues.get(position).title);
             holder.mContentView.setText(mValues.get(position).description);
             holder.mLocation.setText(mValues.get(position).location);
+            holder.mImageView.setImageBitmap(images[position]);
 
             holder.itemView.setTag(mValues.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
@@ -180,12 +178,14 @@ public class OccurrenceListActivity extends AppCompatActivity {
             final TextView mIdView;
             final TextView mContentView;
             final TextView mLocation;
+            final ImageView mImageView;
 
             ViewHolder(View view) {
                 super(view);
                 mIdView = (TextView) view.findViewById(R.id.id_text);
                 mContentView = (TextView) view.findViewById(R.id.content);
                 mLocation = (TextView) view.findViewById(R.id.location);
+                mImageView = (ImageView) view.findViewById(R.id.imageToList);
             }
         }
     }
@@ -201,7 +201,6 @@ public class OccurrenceListActivity extends AppCompatActivity {
                 finalResponse = response;
                 onPostExecute(finalResponse);
             }
-
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -209,88 +208,81 @@ public class OccurrenceListActivity extends AppCompatActivity {
                 onCancelled(error);
             }
         });
-
         VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonRequest);
         setProgressBarVisibility(false);
     }
 
     private void onPostExecute(JSONArray finalResponse) {
 
-        for (int i = 0; i < finalResponse.length(); i++) {
-            String[] coord;
-            String user;
-            String title;
-            String type;
-            String description;
-            String flag;
-            final List<String> imageListURI = new ArrayList<>();
-            String address = "";
-            String imageURI;
-            Geocoder geocoder = new Geocoder(getBaseContext(), Locale.getDefault());
+        try {
+            for (int i = 0; i < finalResponse.length(); i++) {
+                String[] coord;
+                String user;
+                String title;
+                String type;
+                String description;
+                String flag;
+                List<String> imageListURI = new ArrayList<>();
+                String address = "";
+                Geocoder geocoder = new Geocoder(getBaseContext(), Locale.getDefault());
 
-            try {
                 JSONObject jsonObject = finalResponse.getJSONObject(i);
                 coord = jsonObject.getString("location").split(",");
                 LatLng current = new LatLng(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]));
                 title = jsonObject.getString("title");
                 description = jsonObject.getString("description");
-                user = jsonObject.getString("username");
+                user = jsonObject.getString("user");
                 type = jsonObject.getString("type");
                 flag = jsonObject.getString("flag");
+                imageListURI = (List<String>)jsonObject.get("mediaURI");
                 System.out.println(title + "---" + description);
                 System.out.println(Double.parseDouble(coord[0]) + "---" + Double.parseDouble(coord[1]));
                 List<Address> addresses = geocoder.getFromLocation(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]), 1);
                 System.out.println("SIZE: " + addresses.size() + "---" + addresses.get(0));
 
-                if (addresses.size() > 0) {
+                if (addresses.size() > 0)
                     address = addresses.get(0).getAddressLine(0);
 
-                    imageURI = (String) jsonObject.getJSONArray("mediaURI").get(0);
-                    String username = LogOutSingleton.getInstance(getApplicationContext()).getUsername();
-                    String loginToken = LogOutSingleton.getInstance(getApplicationContext()).getLoginToken();
-                    ImageDataRequest imageR = new ImageDataRequest(username, loginToken);
 
-                    Gson gson = new Gson();
-                    String jsonImageURI = gson.toJson(imageR);
-                    JSONObject jsonImage = null;
-                    try {
-                        jsonImage = new JSONObject(jsonImageURI);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                imageURI = (String) jsonObject.getJSONArray("mediaURI").get(0);
+                /*String username = LogOutSingleton.getInstance(getApplicationContext()).getUsername();
+                String loginToken = LogOutSingleton.getInstance(getApplicationContext()).getLoginToken();
+                ImageDataRequest imageR = new ImageDataRequest(username, loginToken);
+
+                Gson gson = new Gson();
+                String jsonImageURI = gson.toJson(imageR);
+                JSONObject jsonImage = new JSONObject(jsonImageURI);*/
+                JSONObject sessionInfo = LogOutSingleton.getInstance(getApplicationContext()).getSessionId();
+
+                JsonObjectRequest imageObjectRequest = new JsonObjectRequest(Request.Method.POST, url + "occurrency/getImageAndroid/" + imageURI, sessionInfo, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            image = (byte[]) response.get("mediaURI");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        imageListURI.add(image.toString());
                     }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                });
+                VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(imageObjectRequest);
+                System.out.println(image.length + "--------------");
+                Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
+                images[i] = bitmap;
 
-                    JsonObjectRequest imageObjectRequest = new JsonObjectRequest(Request.Method.POST, url + "occurrency/getImageAndroid/" + imageURI, jsonImage, new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                image = (byte[]) response.get("mediaURI");
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            imageListURI.add(image.toString());
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            error.printStackTrace();
-                        }
-                    });
-                    VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(imageObjectRequest);
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
-                    images[i].setImageBitmap(bitmap);
-                }
-
-                System.out.println("passou aqui " + address);
                 ocurrencys.add(new OcurrenceData(title, description, user, address, type, imageListURI, flag));
-
-
-            } catch (JSONException e) {
-                onCancelled(e);
-            } catch (IOException e) {
-                e.printStackTrace();
+                showProgress(false);
             }
+        } catch (JSONException e) {
+            onCancelled(e);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        showProgress(false);
     }
 
     private void onCancelled(Exception e) {
@@ -333,10 +325,5 @@ public class OccurrenceListActivity extends AppCompatActivity {
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             fram_l.setVisibility(show ? View.GONE : View.VISIBLE);
         }
-    }
-
-
-    public List<OcurrenceData> getOcurrencys() {
-        return ocurrencys;
     }
 }
