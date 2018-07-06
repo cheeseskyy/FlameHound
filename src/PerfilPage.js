@@ -156,7 +156,7 @@ export class ProfileImage extends Component{
     render(){
         return(
             <div id = "UserFoto">
-                <img src={placeHolder}/>
+                <img src={"https://my-first-project-196314.appspot.com/rest/user/getImageUri/" + this.props.id}/>
                 {this.imageOptions()}
             </div>
         )
