@@ -12,7 +12,7 @@ export class CommentList extends Component{
             <div className="CommentList">
                 <div id="mainComment">
                     <div id="authorLogo" >
-                        <Link to="/profile"><ProfileImage user={this.props.user}/></Link>
+                        <Link to={"/profile/" + this.props.user}><ProfileImage user={this.props.user}/></Link>
                     </div>
                     <div style = {{display: "inline", verticalAlign: "middle"}}>
                          {this.props.description? this.props.description:"Main Comment Text"}
