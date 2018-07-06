@@ -1,6 +1,7 @@
 package com.example.hvale.loginapp;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
@@ -47,6 +48,7 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,6 +56,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Random;
+
+import typeClasses.UniversalImageLoader;
 
 
 public class HomePage extends AppCompatActivity
@@ -80,6 +84,7 @@ public class HomePage extends AppCompatActivity
     JSONArray finalResponse = null;
     String[] ocurrencys = new String[20];
     String[] result = null;
+    private Context mContext =HomePage.this;
 
 
     @Override
@@ -95,6 +100,7 @@ public class HomePage extends AppCompatActivity
 
         requestQueue = new RequestQueue(cache, network);
         requestQueue.start();
+        initImageLoader();
         doInBackGround();
 
         valuesToDraw = new ArrayList<>();
@@ -205,6 +211,10 @@ public class HomePage extends AppCompatActivity
 
     }
 
+    private void initImageLoader(){
+        UniversalImageLoader universalImageLoader = new UniversalImageLoader(mContext);
+        ImageLoader.getInstance().init(universalImageLoader.getConfig());
+    }
     private void drawMap() {
         int TRANSPARENT = 0x330000FF;
         PolygonOptions rectOptions = new PolygonOptions();
@@ -224,17 +234,6 @@ public class HomePage extends AppCompatActivity
 
     }
 
-    /*
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-    */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -257,32 +256,6 @@ public class HomePage extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * @SuppressWarnings("StatementWithEmptyBody")
-     * @Override public boolean onNavigationItemSelected(MenuItem item) {
-     * // Handle navigation view item clicks here.
-     * int id = item.getItemId();
-     * <p>
-     * if (id == R.id.nav_camera) {
-     * // Handle the camera action
-     * } else if (id == R.id.minhasOcorrencias) {
-     * <p>
-     * } /*else if (id == R.id.nav_slideshow) {
-     * <p>
-     * } else if (id == R.id.contacts) {
-     * <p>
-     * } else if (id == R.id.nav_share) {
-     * <p>
-     * } else if (id == R.id.nav_send) {
-     * <p>
-     * }
-     * <p>
-     * DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-     * drawer.closeDrawer(GravityCompat.START);
-     * return true;
-     * <p>
-     * }
-     */
 
 
     @Override
@@ -464,6 +437,7 @@ public class HomePage extends AppCompatActivity
             try {
                 JSONObject jsonObject = finalResponse.getJSONObject(i);
                 ocurrencys[i] = finalResponse.getJSONObject(i).toString();
+                System.out.println(ocurrencys[i]);
                 coord = jsonObject.getString("location").split(",");
                 LatLng current = new LatLng(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]));
                 title = jsonObject.getString("title");
