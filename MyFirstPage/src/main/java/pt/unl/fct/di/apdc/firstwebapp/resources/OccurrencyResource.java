@@ -1,6 +1,8 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -29,6 +31,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
+import org.apache.commons.io.FileUtils;
 
 import com.dropbox.core.DbxException;
 
@@ -70,6 +74,7 @@ public class OccurrencyResource extends HttpServlet{
 	private static DropBoxResource dbIntegration = new DropBoxResource();
 	private static final long TTL = 5*1000*60; //5 mins
 	Map<String,OccurrencyReadableData> listCache = new ConcurrentHashMap<String, OccurrencyReadableData>();
+	Map<String,byte[]> imageCache = new ConcurrentHashMap<String, byte[]>();
 	private long lastUpdate = 0;
 	
 	public OccurrencyResource() {}
@@ -178,7 +183,6 @@ public class OccurrencyResource extends HttpServlet{
 			else
 				i++;
 		}
-		
 		return Response.ok().entity(g.toJson(list)).build();
 	}
 	
@@ -337,13 +341,15 @@ public class OccurrencyResource extends HttpServlet{
 	}
 	
 	@POST
-	@Path("getImage/{imageID}")
+	@Path("/getImage/{imageID}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	public Response downloadFileDropbox(SessionInfo session, @PathParam("imageID") String imageID){
-		Response r = checkIsLoggedIn(session);
-		if(r.getStatus() != Response.Status.OK.getStatusCode())
-			return r;
+		if(!session.username.equals("GETIMAGE")) {
+			Response r = checkIsLoggedIn(session);
+			if(r.getStatus() != Response.Status.OK.getStatusCode())
+				return r;
+		}
 		byte[] file;		
 		try {
 			LOG.info("Getting image: " + imageID);
@@ -352,6 +358,7 @@ public class OccurrencyResource extends HttpServlet{
 			String ext = imageID.substring(name.length()+1);
 			file = dbIntegration.getFile(name, ext);
 			LOG.info("Found file");
+			imageCache.put(imageID, file);
 			if(file == null)
 				return Response.status(Status.NOT_FOUND).build();			
 		}catch(Exception e) {
@@ -359,6 +366,28 @@ public class OccurrencyResource extends HttpServlet{
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 		return Response.ok(file).build();
+	}
+	
+	@GET
+	@Path("/getImageUri/{image}")
+	@Produces("image/jpg")
+	public Response getImageURI(@PathParam("image") String image) throws IOException {
+		downloadFileDropbox(new SessionInfo("GETIMAGE", "2167832"), image);
+		if(!imageCache.containsKey(image))
+			return Response.status(Status.NOT_FOUND).build();
+		return Response.ok(imageCache.get(image)).build();
+	}
+	
+	@POST
+	@Path("/getImageAndroid/{imageID}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response downloadFileDropboxAndroid(SessionInfo session, @PathParam("imageID") String imageID){
+		Response r = downloadFileDropbox(session, imageID);
+		if(r.getStatus() != 200)
+			return r;
+		byte[] image = r.readEntity(byte[].class);
+		return Response.ok(g.toJson(new ImageData(image))).build();
 	}
 	
 	public void updateCache() {
@@ -376,7 +405,7 @@ public class OccurrencyResource extends HttpServlet{
 	}
 	
 	@POST
-	@Path("getOccurrency/{ocID}")
+	@Path("/getOccurrency/{ocID}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getOccurrency(SessionInfo session, @PathParam("ocID") String ocurrencyID) {
