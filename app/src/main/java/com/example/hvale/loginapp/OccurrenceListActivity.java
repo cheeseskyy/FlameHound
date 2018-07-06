@@ -167,6 +167,7 @@ public class OccurrenceListActivity extends AppCompatActivity {
             final TextView mIdView;
             final TextView mContentView;
             final TextView mLocation;
+            
 
             ViewHolder(View view) {
                 super(view);
