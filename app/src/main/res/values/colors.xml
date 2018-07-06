@@ -6,4 +6,7 @@
     <color name="white">#fff</color>
     <color name="greyBlue">#719597</color>
     <color name="toastedYellow">#FF6F00</color>
+    <color name="black">#000000</color>
+    <color name="grey">#bfbfbf</color>
+    <color name="link_blue">#005ce6</color>
 </resources>

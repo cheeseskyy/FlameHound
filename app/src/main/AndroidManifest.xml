@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.hvale.loginapp"> <!-- to render in the emulator -->
     <uses-sdk
-        android:minSdkVersion="11"
+        android:minSdkVersion="21"
         android:targetSdkVersion="17" />
 
     <!-- To auto-complete the email text field in the LoginData form with the user's emails -->
