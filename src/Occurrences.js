@@ -76,7 +76,7 @@ export class OccurrencePreview extends Component {
     }
 
     componentDidMount(){
-        this.getImage(this.props.image);
+        //this.getImage(this.props.image);
     }
 
     render() {
@@ -85,7 +85,7 @@ export class OccurrencePreview extends Component {
             <div className="occurrence">
                 <Link to={"/occurrence/"+this.props.id}>
                         <div id="occurrenceImage">
-                    <img id="occurrenceLogo" src={this.state.image}/>
+                    <img id="occurrenceLogo" src={"https://my-first-project-196314.appspot.com/rest/occurrency/getImageUri/" + this.props.image}/>
                 </div>
                 <div>
                     <p id = "occurrenceTitle"> {this.props.title}</p>
@@ -143,9 +143,9 @@ export class OccurrencePage extends Component {
                 console.log(JSON.parse(xhttp.response));
                 this.setState({
                     info: JSON.parse(xhttp.response),
-                    image: this.state.image
+                    image: JSON.parse(xhttp.response).mediaURI[0]
                 });
-                this.getOcImage(this.state.info.mediaURI[0]);
+                //this.getOcImage(this.state.info.mediaURI[0]);
             }
         };
     }
@@ -154,7 +154,7 @@ export class OccurrencePage extends Component {
         this.hasImage = true;
         const extension = mediaURI.split(".")[1];
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/getImage/" + mediaURI, true);
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/getImage/" + mediaURI[0], true);
         xhttp.setRequestHeader("Content-type", "application/json");
         var username = sessionStorage.getItem('sessionUsername');
         var token = sessionStorage.getItem('sessionToken');
@@ -168,6 +168,7 @@ export class OccurrencePage extends Component {
                 var urlCreator = window.URL || window.webkitURL;
                 var imageUrl = urlCreator.createObjectURL( blob );
                 this.setState({
+                    info: this.state.info,
                     image: imageUrl
                 })
             }
@@ -180,10 +181,10 @@ export class OccurrencePage extends Component {
                 <div>
                     <h2 id="occurrenceTitle"> Descrição da Ocorrência: {this.state.info.title} </h2>
                     <div id="occurrenceImage" align="center">
-                        <img alt="Occurrence Image" src={this.state.image ? this.state.image : placeHolder1}/>
+                        <img alt="Occurrence Image" src={"https://my-first-project-196314.appspot.com/rest/occurrency/getImageUri/" + this.state.image}/>
                     </div>
                 </div>
-                <CommentList description={this.state.info.description} user={this.state.info.user}/>
+                <CommentList description={this.state.info.description} user={this.state.info.user} ocID={this.props.id}/>
             </div>
         )
     };
