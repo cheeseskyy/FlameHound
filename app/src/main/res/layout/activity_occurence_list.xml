@@ -30,6 +30,15 @@
         android:layout_marginBottom="8dp"
         android:visibility="gone" />
 
+    <ProgressBar
+        android:id="@+id/list_progress2"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
+
+
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
