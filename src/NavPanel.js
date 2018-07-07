@@ -11,6 +11,8 @@ const RegisterForm = withRouter(RegForm);
 const navPanelState = ["REGULAR", "REGISTER", "LOGIN", "ADMIN_LOGIN"];
 
 class NavPanel extends Component {
+    isLoggedIn = false;
+
     log() {
         console.log("clicked");
     }
@@ -25,8 +27,10 @@ class NavPanel extends Component {
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () => {
-            if (xhttp.readyState == 4 && xhttp.status == 200) {
+            if (xhttp.readyState === 4 && xhttp.status === 200) {
                 console.log("getRole response: " + JSON.parse(xhttp.response));
+                sessionStorage.setItem("userRole", JSON.parse(xhttp.response));
+                this.isLoggedIn = true;
                 this.setState(() => ({
                     navState: navPanelState[0], //REGULAR
                     role: JSON.parse(xhttp.response)
@@ -105,6 +109,31 @@ class NavPanel extends Component {
         };
     }
 
+    NotLoggedInPanel =
+        <div>
+            <p><a onClick={() => this.setState({navState: navPanelState[2], role: this.state.role})}>Login </a></p>
+            <p><a onClick={() => this.setState({navState: navPanelState[1], role: this.state.role})}>Register</a></p>
+            <p><Link to="/about">About</Link></p>
+            <Link to="/contact">Contact</Link>
+        </div>;
+
+    LoggedInPanel ({match}) {
+        return (<div>
+            <p><a onClick={() => this.setState({navState: navPanelState[2], role: this.state.role})}>Login </a></p>
+            <p><a onClick={() => this.setState({navState: navPanelState[1], role: this.state.role})}>Register</a></p>
+            <p><Link to="/about">About</Link></p>
+            <Link to="/contact">Contact</Link>
+        </div>)
+    }
+
+    renderCorrectPanel({match}){
+        if(this.isLoggedIn){
+            return <this.LoggedInPanel/>
+        } else {
+            return <this.NotLoggedInPanel/>
+        }
+    }
+
     render() {
 
         const panel =
@@ -120,27 +149,28 @@ class NavPanel extends Component {
                            </div>
                        }
                 />
-                <Route exact path='/'
-                       render={({match}) =>
-                           <div>
-                               <p><a onClick={() => this.setState({navState: navPanelState[2], role: this.state.role})}>Login </a></p>
-                               <p><a onClick={() => this.setState({navState: navPanelState[1], role: this.state.role})}>Register</a></p>
-                               <p><Link to="/about">About</Link></p>
-                               <Link to="/contact">Contact</Link>
-                           </div>
-                       }
-                />
-                <Route path="/" render={({match}) =>
-                    <div>
-                        <p><Link to={"/map"}>Mapa</Link></p>
-                        <p><Link to={match.url + "/submitOccurrence"}>Criar Ocorrência</Link></p>
-                        <p><Link to={"/profile/" + sessionStorage.getItem('sessionUsername')}>Perfil </Link></p>
-                        {console.log("Running showAdminPanel()")}
-                        {this.showAdminPanel()}
-                        <p><Link to="/logout" onClick={() =>
-                            this.logout()}>Logout </Link></p>
-                    </div>
-                }
+                <Route path="/" render={({match}) =>{
+                    if(this.isLoggedIn){
+                    return(
+                        <div>
+                            <p><Link to={"/map"}>Mapa</Link></p>
+                            <p><Link to={match.url + "/submitOccurrence"}>Criar Ocorrência</Link></p>
+                            <p><Link to={"/profile/" + sessionStorage.getItem('sessionUsername')}>Perfil </Link></p>
+                            {console.log("Running showAdminPanel()")}
+                            {this.showAdminPanel()}
+                            <p><Link to="/logout" onClick={() =>
+                                this.logout()}>Logout </Link></p>
+                        </div>
+                    )}else{
+                    return(
+                        <div>
+                            <p><a onClick={() => this.setState({navState: navPanelState[2], role: this.state.role})}>Login </a></p>
+                            <p><a onClick={() => this.setState({navState: navPanelState[1], role: this.state.role})}>Register</a></p>
+                            <p><Link to="/about">About</Link></p>
+                            <Link to="/contact">Contact</Link>
+                        </div>
+                    )}
+                }}
                 />
 
             </Switch>;
