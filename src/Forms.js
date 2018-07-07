@@ -126,14 +126,6 @@ export class RegisterForm extends Component {
                     <label htmlFor="email"><b>Email*</b></label><br/>
                     <input type="text" placeholder="Enter Email" style={{width: "95%"}} id="email" required></input>
                     <br></br>
-
-                    <label htmlFor="role"><b>Role</b></label><br/>
-                    <select id="role"  defaultValue="USER" style={{width: "98%"}}>
-                        <option value="USER">User</option>
-                        <option value="GBO">Gestor BackOffice</option>
-                        <option value="GS">Gestor Sistema</option>
-                        <option value="OPE">Operacional BackEnd</option>
-                    </select>
                     <label
                         htmlFor="psw"><b>Password*</b></label><br/>
                     <input type="password"
