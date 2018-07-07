@@ -124,12 +124,13 @@ public class OccurrenceListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 OcurrenceData item = (OcurrenceData) view.getTag();
+                System.out.println(mTwoPane);
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
 
                     arguments.putString(OccurrenceDetailFragment.ARG_ITEM_ID, item.title);
                     arguments.putString(OccurrenceDetailFragment.ARG_CONTENT, item.description);
-                   // arguments.putString(OccurrenceDetailFragment._);
+                    arguments.putString(OccurrenceDetailFragment.ARG_IMAGE,item.mediaURI.get(0));
                     OccurrenceDetailFragment fragment = new OccurrenceDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -141,6 +142,8 @@ public class OccurrenceListActivity extends AppCompatActivity {
                     Intent intent = new Intent(context, OccurrenceDetailActivity.class);
                     intent.putExtra(OccurrenceDetailFragment.ARG_ITEM_ID, item.title);
                     intent.putExtra(OccurrenceDetailFragment.ARG_CONTENT, item.description);
+                    System.out.println(item.mediaURI.get(0));
+                    intent.putExtra(OccurrenceDetailFragment.ARG_IMAGE,item.mediaURI.get(0));
                     context.startActivity(intent);
                 }
             }
