@@ -146,6 +146,8 @@ class NavPanel extends Component {
                                <p><Link to={"/admin/occurrences"}>Ocorrências</Link></p>
                                <p><Link to={"/admin/reports"}>Reports</Link></p>
                                <p><Link to={"/admin/logs"}>Registos</Link></p>
+                               <p><Link to="/logout" onClick={() =>
+                                   this.logout()}>Logout </Link></p>
                            </div>
                        }
                 />

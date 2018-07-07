@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import {Switch, Route} from 'react-router-dom';
+import {Switch, Route, Link} from 'react-router-dom';
 import "./Admin.css";
 import {PerfilPage} from "./PerfilPage";
+import {OccurrencePreview} from "./Occurrences";
 
 export class AdminArea extends Component{
 
@@ -15,6 +16,12 @@ export class AdminArea extends Component{
                 <Switch>
                     <Route path={"/admin/reports"}>
                         <Report/>
+                    </Route>
+                    <Route path={"/admin/users/create/admin"}>
+                        <CreateAdminForm/>
+                    </Route>
+                    <Route path={"/admin/users/create/moderator"}>
+                        <CreateModeratorForm/>
                     </Route>
                     <Route path={"/admin/users"}>
                         <Users/>
@@ -132,26 +139,28 @@ class Users extends Component{
     UsersRow = (props) => {
       return(
           <div className={"TableEntry"}>
-              <div className={"RowEntry User"}> {props.user}</div>
-              <div className={"RowEntry LastEntry User"}> {props.user}</div>
+              <div className={"RowEntry User"}> <p>{props.user}</p></div>
+              <div className={"RowEntry User"}> <p>{props.name}</p></div>
+              <div className={"RowEntry LastEntry User"}> <p>{props.email}</p></div>
           </div>
       )
     };
 
     render(){
         return(
-            <div>
-                <div>
-                    <button>Criar Utilizador</button>
-                </div>
+            <div style={{height: "100%"}}>
                 <div className="AdminBox">
                     Caixa de Utilizadores
 
                     {this.state.users.map(user => {
                         return (
-                            <this.UsersRow key={user} user={user.user_name} email={user.email}/>
+                            <this.UsersRow key={user} user={user.username} email={user.email} name={user.name}/>
                         )
                     })}
+                    <div>
+                        <Link to={"/admin/users/create/moderator"} style={{width: "50%"}}>Criar Moderador</Link>
+                        <Link to={"/admin/users/create/admin"} style={{width: "50%", float: "right"}}>Criar Administrador</Link>
+                    </div>
                 </div>
             </div>
         )
@@ -260,9 +269,12 @@ class Occurrences extends Component{
     render(){
         return(
             <div className="AdminBox">
-                {this.state.ocs.map(oc => {
+                {this.state.ocs.map(occurrence => {
                     return(
-                        <this.OccurrencesRow key={oc}/>
+                        <OccurrencePreview key={occurrence.id} id={occurrence.id} title={occurrence.title} user={occurrence.user}
+                                           description={occurrence.description}
+                                           image={occurrence.mediaURI[0]}
+                        />
                     )
                 })}
             </div>
@@ -292,4 +304,11 @@ class CreateModeratorForm extends Component{
 
 class CreateAdminForm extends Component{
 
+    render(){
+        return(
+            <div>
+
+            </div>
+        )
+    }
 }
