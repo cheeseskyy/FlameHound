@@ -1,13 +1,10 @@
 import React, {Component} from 'react';
-import {Switch, Route, Link} from 'react-router-dom';
+import {Switch, Route, Link, withRouter} from 'react-router-dom';
 import "./Admin.css";
 import {PerfilPage} from "./PerfilPage";
 import {OccurrencePreview} from "./Occurrences";
 
 export class AdminArea extends Component{
-
-
-
 
     render(){
         return(
@@ -18,10 +15,10 @@ export class AdminArea extends Component{
                         <Report/>
                     </Route>
                     <Route path={"/admin/users/create/admin"}>
-                        <CreateAdminForm/>
+                        {withRouter(CreateAdminForm)}
                     </Route>
                     <Route path={"/admin/users/create/moderator"}>
-                        <CreateModeratorForm/>
+                        {withRouter(CreateModeratorForm)}
                     </Route>
                     <Route path={"/admin/users"}>
                         <Users/>
@@ -285,18 +282,47 @@ class Occurrences extends Component{
 
 class CreateModeratorForm extends Component{
 
+    sendModerator() {
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_be/_admin/addModerator");
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        var username = sessionStorage.getItem('sessionUsernameAdmin');
+        var token = sessionStorage.getItem('sessionTokenAdmin');
+        var jSonObj = JSON.stringify({
+            "username": document.getElementById("username").value,
+            "password": document.getElementById("psw").value,
+            "entity": document.getElementById("entity").value,
+            "registerUsername": username,
+            "tokenId": token
+        });
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if(xhttp.readyState === 4){
+                if(xhttp.status === 200){
+                    alert("Moderador " + jSonObj.username + " registado. A redireccionar...");
+                    this.props.history.goBack();
+                } else if(xhttp.status > 200) {
+                    alert("Ocorreu um erro, verifique a informação e tente novamente.");
+                    console.log("Error: " + xhttp.status);
+                }
+            }
+        }
+    }
+
 
     render(){
         return(
           <div>
               <p>Nome de Utilizador:</p>
-              <input type="text" placeholder="Nome de Utilizador"/>
+              <input id={"username"} type="text" placeholder="Nome de Utilizador"/>
               <p>Palavra-passe:</p>
-              <input type="password"/>
+              <input id={"psw"} type="password"/>
               <p>Confirme a Palavra-passe</p>
               <input type="password"/>
               <p>Entidade:</p>
-              <input type="text"/>
+              <input id={"entity"} type="text"/>
+              <button onClick={() => this.sendModerator()}>Criar</button>
           </div>
         );
     }
@@ -304,10 +330,43 @@ class CreateModeratorForm extends Component{
 
 class CreateAdminForm extends Component{
 
+    sendAdmin() {
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_be/_admin/addAdmin");
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        var username = sessionStorage.getItem('sessionUsernameAdmin');
+        var token = sessionStorage.getItem('sessionTokenAdmin');
+        var jSonObj = JSON.stringify({
+            "username": document.getElementById("username").value,
+            "password": document.getElementById("psw").value,
+            "registerUsername": username,
+            "tokenId": token
+        });
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if(xhttp.readyState === 4){
+                if(xhttp.status === 200){
+                    alert("Moderador " + jSonObj.username + " registado. A redireccionar...");
+                    this.props.history.goBack();
+                } else if(xhttp.status > 200) {
+                    alert("Ocorreu um erro, verifique a informação e tente novamente.");
+                    console.log("Error: " + xhttp.status);
+                }
+            }
+        }
+    }
+
     render(){
         return(
             <div>
-
+                <p>Nome de Utilizador:</p>
+                <input id={"username"} type="text" placeholder="Nome de Utilizador"/>
+                <p>Palavra-passe:</p>
+                <input id={"psw"} type="password"/>
+                <p>Confirme a Palavra-passe</p>
+                <input type="password"/>
+                <button onClick={() => this.sendAdmin()}>Criar</button>
             </div>
         )
     }

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {BrowserRouter as Router, Route, Link, Switch} from "react-router-dom";
+import {BrowserRouter as Router, Route, Link, Switch, withRouter} from "react-router-dom";
 import MapView from './MapView';
 import './Body.css';
 import placeHolder from './images/placeholders/colegas.png';
@@ -12,7 +12,9 @@ import EntityPage from "./EntityPage";
 import {PerfilPage} from "./PerfilPage";
 import {CommentList} from "./Comments";
 import {OccurrencePage} from "./Occurrences";
-import {AdminArea} from "./Admin";
+import {AdminArea as AdminAr} from "./Admin";
+
+let AdminArea = withRouter(AdminAr);
 
 const Home = () =>
     <div className="FullBody">
