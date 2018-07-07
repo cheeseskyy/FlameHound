@@ -12,6 +12,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -40,6 +41,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -47,6 +50,8 @@ import java.util.List;
 import java.util.Locale;
 
 import typeClasses.*;
+
+import static android.os.StrictMode.*;
 
 /**
  * An activity representing a list of Occurences. This activity
@@ -65,19 +70,21 @@ public class OccurrenceListActivity extends AppCompatActivity {
     private boolean mTwoPane;
 
     private static final String url = "https://my-first-project-196314.appspot.com/rest/";
+    private static final String IMAGEURL = url + "occurrency/getImageUri/";
+    private final List<OcurrenceData> ocurrencys = new LinkedList<>();
+    private final List<LatLng> locations = new LinkedList<>();
     private JSONArray finalResponse = null;
-    public final List<OcurrenceData> ocurrencys = new LinkedList<OcurrenceData>();
-    private final List<LatLng> locations = new LinkedList<LatLng>();
     private View mProgressView;
     private FrameLayout fram_l;
-    private static Bitmap[] images;
-    private byte[] image = null;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_occurence_list);
+
+        ThreadPolicy policy = new ThreadPolicy.Builder().permitAll().build();
+        setThreadPolicy(policy);
 
         mProgressView = findViewById(R.id.list_progress);
         fram_l = findViewById(R.id.frameLayout);
@@ -88,7 +95,6 @@ public class OccurrenceListActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
-        System.out.println(ocurrencys.size());
 
         if (findViewById(R.id.occurence_detail_container) != null) {
             // The detail container view will be present only in the
@@ -99,7 +105,7 @@ public class OccurrenceListActivity extends AppCompatActivity {
         }
 
         View recyclerView = findViewById(R.id.occurence_list);
-        if (recyclerView != null && ocurrencys.size() > 0)
+        if (recyclerView != null)
             setupRecyclerView((RecyclerView) recyclerView);
     }
 
@@ -117,13 +123,13 @@ public class OccurrenceListActivity extends AppCompatActivity {
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
                 OcurrenceData item = (OcurrenceData) view.getTag();
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
 
                     arguments.putString(OccurrenceDetailFragment.ARG_ITEM_ID, item.title);
                     arguments.putString(OccurrenceDetailFragment.ARG_CONTENT, item.description);
+                   // arguments.putString(OccurrenceDetailFragment._);
                     OccurrenceDetailFragment fragment = new OccurrenceDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -161,7 +167,17 @@ public class OccurrenceListActivity extends AppCompatActivity {
             holder.mIdView.setText(mValues.get(position).title);
             holder.mContentView.setText(mValues.get(position).description);
             holder.mLocation.setText(mValues.get(position).location);
-            holder.mImageView.setImageBitmap(images[position]);
+            if(!mValues.get(position).getImageURI(0).equals("")) {
+                try {
+                    URL url = new URL(IMAGEURL + mValues.get(position).getImageURI(0));
+                    Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                    holder.mImageView.setImageBitmap(bmp);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
 
             holder.itemView.setTag(mValues.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
@@ -185,7 +201,7 @@ public class OccurrenceListActivity extends AppCompatActivity {
                 mIdView = (TextView) view.findViewById(R.id.id_text);
                 mContentView = (TextView) view.findViewById(R.id.content);
                 mLocation = (TextView) view.findViewById(R.id.location);
-                mImageView = (ImageView) view.findViewById(R.id.imageToList);
+                mImageView = view.findViewById(R.id.imageToList);
             }
         }
     }
@@ -222,8 +238,8 @@ public class OccurrenceListActivity extends AppCompatActivity {
                 String type;
                 String description;
                 String flag;
-                List<String> imageListURI = new ArrayList<>();
                 String address = "";
+                JSONArray imageArray;
                 Geocoder geocoder = new Geocoder(getBaseContext(), Locale.getDefault());
 
                 JSONObject jsonObject = finalResponse.getJSONObject(i);
@@ -234,48 +250,17 @@ public class OccurrenceListActivity extends AppCompatActivity {
                 user = jsonObject.getString("user");
                 type = jsonObject.getString("type");
                 flag = jsonObject.getString("flag");
-                imageListURI = (List<String>)jsonObject.get("mediaURI");
-                System.out.println(title + "---" + description);
-                System.out.println(Double.parseDouble(coord[0]) + "---" + Double.parseDouble(coord[1]));
+                imageArray = jsonObject.getJSONArray("mediaURI");
                 List<Address> addresses = geocoder.getFromLocation(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]), 1);
-                System.out.println("SIZE: " + addresses.size() + "---" + addresses.get(0));
 
                 if (addresses.size() > 0)
                     address = addresses.get(0).getAddressLine(0);
 
+                List<String> images = new ArrayList<>();
+                for (int j = 0; j < imageArray.length(); j++)
+                    images.add((String) imageArray.get(0));
 
-                imageURI = (String) jsonObject.getJSONArray("mediaURI").get(0);
-                /*String username = LogOutSingleton.getInstance(getApplicationContext()).getUsername();
-                String loginToken = LogOutSingleton.getInstance(getApplicationContext()).getLoginToken();
-                ImageDataRequest imageR = new ImageDataRequest(username, loginToken);
-
-                Gson gson = new Gson();
-                String jsonImageURI = gson.toJson(imageR);
-                JSONObject jsonImage = new JSONObject(jsonImageURI);*/
-                JSONObject sessionInfo = LogOutSingleton.getInstance(getApplicationContext()).getSessionId();
-
-                JsonObjectRequest imageObjectRequest = new JsonObjectRequest(Request.Method.POST, url + "occurrency/getImageAndroid/" + imageURI, sessionInfo, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            image = (byte[]) response.get("mediaURI");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        imageListURI.add(image.toString());
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
-                    }
-                });
-                VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(imageObjectRequest);
-                System.out.println(image.length + "--------------");
-                Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
-                images[i] = bitmap;
-
-                ocurrencys.add(new OcurrenceData(title, description, user, address, type, imageListURI, flag));
+                ocurrencys.add(new OcurrenceData(title, description, user, address, type, images, flag));
                 showProgress(false);
             }
         } catch (JSONException e) {

@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import com.example.hvale.loginapp.dummy.DummyContent;
 
+import java.util.List;
+
 import typeClasses.OcurrenceData;
 
 /**
@@ -26,8 +28,11 @@ public class OccurrenceDetailFragment extends Fragment {
      */
     public static final String ARG_ITEM_ID = "item_id";
     public static final String ARG_CONTENT = "content";
-    private String id = null;
-    private String content = null;
+    public static final String ARG_IMAGE  = "image_id";
+    private String id = "";
+    private String content = "";
+    private List<String> images = null;
+
 
     /**
      * The dummy content this fragment is presenting.
@@ -51,6 +56,7 @@ public class OccurrenceDetailFragment extends Fragment {
             // to load content from a content provider.
             id = getArguments().getString(ARG_ITEM_ID);
             content = getArguments().getString(ARG_CONTENT);
+
             System.out.println(id + " *** " + content);
 
 
