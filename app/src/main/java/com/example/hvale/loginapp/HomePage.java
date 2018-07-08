@@ -347,7 +347,6 @@ public class HomePage extends AppCompatActivity
             if (resultCode == RegistOccurrence.RESULT_OK) {
                 String[] result = data.getStringArrayExtra("result");
                 for(int i = 0; i < result.length; i++) {
-                    System.out.println("hiiiiiiii" + "  " + result[i]);
                 }
 
                 MarkerOptions markerOptions = new MarkerOptions();
