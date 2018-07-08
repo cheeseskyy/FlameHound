@@ -305,28 +305,6 @@ public class OccurrenceListActivity extends AppCompatActivity {
         }
     }
 
-    public static class OccurrenceItem {
-        public final String id;
-        public final String content;
-        public final String details;
-        public final String location;
-        public final String imageToList;
-
-        public OccurrenceItem(String id, String content, String details, String location, String image) {
-            this.id = id;
-            this.content = content;
-            this.details = details;
-            this.location = location;
-            this.imageToList = image;
-
-        }
-
-        @Override
-        public String toString() {
-            return content;
-        }
-    }
-
     public List<OcurrenceData> getOcurrencys() {
         return ocurrencys;
     }

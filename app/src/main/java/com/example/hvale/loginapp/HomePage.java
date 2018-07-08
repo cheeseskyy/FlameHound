@@ -329,9 +329,9 @@ public class HomePage extends AppCompatActivity
             @Override
             public void onInfoWindowClick(Marker marker) {
                 Toast.makeText(getBaseContext(), marker.getTitle() + "Info Touched", Toast.LENGTH_LONG).show();
-               // Intent it = new Intent(HomePage.this, OccurrenceDetailActivity.class);
-               // it.putExtra(OccurrenceDetailFragment.ARG_ITEM_ID, marker.getTitle());
-              //  it.putExtra(OccurrenceDetailFragment.ARG_CONTENT, ocurrencys.description);
+                Intent it = new Intent(HomePage.this, OccurrenceDetailActivity.class);
+                it.putExtra(OccurrenceDetailFragment.ARG_ITEM_ID, marker.getTitle());
+                //it.putExtra(OccurrenceDetailFragment.ARG_CONTENT, ocurrencys.description);
                // it.putExtra(OccurrenceDetailFragment.ARG_IMAGE,item.mediaURI.get(0));
 
 
@@ -347,7 +347,6 @@ public class HomePage extends AppCompatActivity
             if (resultCode == RegistOccurrence.RESULT_OK) {
                 String[] result = data.getStringArrayExtra("result");
                 for(int i = 0; i < result.length; i++) {
-                    System.out.println("hiiiiiiii" + "  " + result[i]);
                 }
 
                 MarkerOptions markerOptions = new MarkerOptions();
