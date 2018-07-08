@@ -1,5 +1,6 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.attribute.UserPrincipalNotFoundException;
 import java.util.ArrayList;
@@ -220,8 +221,9 @@ public class UserResource extends HttpServlet {
 		Transaction txn = datastore.beginTransaction();
 		Key profileImageKey = KeyFactory.createKey("ProfileImage", nameL);
 		Entity profileImage = new Entity(profileImageKey);
-		profileImage.setProperty("uri", uuid+ name.substring(name.indexOf(".")+1));
+		profileImage.setProperty("uri", uuid+ name.substring(name.indexOf(".")));
 		datastore.put(txn, profileImage);
+		txn.commit();
 		return Response.ok().build();
 	}
 	
@@ -229,9 +231,12 @@ public class UserResource extends HttpServlet {
 	@Path("/getImageUri/{username}")
 	@Produces("image/jpg")
 	public Response getImageURI(@PathParam("username") String username) throws IOException, EntityNotFoundException {
-			byte[] f = downloadFileDropbox(new SessionInfo("GETIMAGE", "2167832"), username).readEntity(byte[].class);
-		if(f == null)
-			return Response.status(Status.NOT_FOUND).build();
+		byte[] f;
+		try {	
+		 f = ( byte[]) downloadFileDropbox(new SessionInfo("GETIMAGE", "2167832"), username).getEntity();
+		}catch(EntityNotFoundException e) {
+			f = ( byte[]) downloadFileDropbox(new SessionInfo("GETIMAGE", "2167832"), "defaultP").getEntity();
+		}
 		return Response.ok(f).build();
 	}
 	
@@ -246,7 +251,7 @@ public class UserResource extends HttpServlet {
 				return r;
 		}
 		String imageID = "";
-		Key profileKey = KeyFactory.createKey("ProfileImage", imageID);
+		Key profileKey = KeyFactory.createKey("ProfileImage", username);
 		Entity picture = datastore.get(profileKey);
 		imageID = (String) picture.getProperty("uri");
 		byte[] file;		

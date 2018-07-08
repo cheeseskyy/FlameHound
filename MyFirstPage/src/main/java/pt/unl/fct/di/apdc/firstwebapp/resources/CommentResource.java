@@ -88,7 +88,7 @@ public class CommentResource {
 		if(r.getStatus() != 200)
 			return r;
 		
-		Query q = new Query("Person").addFilter("occurrency", FilterOperator.EQUAL, ocID);
+		Query q = new Query("Comment").addFilter("occurrency", FilterOperator.EQUAL, ocID);
 		
 		PreparedQuery pQ = datastore.prepare(q);
 		Iterator<Entity> it = pQ.asIterator();
@@ -96,6 +96,14 @@ public class CommentResource {
 		while(it.hasNext())
 			list.add(convertCommentToCommentData(it.next()));
 		return Response.ok(g.toJson(list)).build();
+	}
+	
+	@Path("/{ocID}/getAllAndroid")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getCommentsAndroid(@PathParam("ocID") String ocID, SessionInfo[] session) {
+		return getComments(ocID, session[0]);
 	}
 	
 	public CommentData convertCommentToCommentData(Entity comment){

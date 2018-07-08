@@ -72,7 +72,7 @@ public class BackEndResource extends HttpServlet {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addNewAdmin(AdminRegisterInfo info) {
-		Response r = validAdminLogin(new SessionInfo(info.username, info.tokenId));
+		Response r = validAdminLogin(new SessionInfo(info.registerUsername, info.tokenId));
 		if(r.getStatus() != 200)
 			return Response.status(Status.FORBIDDEN).build(); 
 		LOG.fine("Attempt to register admin: " + info.username);
@@ -84,7 +84,7 @@ public class BackEndResource extends HttpServlet {
 			Key userKey = KeyFactory.createKey("UserAdmin", info.username);
 			datastore.get(userKey);
 			txn.rollback();
-			return Response.status(Status.FORBIDDEN).entity("Username").build(); 
+			return Response.status(Status.CONFLICT).entity("Username").build(); 
 		} catch (EntityNotFoundException e) {
 			Entity user = new Entity("UserAdmin", info.username);
 			user.setProperty("password", DigestUtils.sha512Hex(info.password));
@@ -111,7 +111,7 @@ public class BackEndResource extends HttpServlet {
 		if(r.getStatus() != 200)
 			return Response.status(Status.FORBIDDEN).build(); 
 		LOG.fine("Attempt to register moderator: " + info.username);
-		if(info.username == null || info.password == null)
+		if(info.username == null || info.password == null || info.entity == null)
 			return Response.status(Status.BAD_REQUEST).build();
 		Transaction txn = datastore.beginTransaction();
 		try {
@@ -119,7 +119,7 @@ public class BackEndResource extends HttpServlet {
 			Key userKey = KeyFactory.createKey("UserModerator", info.username);
 			datastore.get(userKey);
 			txn.rollback();
-			return Response.status(Status.FORBIDDEN).entity("Username").build(); 
+			return Response.status(Status.CONFLICT).entity("Username").build(); 
 		} catch (EntityNotFoundException e) {
 			Entity user = new Entity("UserModerator", info.username);
 			user.setProperty("password", DigestUtils.sha512Hex(info.password));
@@ -152,7 +152,7 @@ public class BackEndResource extends HttpServlet {
 		}
 		
 		LOG.fine("Attempt to register worker: " + info.username);
-		if(info.username == null || info.password == null)
+		if(info.username == null || info.password == null|| info.entity == null)
 			return Response.status(Status.BAD_REQUEST).build();
 		Transaction txn = datastore.beginTransaction();
 		try {
@@ -160,7 +160,7 @@ public class BackEndResource extends HttpServlet {
 			Key userKey = KeyFactory.createKey("UserWorker", info.username);
 			datastore.get(userKey);
 			txn.rollback();
-			return Response.status(Status.FORBIDDEN).entity("Username").build(); 
+			return Response.status(Status.CONFLICT).entity("Username").build(); 
 		} catch (EntityNotFoundException e) {
 			Entity user = new Entity("UserWorker", info.username);
 			user.setProperty("password", DigestUtils.sha512Hex(info.password));
@@ -291,6 +291,53 @@ public class BackEndResource extends HttpServlet {
 			if(r.getStatus() == 404)
 				return doModLogin(data, request, response, headers);
 		return r;
+	}
+	
+	@POST
+	@Path("/validLogin")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	public Response doLogin(SessionInfo session) {
+		Response r = validAdminLogin(session);
+		if(r.getStatus() == 200)
+			return Response.ok("ADMIN").build();
+		else
+			if(r.getStatus() == 404)
+				if (validModeratorLogin(session).getStatus() == 200)
+					return Response.ok("MODERATOR").build();
+		return r;
+	}
+	
+	@POST
+	@Path("/logout")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+	public Response doLogout(String username) {
+			Transaction txn = datastore.beginTransaction();
+			Key userKey = KeyFactory.createKey("UserAdmin", username);
+			try {
+				Entity user = datastore.get(txn, userKey);
+				user.setProperty("TokenKey","");
+				user.setProperty("TokeCreationDate", "");
+				user.setProperty("TokenExpirationDate","");
+				
+				datastore.put(txn,user);
+				txn.commit();
+			} catch (EntityNotFoundException e) {
+				userKey = KeyFactory.createKey("UserModerator", username);
+				try {
+					Entity user = datastore.get(txn, userKey);
+					user.setProperty("TokenKey","");
+					user.setProperty("TokeCreationDate", "");
+					user.setProperty("TokenExpirationDate","");
+					
+					datastore.put(txn,user);
+					txn.commit();
+				} catch (EntityNotFoundException e2) {
+					return Response.status(Status.FORBIDDEN).build();
+				}
+		}
+		return Response.ok().build();
 	}
 	
 	

@@ -1,3 +1,4 @@
+
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import java.text.DateFormat;

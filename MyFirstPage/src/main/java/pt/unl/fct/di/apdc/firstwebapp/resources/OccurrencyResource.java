@@ -114,6 +114,34 @@ public class OccurrencyResource extends HttpServlet{
 	}
 	
 	@POST
+	@Path("/searchByPrefixAndroid/{prefix}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getByPrefixAndroid(@PathParam("prefix") String prefix, SessionInfo[] info) {
+		return getByPrefix(prefix, info[0]);
+	}
+	
+	@POST
+	@Path("/searchByPrefix/{prefix}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getByPrefix(@PathParam("prefix") String prefix, SessionInfo info) {
+		Response r = checkIsLoggedIn(info);
+		if(r.getStatus() != Response.Status.OK.getStatusCode())
+			return Response.status(Status.FORBIDDEN).build();
+		if(System.currentTimeMillis() - TTL > lastUpdate)
+			updateCache();
+		List<String> keys = new ArrayList<String>(listCache.keySet());
+		for(int i = 0; i < keys.size();) {;
+			if(!keys.get(i).startsWith(prefix))
+				keys.remove(i);
+			else
+				i++;
+		}
+		return Response.ok().entity(g.toJson(keys)).build();
+	}
+	
+	@POST
 	@Path("/occurrencyByFlag/{flag}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -268,7 +296,13 @@ public class OccurrencyResource extends HttpServlet{
 			occurrency.setProperty("locationLong", coords[1].trim());
 			occurrency.setProperty("type", data.getType().toString());
 			occurrency.setProperty("creationTime", System.currentTimeMillis());
-			occurrency.setProperty("imagesID", data.getMediaURI());
+			if(data.getMediaURI() != null && data.getMediaURI().size() > 0)
+				occurrency.setProperty("imagesID", data.getMediaURI());
+			else {
+				List<String> mUri= data.mediaURI;
+				mUri.add("default-occurrency.png");
+				occurrency.setProperty("imagesID", mUri);
+			}
 			occurrency.setProperty("flag", OccurrencyFlags.unconfirmed.toString());
 			datastore.put(txn, occurrency);
 			LOG.info("Put Occurrency");
@@ -386,6 +420,7 @@ public class OccurrencyResource extends HttpServlet{
 			return Response.status(Status.NOT_FOUND).build();
 		return Response.ok(imageCache.get(image)).build();
 	}
+	
 	
 	@POST
 	@Path("/getImageAndroid/{imageID}")

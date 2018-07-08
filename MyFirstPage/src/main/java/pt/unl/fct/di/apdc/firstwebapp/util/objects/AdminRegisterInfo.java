@@ -4,7 +4,6 @@ public class AdminRegisterInfo {
 	public String username;
 	public String password;
 	public String registerUsername;
-	public String registerToken;
 	public String tokenId;
 	
 	public AdminRegisterInfo() {
@@ -15,7 +14,6 @@ public class AdminRegisterInfo {
 		this.tokenId = tokenId;
 		this.username = username;
 		this.password = password;
-		this.registerToken = registerToken;
 		this.registerUsername = registerUsername;
 	}
 }
