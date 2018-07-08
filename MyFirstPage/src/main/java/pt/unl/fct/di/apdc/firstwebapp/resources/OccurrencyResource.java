@@ -304,6 +304,7 @@ public class OccurrencyResource extends HttpServlet{
 				occurrency.setProperty("imagesID", mUri);
 			}
 			occurrency.setProperty("flag", OccurrencyFlags.unconfirmed.toString());
+			occurrency.setProperty("worker", "");
 			datastore.put(txn, occurrency);
 			LOG.info("Put Occurrency");
 			listCache.put(occurrency.getKey().toString(), convertOcToOcData(occurrency));
@@ -349,7 +350,7 @@ public class OccurrencyResource extends HttpServlet{
 	@Path("/saveImageAndroid/{extension}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response uploadFileDropbox(ImageData img, @PathParam("extension") String ext) {
+	public Response uploadFileDropboxAndroid(ImageData img, @PathParam("extension") String ext) {
 		Response r = uploadFileDropbox(img.image, ext);
 		if(r.getStatus() != 200)
 			return r;
@@ -486,7 +487,8 @@ public class OccurrencyResource extends HttpServlet{
 				(String)ocurrency.getProperty("user"),
 				coordinates,
 				(String)ocurrency.getProperty("type"),
-				(List<String>) ocurrency.getProperty("imagesID"));
+				(List<String>) ocurrency.getProperty("imagesID"),
+				(String) ocurrency.getProperty("worker"));
 		return oc;
 	}
 }

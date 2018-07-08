@@ -14,14 +14,14 @@ public class OccurrencyReadableData {
 	public String title;
 	public String description;
 	public OccurrencyFlags flag;
-	
+	public String worker;
 	
 	public OccurrencyReadableData() {
 		
 	}
 
 
-	public OccurrencyReadableData(String id, String title, String description, String user, String location, String type, List<String> mediaURI) {
+	public OccurrencyReadableData(String id, String title, String description, String user, String location, String type, List<String> mediaURI, String worker) {
 		this.id = id;
 		this.title = title;
 		this.description = description;
@@ -30,9 +30,10 @@ public class OccurrencyReadableData {
 		this.type = selectType(type);
 		this.mediaURI = mediaURI;
 		this.flag = OccurrencyFlags.unconfirmed;
+		this.worker = worker;
 	}
 	
-	public OccurrencyReadableData(String title, String description, String user, String location, String type, List<String> mediaURI, String flag) {
+	public OccurrencyReadableData(String title, String description, String user, String location, String type, List<String> mediaURI, String flag, String worker) {
 		this.title = title;
 		this.description = description;
 		this.user = user;
@@ -40,6 +41,7 @@ public class OccurrencyReadableData {
 		this.type = selectType(type);
 		this.mediaURI = mediaURI;
 		this.flag = OccurrencyFlags.valueOf(flag);
+		this.worker = worker;
 	}
 
 

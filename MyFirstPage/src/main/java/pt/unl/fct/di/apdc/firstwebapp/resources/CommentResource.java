@@ -37,6 +37,7 @@ import com.google.gson.Gson;
 import pt.unl.fct.di.apdc.firstwebapp.resources.BackEndResource;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.CommentData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.CommentInfoData;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.MessageData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.OccurrencyData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.ReportInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
@@ -75,7 +76,7 @@ public class CommentResource {
 		commentE.setProperty("downvotes", 0);
 		datastore.put(txn,commentE);
 		txn.commit();
-		return Response.ok().build();
+		return Response.ok(new MessageData("OK")).build();
 	}
 	
 	//GETALL
