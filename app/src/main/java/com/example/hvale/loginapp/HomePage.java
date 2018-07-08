@@ -324,6 +324,14 @@ public class HomePage extends AppCompatActivity
             }
         });
 
+        //THIS ACTUALLY WORKS
+        map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                Toast.makeText(getBaseContext(), marker.getTitle() + "Info Touched", Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     @Override
