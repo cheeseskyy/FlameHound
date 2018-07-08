@@ -5,14 +5,10 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -25,33 +21,27 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.gson.Gson;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-import typeClasses.*;
-
-import static android.os.StrictMode.*;
+import typeClasses.OcurrenceData;
+import typeClasses.UniversalImageLoader;
 
 /**
  * An activity representing a list of Occurences. This activity
@@ -70,12 +60,14 @@ public class OccurrenceListActivity extends AppCompatActivity {
     private boolean mTwoPane;
 
     private static final String url = "https://my-first-project-196314.appspot.com/rest/";
-    private static final String IMAGEURL = url + "occurrency/getImageUri/";
-    private final List<OcurrenceData> ocurrencys = new LinkedList<>();
-    private final List<LatLng> locations = new LinkedList<>();
     private JSONArray finalResponse = null;
+    public final List<OcurrenceData> ocurrencys = new LinkedList<OcurrenceData>();
+    private final List<LatLng> locations = new LinkedList<LatLng>();
+    private boolean rested = false;
     private View mProgressView;
+    private static ProgressBar progressBar;
     private FrameLayout fram_l;
+    private static final String URL = "https://my-first-project-196314.appspot.com/rest/occurrency/getImageUri/";
 
 
     @Override
@@ -83,18 +75,17 @@ public class OccurrenceListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_occurence_list);
 
-        ThreadPolicy policy = new ThreadPolicy.Builder().permitAll().build();
-        setThreadPolicy(policy);
-
         mProgressView = findViewById(R.id.list_progress);
+        progressBar = findViewById(R.id.list_progress2);
         fram_l = findViewById(R.id.frameLayout);
         showProgress(true);
-        System.out.println("Inicio");
-        doInBackGround();
+            doInBackGround();
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
+        System.out.println(ocurrencys.size());
 
         if (findViewById(R.id.occurence_detail_container) != null) {
             // The detail container view will be present only in the
@@ -104,9 +95,10 @@ public class OccurrenceListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
+
         View recyclerView = findViewById(R.id.occurence_list);
-        if (recyclerView != null)
-            setupRecyclerView((RecyclerView) recyclerView);
+        assert recyclerView != null;
+        setupRecyclerView((RecyclerView) recyclerView);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -123,14 +115,14 @@ public class OccurrenceListActivity extends AppCompatActivity {
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+               // DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
                 OcurrenceData item = (OcurrenceData) view.getTag();
-                System.out.println(mTwoPane);
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
 
                     arguments.putString(OccurrenceDetailFragment.ARG_ITEM_ID, item.title);
                     arguments.putString(OccurrenceDetailFragment.ARG_CONTENT, item.description);
-                    arguments.putString(OccurrenceDetailFragment.ARG_IMAGE,item.mediaURI.get(0));
+                    arguments.putString(OccurrenceDetailFragment.ARG_IMAGE, item.mediaURI.get(0));
                     OccurrenceDetailFragment fragment = new OccurrenceDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -142,8 +134,8 @@ public class OccurrenceListActivity extends AppCompatActivity {
                     Intent intent = new Intent(context, OccurrenceDetailActivity.class);
                     intent.putExtra(OccurrenceDetailFragment.ARG_ITEM_ID, item.title);
                     intent.putExtra(OccurrenceDetailFragment.ARG_CONTENT, item.description);
-                    System.out.println(item.mediaURI.get(0));
                     intent.putExtra(OccurrenceDetailFragment.ARG_IMAGE,item.mediaURI.get(0));
+
                     context.startActivity(intent);
                 }
             }
@@ -156,6 +148,7 @@ public class OccurrenceListActivity extends AppCompatActivity {
             mValues = items;
             mParentActivity = parent;
             mTwoPane = twoPane;
+
         }
 
         @Override
@@ -170,18 +163,12 @@ public class OccurrenceListActivity extends AppCompatActivity {
             holder.mIdView.setText(mValues.get(position).title);
             holder.mContentView.setText(mValues.get(position).description);
             holder.mLocation.setText(mValues.get(position).location);
-            if(!mValues.get(position).getImageURI(0).equals("")) {
-                try {
-                    URL url = new URL(IMAGEURL + mValues.get(position).getImageURI(0));
-                    Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                    holder.mImageView.setImageBitmap(bmp);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
 
+            //UniversalImageLoader.setImage(URL + url, holder.mImageView, progressBar, "");
+            if(mValues.get(position).mediaURI.get(0).length() != 0) {
+                ImageLoader imageLoader = ImageLoader.getInstance();
+                imageLoader.displayImage(URL + mValues.get(position).mediaURI.get(0), holder.mImageView);
+            }
             holder.itemView.setTag(mValues.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
 
@@ -204,7 +191,7 @@ public class OccurrenceListActivity extends AppCompatActivity {
                 mIdView = (TextView) view.findViewById(R.id.id_text);
                 mContentView = (TextView) view.findViewById(R.id.content);
                 mLocation = (TextView) view.findViewById(R.id.location);
-                mImageView = view.findViewById(R.id.imageToList);
+                mImageView = (ImageView) view.findViewById(R.id.imageToList);
             }
         }
     }
@@ -220,6 +207,7 @@ public class OccurrenceListActivity extends AppCompatActivity {
                 finalResponse = response;
                 onPostExecute(finalResponse);
             }
+
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -227,6 +215,7 @@ public class OccurrenceListActivity extends AppCompatActivity {
                 onCancelled(error);
             }
         });
+
         VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonRequest);
         setProgressBarVisibility(false);
     }
@@ -264,13 +253,14 @@ public class OccurrenceListActivity extends AppCompatActivity {
                     images.add((String) imageArray.get(0));
 
                 ocurrencys.add(new OcurrenceData(title, description, user, address, type, images, flag));
-                showProgress(false);
+
             }
         } catch (JSONException e) {
             onCancelled(e);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        showProgress(false);
     }
 
     private void onCancelled(Exception e) {
@@ -313,5 +303,31 @@ public class OccurrenceListActivity extends AppCompatActivity {
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             fram_l.setVisibility(show ? View.GONE : View.VISIBLE);
         }
+    }
+
+    public static class OccurrenceItem {
+        public final String id;
+        public final String content;
+        public final String details;
+        public final String location;
+        public final String imageToList;
+
+        public OccurrenceItem(String id, String content, String details, String location, String image) {
+            this.id = id;
+            this.content = content;
+            this.details = details;
+            this.location = location;
+            this.imageToList = image;
+
+        }
+
+        @Override
+        public String toString() {
+            return content;
+        }
+    }
+
+    public List<OcurrenceData> getOcurrencys() {
+        return ocurrencys;
     }
 }

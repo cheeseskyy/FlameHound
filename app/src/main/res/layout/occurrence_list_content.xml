@@ -8,9 +8,10 @@
 
     <ImageView
         android:id="@+id/imageToList"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="184dp"
         android:layout_marginTop="8dp"
+        android:adjustViewBounds="true"
         android:scaleType="centerCrop"
         android:src="@drawable/bom"
         app:layout_constraintEnd_toEndOf="@+id/content"
