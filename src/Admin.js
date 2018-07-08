@@ -79,8 +79,8 @@ class Report extends Component{
               <div className={"EntryInfo Report"}>{props.reported}</div>
               <div className={"EntryInfo Report"}>{props.description}</div>
               <div className={"EntryInfo Report"}>{props.ocID}</div>
-              <button>Accept</button>
-              <button>Reject</button>
+              <button>Apagar Ocorrência</button>
+              <button>Rejeitar report</button>
           </div>
       )
     };
@@ -249,7 +249,7 @@ class Occurrences extends Component{
                 const ocs = JSON.parse(xhttp.response);
                 console.log("Response in function: ");
                 console.log(JSON.parse(xhttp.response));
-                this.setState({ccs: ocs});
+                this.setState({ocs: ocs});
             }
         };
     }
@@ -268,10 +268,13 @@ class Occurrences extends Component{
             <div className="AdminBox">
                 {this.state.ocs.map(occurrence => {
                     return(
-                        <OccurrencePreview key={occurrence.id} id={occurrence.id} title={occurrence.title} user={occurrence.user}
-                                           description={occurrence.description}
-                                           image={occurrence.mediaURI[0]}
-                        />
+                        <div>
+                            <OccurrencePreview key={occurrence.id} id={occurrence.id} title={occurrence.title} user={occurrence.user}
+                                               description={occurrence.description}
+                                               image={occurrence.mediaURI[0]}
+                            />
+                            <button>Remover Ocorrência</button>
+                        </div>
                     )
                 })}
             </div>

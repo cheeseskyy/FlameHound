@@ -11,6 +11,7 @@
     background: grey;
     margin:auto;
     border: black solid 1px;
+    overflow-y:auto;
 }
 
 .Report{
