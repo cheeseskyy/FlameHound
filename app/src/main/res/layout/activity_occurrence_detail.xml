@@ -45,19 +45,8 @@
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/occurence_detail_container"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
-        </ScrollView>
-    </android.support.v4.widget.NestedScrollView>
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

@@ -1,7 +1,5 @@
 package typeClasses;
 
-import android.widget.ImageView;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,11 +46,6 @@ public class OcurrenceData {
     private OcurrencyType selectType(String type) {
         return OcurrencyType.valueOf(type);
     }
-
-    public String getImageURI(int position){
-        return mediaURI.get(position);
-    }
-
 
     public String[] getOcuInfo() {
         String[] ocuInfo = new String[FIVE + mediaURI.size()];

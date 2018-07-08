@@ -45,6 +45,7 @@ import static android.R.layout.simple_spinner_item;
 
 public class RegistOccurrence extends AppCompatActivity implements View.OnClickListener {
 
+    /*VERSAO COM A FINAL -------------_>>>>>>>>>>*/
     private static final String URL_SERVER = "https://my-first-project-196314.appspot.com/rest";
     private static final int RESULT_LOAD_IMAGE = 1;
 
