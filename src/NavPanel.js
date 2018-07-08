@@ -95,16 +95,34 @@ class NavPanel extends Component {
         console.log("Logging out");
 
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "https://my-first-project-196314.appspot.com//rest/session/logout", true);
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/session/logout", true);
         xhttp.setRequestHeader("Content-type", "application/json");
         var jSonObj = sessionStorage.getItem('sessionUsername');
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = function () {
-            if (xhttp.readyState == 4 && xhttp.status == 200) {
+            if (xhttp.readyState === 4 && xhttp.status === 200) {
                 alert("Successful logout.");
                 sessionStorage.setItem('username', "");
                 sessionStorage.setItem('tokenId', "0");
                 window.location.replace("/");
+            }
+        };
+    }
+
+    logoutAdmin() {
+
+        console.log("Logging out");
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/_be/_admin/logout", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        var jSonObj = sessionStorage.getItem('sessionUsernameAdmin');
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if (xhttp.readyState === 4 && xhttp.status === 200) {
+                alert("Successful logout.");
+                sessionStorage.setItem('sessionUsernameAdmin', "");
+                sessionStorage.setItem('tokenIdAdmin', "0");
             }
         };
     }
@@ -146,8 +164,8 @@ class NavPanel extends Component {
                                <p><Link to={"/admin/occurrences"}>Ocorrências</Link></p>
                                <p><Link to={"/admin/reports"}>Reports</Link></p>
                                <p><Link to={"/admin/logs"}>Registos</Link></p>
-                               <p><Link to="/logout" onClick={() =>
-                                   this.logout()}>Logout </Link></p>
+                               <p><Link to="/map" onClick={() =>
+                                   this.logoutAdmin()}>Logout </Link></p>
                            </div>
                        }
                 />

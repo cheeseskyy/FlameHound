@@ -1,12 +1,40 @@
 import React, {Component} from 'react';
 import {Switch, Route, Link, withRouter} from 'react-router-dom';
 import "./Admin.css";
-import {PerfilPage} from "./PerfilPage";
 import {OccurrencePreview} from "./Occurrences";
 
 export class AdminArea extends Component{
 
+    role = "MODERATOR";
+
+    verifyAdmin(){
+        var xhttp = new XMLHttpRequest();
+
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_be/_admin/validLogin", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        var username = sessionStorage.getItem('sessionUsernameAdmin');
+        var token = sessionStorage.getItem('sessionTokenAdmin');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () =>  {
+            if (xhttp.readyState === 4 && xhttp.status === 200) {
+                if(xhttp.status === 200) {
+                    console.log("Correct user logged in with role " + xhttp.response);
+                    this.role = xhttp.response;
+                }
+                else{
+                    alert("Não tem permissão para aceder a esta área, a redireccionar...")
+                    this.props.history.goBack();
+                }
+            }
+        };
+    }
+
     render(){
+
+        this.verifyAdmin();
+
         return(
             <div className={"AdminPage"}>
                 <h1>Página de Moderação</h1>
@@ -61,7 +89,7 @@ class Report extends Component{
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () =>  {
-            if (xhttp.readyState == 4 && xhttp.status == 200) {
+            if (xhttp.readyState === 4 && xhttp.status === 200) {
                 console.log("Got Reports");
                 const reports = JSON.parse(xhttp.response);
                 console.log("Response in function: ");
@@ -69,6 +97,10 @@ class Report extends Component{
                 this.setState({reports: reports});
             }
         };
+    }
+
+    deleteOc(id){
+        console.log("removing occurrence with ID: " + id);
     }
 
     ReportRow = (props) => {
@@ -79,7 +111,7 @@ class Report extends Component{
               <div className={"EntryInfo Report"}>{props.reported}</div>
               <div className={"EntryInfo Report"}>{props.description}</div>
               <div className={"EntryInfo Report"}>{props.ocID}</div>
-              <button>Apagar Ocorrência</button>
+              <button onClick={() => {this.deleteOc(props.id)}}>Apagar Ocorrência</button>
               <button>Rejeitar report</button>
           </div>
       )
@@ -90,7 +122,15 @@ class Report extends Component{
             <div className="AdminBox">
                 {this.state.reports.map(report => {
                     return(
-                        <this.ReportRow key={report} id = {report.reportId} reporter = {report.reporterInfo} reported = {report.reportedInfo} ocID = {report.ocID} description={report.description}/>
+                        <div className={"TableEntry"}>
+                            <div className={"EntryInfo Report"}>{report.reportId}</div>
+                            <div className={"EntryInfo Report"}>{report.reporter}</div>
+                            <div className={"EntryInfo Report"}>{report.reported}</div>
+                            <div className={"EntryInfo Report"}>{report.description}</div>
+                            <div className={"EntryInfo Report"}>{report.ocID}</div>
+                            <button onClick={() => this.deleteOc(report.ocID)}>Apagar Ocorrência</button>
+                            <button>Rejeitar report</button>
+                        </div>
                     )
                 })}
             </div>
@@ -123,7 +163,7 @@ class Users extends Component{
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () =>  {
-            if (xhttp.readyState == 4 && xhttp.status == 200) {
+            if (xhttp.readyState === 4 && xhttp.status === 200) {
                 console.log("Got Users");
                 const users = JSON.parse(xhttp.response);
                 console.log("Response in function: ");
@@ -273,6 +313,7 @@ class Occurrences extends Component{
                                                description={occurrence.description}
                                                image={occurrence.mediaURI[0]}
                             />
+                            <button>Confirmar Ocorrência</button>
                             <button>Remover Ocorrência</button>
                         </div>
                     )
