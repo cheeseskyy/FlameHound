@@ -101,6 +101,26 @@ class Report extends Component{
 
     deleteOc(id){
         console.log("removing occurrence with ID: " + id);
+        let xhttp = new XMLHttpRequest();
+
+        xhttp.open("DELETE", "https://my-first-project-196314.appspot.com/rest/oM/delete/" + id, true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        const username = sessionStorage.getItem('sessionUsernameAdmin');
+        const token = sessionStorage.getItem('sessionTokenAdmin');
+        const jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if (xhttp.readyState === 4) {
+                if(xhttp.status === 200){
+                    alert("Ocorrência removida com sucesso");
+                } else{
+                    console.log("deleteOC error: " + xhttp.status);
+                    alert("Ocorreu um erro a remover a ocorrência, tente novamente mais tarde");
+                }
+
+            }
+        }
     }
 
     ReportRow = (props) => {
@@ -151,6 +171,30 @@ class Users extends Component{
         this.getUsers();
     }
 
+    deleteUser(user){
+        console.log("removing user with username: " + user);
+        let xhttp = new XMLHttpRequest();
+
+        xhttp.open("DELETE", "https://my-first-project-196314.appspot.com/rest/UM/delete/" + user, true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        const username = sessionStorage.getItem('sessionUsernameAdmin');
+        const token = sessionStorage.getItem('sessionTokenAdmin');
+        const jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if (xhttp.readyState === 4) {
+                if(xhttp.status === 200){
+                    alert("Ocorrência removida com sucesso");
+                } else{
+                    console.log("deleteOC error: " + xhttp.status);
+                    alert("Ocorreu um erro a remover a ocorrência, tente novamente mais tarde");
+                }
+
+            }
+        }
+    }
+
     getUsers() {
         console.log("Getting all users");
         var xhttp = new XMLHttpRequest();
@@ -179,6 +223,7 @@ class Users extends Component{
               <div className={"RowEntry User"}> <p>{props.user}</p></div>
               <div className={"RowEntry User"}> <p>{props.name}</p></div>
               <div className={"RowEntry LastEntry User"}> <p>{props.email}</p></div>
+              <button onClick={() => this.deleteUser(props.user)}>Apagar Utilizador</button>
           </div>
       )
     };
@@ -272,6 +317,54 @@ class Occurrences extends Component{
         this.getOcs();
     }
 
+    deleteOc(id){
+        console.log("removing occurrence with ID: " + id);
+        let xhttp = new XMLHttpRequest();
+
+        xhttp.open("DELETE", "https://my-first-project-196314.appspot.com/rest/oM/delete/" + id, true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        const username = sessionStorage.getItem('sessionUsernameAdmin');
+        const token = sessionStorage.getItem('sessionTokenAdmin');
+        const jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if (xhttp.readyState === 4) {
+                if(xhttp.status === 200){
+                    alert("Ocorrência removida com sucesso");
+                } else{
+                    console.log("deleteOC error: " + xhttp.status);
+                    alert("Ocorreu um erro a remover a ocorrência, tente novamente mais tarde");
+                }
+
+            }
+        }
+    }
+
+    confirmOc(id){
+        console.log("removing occurrence with ID: " + id);
+        let xhttp = new XMLHttpRequest();
+
+        xhttp.open("PUT", "https://my-first-project-196314.appspot.com/rest/oM/confirm/" + id, true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        const username = sessionStorage.getItem('sessionUsernameAdmin');
+        const token = sessionStorage.getItem('sessionTokenAdmin');
+        const jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if (xhttp.readyState === 4) {
+                if(xhttp.status === 200){
+                    alert("Ocorrência confirmada com sucesso");
+                } else{
+                    console.log("deleteOC error: " + xhttp.status);
+                    alert("Ocorreu um erro a confirmar a ocorrência, tente novamente mais tarde");
+                }
+
+            }
+        }
+    }
+
     getOcs() {
         console.log("Getting all occurrences");
         var xhttp = new XMLHttpRequest();
@@ -313,8 +406,8 @@ class Occurrences extends Component{
                                                description={occurrence.description}
                                                image={occurrence.mediaURI[0]}
                             />
-                            <button>Confirmar Ocorrência</button>
-                            <button>Remover Ocorrência</button>
+                            <button onClick={() => this.confirmOc(occurrence.id)}>Confirmar Ocorrência</button>
+                            <button onClick={() => this.deleteOc(occurrence.id)}>Remover Ocorrência</button>
                         </div>
                     )
                 })}

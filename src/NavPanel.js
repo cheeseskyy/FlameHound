@@ -102,8 +102,8 @@ class NavPanel extends Component {
         xhttp.onreadystatechange = function () {
             if (xhttp.readyState === 4 && xhttp.status === 200) {
                 alert("Successful logout.");
-                sessionStorage.setItem('username', "");
-                sessionStorage.setItem('tokenId', "0");
+                sessionStorage.removeItem('sessionUsername');
+                sessionStorage.removeItem('sessionToken');
                 window.location.replace("/");
             }
         };
@@ -114,15 +114,15 @@ class NavPanel extends Component {
         console.log("Logging out");
 
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "https://my-first-project-196314.appspot.com/_be/_admin/logout", true);
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_be/_admin/logout", true);
         xhttp.setRequestHeader("Content-type", "application/json");
         var jSonObj = sessionStorage.getItem('sessionUsernameAdmin');
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () => {
             if (xhttp.readyState === 4 && xhttp.status === 200) {
                 alert("Successful logout.");
-                sessionStorage.setItem('sessionUsernameAdmin', "");
-                sessionStorage.setItem('tokenIdAdmin', "0");
+                sessionStorage.removeItem('sessionUsernameAdmin');
+                sessionStorage.removeItem('sessionTokenAdmin');
             }
         };
     }
