@@ -329,6 +329,12 @@ public class HomePage extends AppCompatActivity
             @Override
             public void onInfoWindowClick(Marker marker) {
                 Toast.makeText(getBaseContext(), marker.getTitle() + "Info Touched", Toast.LENGTH_LONG).show();
+                Intent it = new Intent(HomePage.this, OccurrenceDetailActivity.class);
+                it.putExtra(OccurrenceDetailFragment.ARG_ITEM_ID, marker.getTitle());
+                //it.putExtra(OccurrenceDetailFragment.ARG_CONTENT, ocurrencys.description);
+               // it.putExtra(OccurrenceDetailFragment.ARG_IMAGE,item.mediaURI.get(0));
+
+
             }
         });
 
@@ -453,14 +459,17 @@ public class HomePage extends AppCompatActivity
         for (int i = 0; i < finalResponse.length(); i++) {
             String[] coord = null;
             String title = null;
+            String description;
+            String mediaURI;
             try {
                 JSONObject jsonObject = finalResponse.getJSONObject(i);
                 ocurrencys[i] = finalResponse.getJSONObject(i).toString();
                 System.out.println(ocurrencys[i]);
                 coord = jsonObject.getString("location").split(",");
+
                 LatLng current = new LatLng(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]));
                 title = jsonObject.getString("title");
-
+                description = jsonObject.getString("description");
 
                 latlngs.add(current);
                 titles.add(title);
