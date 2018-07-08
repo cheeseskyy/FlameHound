@@ -56,6 +56,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 import typeClasses.UniversalImageLoader;
@@ -72,6 +73,8 @@ public class HomePage extends AppCompatActivity
     private FusedLocationProviderClient Client;
     private ArrayList<LatLng> latlngs;
     private ArrayList<String> titles;
+    private ArrayList<String> descriptions;
+    private ArrayList<String> images;
     private ImageView Occorrences;
     private ImageView Trending;
     private ImageView Draw;
@@ -82,6 +85,7 @@ public class HomePage extends AppCompatActivity
     private Projection projection;
     private double lat, log;
     private ArrayList<LatLng> valuesToDraw;
+    private HashMap<Marker, Integer> markers;
     private static final String url = "https://my-first-project-196314.appspot.com/rest/";
     RequestQueue requestQueue;
     JSONArray finalResponse = null;
@@ -100,7 +104,9 @@ public class HomePage extends AppCompatActivity
 
         latlngs = new ArrayList<>();
         titles = new ArrayList<>();
-
+        images = new ArrayList<>();
+        descriptions = new ArrayList<>();
+        markers = new HashMap<>();
         requestQueue = new RequestQueue(cache, network);
         requestQueue.start();
         initImageLoader();
@@ -316,24 +322,17 @@ public class HomePage extends AppCompatActivity
             }
         });
 
-        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                Toast.makeText(getBaseContext(), marker.getTitle(), Toast.LENGTH_LONG).show();
-                return false;
-            }
-        });
-
         //THIS ACTUALLY WORKS
         map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                Toast.makeText(getBaseContext(), marker.getTitle() + "Info Touched", Toast.LENGTH_LONG).show();
-               // Intent it = new Intent(HomePage.this, OccurrenceDetailActivity.class);
-               // it.putExtra(OccurrenceDetailFragment.ARG_ITEM_ID, marker.getTitle());
-              //  it.putExtra(OccurrenceDetailFragment.ARG_CONTENT, ocurrencys.description);
-               // it.putExtra(OccurrenceDetailFragment.ARG_IMAGE,item.mediaURI.get(0));
+                int pos = markers.get(marker);
+                Intent intent = new Intent(getBaseContext(), OccurrenceDetailActivity.class);
+                intent.putExtra(OccurrenceDetailFragment.ARG_ITEM_ID, marker.getTitle());
+                intent.putExtra(OccurrenceDetailFragment.ARG_CONTENT, descriptions.get(pos));
+                intent.putExtra(OccurrenceDetailFragment.ARG_IMAGE,images.get(pos));
 
+                startActivity(intent);
 
             }
         });
@@ -460,8 +459,9 @@ public class HomePage extends AppCompatActivity
             String[] coord = null;
             String title = null;
             String description;
-            String mediaURI;
+            String mediaURI = "";
             try {
+                JSONArray imageArray;
                 JSONObject jsonObject = finalResponse.getJSONObject(i);
                 ocurrencys[i] = finalResponse.getJSONObject(i).toString();
                 System.out.println(ocurrencys[i]);
@@ -470,9 +470,15 @@ public class HomePage extends AppCompatActivity
                 LatLng current = new LatLng(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]));
                 title = jsonObject.getString("title");
                 description = jsonObject.getString("description");
+                imageArray = jsonObject.getJSONArray("mediaURI");
+
+                mediaURI = ((String) imageArray.get(0));
+                System.out.println(mediaURI);
 
                 latlngs.add(current);
                 titles.add(title);
+                descriptions.add(description);
+                images.add(mediaURI);
             } catch (JSONException e) {
                 onCancelled(e);
             }
@@ -484,8 +490,10 @@ public class HomePage extends AppCompatActivity
             MarkerOptions initialMarkerOptions = new MarkerOptions();
             initialMarkerOptions.position(newMarker);
             initialMarkerOptions.title(titles.get(j));
+            Marker marker = map.addMarker(initialMarkerOptions);
+            markers.put(marker, j);
             //map.animateCamera(CameraUpdateFactory.newLatLngZoom(newMarker, 10));
-            map.addMarker(initialMarkerOptions);
+
 
         }
     }
