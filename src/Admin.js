@@ -7,14 +7,43 @@ export class AdminArea extends Component{
 
     role = "MODERATOR";
 
+    getRole() {
+        console.log("called getRole");
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/user/getRole", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+
+        xhttp.onreadystatechange = () => {
+            if (xhttp.readyState === 4) {
+                if(xhttp.status === 200) {
+                    const role = JSON.parse(xhttp.response);
+                    console.log("getRole response: " + role);
+                    sessionStorage.setItem("userRole", role);
+                    if (role !== "ADMIN" && role !== "MODERATOR") {
+                        alert("Não está autorizado a aceder a esta página. A redireccionar...");
+                        this.props.history.goBack();
+                    }
+                } else {
+                    alert("A sua sessão expirou. A redireccionar...");
+                    this.props.history.push("/");
+                }
+            }
+        }
+    }
+
     verifyAdmin(){
         var xhttp = new XMLHttpRequest();
 
         xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_be/_admin/validLogin", true);
         xhttp.setRequestHeader("Content-type", "application/json");
 
-        var username = sessionStorage.getItem('sessionUsernameAdmin');
-        var token = sessionStorage.getItem('sessionTokenAdmin');
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () =>  {
@@ -24,11 +53,15 @@ export class AdminArea extends Component{
                     this.role = xhttp.response;
                 }
                 else{
-                    alert("Não tem permissão para aceder a esta área, a redireccionar...")
+                    alert("Não tem permissão para aceder a esta área, a redireccionar...");
                     this.props.history.goBack();
                 }
             }
         };
+    }
+
+    componentDidMount(){
+        this.getRole();
     }
 
     render(){
@@ -47,6 +80,9 @@ export class AdminArea extends Component{
                     </Route>
                     <Route path={"/admin/users/create/moderator"}>
                         {withRouter(CreateModeratorForm)}
+                    </Route>
+                    <Route path={"/admin/users/create/worker"}>
+                        {withRouter(CreateWorkerForm)}
                     </Route>
                     <Route path={"/admin/users"}>
                         <Users/>
@@ -84,8 +120,8 @@ class Report extends Component{
         xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/rM/getReport/all", true);
         xhttp.setRequestHeader("Content-type", "application/json");
 
-        var username = sessionStorage.getItem('sessionUsernameAdmin');
-        var token = sessionStorage.getItem('sessionTokenAdmin');
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () =>  {
@@ -106,8 +142,8 @@ class Report extends Component{
         xhttp.open("DELETE", "https://my-first-project-196314.appspot.com/rest/oM/delete/" + id, true);
         xhttp.setRequestHeader("Content-type", "application/json");
 
-        const username = sessionStorage.getItem('sessionUsernameAdmin');
-        const token = sessionStorage.getItem('sessionTokenAdmin');
+        const username = sessionStorage.getItem('sessionUsername');
+        const token = sessionStorage.getItem('sessionToken');
         const jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () => {
@@ -123,6 +159,30 @@ class Report extends Component{
         }
     }
 
+    deleteRep(id){
+        console.log("removing occurrence with ID: " + id);
+        let xhttp = new XMLHttpRequest();
+
+        xhttp.open("DELETE", "https://my-first-project-196314.appspot.com/rest/rM/delete/" + id, true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        const username = sessionStorage.getItem('sessionUsername');
+        const token = sessionStorage.getItem('sessionToken');
+        const jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if (xhttp.readyState === 4) {
+                if(xhttp.status === 200){
+                    alert("Denúncia removida com sucesso");
+                } else{
+                    console.log("deleteOC error: " + xhttp.status);
+                    alert("Ocorreu um erro a remover a denúncia, tente novamente mais tarde");
+                }
+
+            }
+        }
+    }
+
     ReportRow = (props) => {
       return (
           <div className={"TableEntry"}>
@@ -132,7 +192,7 @@ class Report extends Component{
               <div className={"EntryInfo Report"}>{props.description}</div>
               <div className={"EntryInfo Report"}>{props.ocID}</div>
               <button onClick={() => {this.deleteOc(props.id)}}>Apagar Ocorrência</button>
-              <button>Rejeitar report</button>
+              <button onClick={() => {}}>Rejeitar report</button>
           </div>
       )
     };
@@ -140,9 +200,9 @@ class Report extends Component{
     render(){
         return(
             <div className="AdminBox">
-                {this.state.reports.map((report, i) => {
+                {this.state.reports.map(report => {
                     return(
-                        <div key={i} className={"TableEntry"}>
+                        <div className={"TableEntry"}>
                             <div className={"EntryInfo Report"}>{report.reportId}</div>
                             <div className={"EntryInfo Report"}>{report.reporter}</div>
                             <div className={"EntryInfo Report"}>{report.reported}</div>
@@ -178,14 +238,15 @@ class Users extends Component{
         xhttp.open("DELETE", "https://my-first-project-196314.appspot.com/rest/UM/delete/" + user, true);
         xhttp.setRequestHeader("Content-type", "application/json");
 
-        const username = sessionStorage.getItem('sessionUsernameAdmin');
-        const token = sessionStorage.getItem('sessionTokenAdmin');
+        const username = sessionStorage.getItem('sessionUsername');
+        const token = sessionStorage.getItem('sessionToken');
         const jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () => {
             if (xhttp.readyState === 4) {
                 if(xhttp.status === 200){
-                    alert("Utlizador removido com sucesso");
+                    alert("Utilizador removido com sucesso");
+                    this.forceUpdate();
                 } else{
                     console.log("deleteOC error: " + xhttp.status);
                     alert("Ocorreu um erro a remover o utilizador, tente novamente mais tarde");
@@ -202,8 +263,8 @@ class Users extends Component{
         xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/UM/getUsers/all", true);
         xhttp.setRequestHeader("Content-type", "application/json");
 
-        var username = sessionStorage.getItem('sessionUsernameAdmin');
-        var token = sessionStorage.getItem('sessionTokenAdmin');
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () =>  {
@@ -220,6 +281,7 @@ class Users extends Component{
     UsersRow = (props) => {
       return(
           <div className={"TableEntry"}>
+              <div className={"RowEntry User"}> <p>{props.role}</p></div>
               <div className={"RowEntry User"}> <p>{props.user}</p></div>
               <div className={"RowEntry User"}> <p>{props.name}</p></div>
               <div className={"RowEntry LastEntry User"}> <p>{props.email}</p></div>
@@ -229,6 +291,13 @@ class Users extends Component{
     };
 
     render(){
+
+        const moderatorLink = () => {
+            if(sessionStorage.getItem("userRole") === "ADMIN"){
+                return <Link to={"/admin/users/create/moderator"} style={{width: "33%", float: "center"}}>Criar Moderador</Link>;
+            }
+        };
+
         return(
             <div style={{height: "100%"}}>
                 <div className="AdminBox">
@@ -236,13 +305,13 @@ class Users extends Component{
 
                     {this.state.users.map(user => {
                         return (
-                            <this.UsersRow key={user} user={user.username} email={user.email} name={user.name}/>
+                            <this.UsersRow key={user} user={user.username} email={user.email} name={user.name} role={user.role}/>
                         )
                     })}
                     <div>
-                        <Link to={"/admin/users/create/moderator"} style={{width: "50%"}}>Criar Moderador</Link>
-                        <Link to={"/admin/users/create/admin"} style={{width: "50%", float: "right"}}>Criar Administrador</Link>
-                        <Link to={"/admin/users/create/worker"}>Criar Trabalhador</Link>
+                        <Link to={"/admin/users/create/worker"} style={{width: "34%", float: "left"}}>Criar Trabalhador</Link>
+                        {moderatorLink()}
+                        <Link to={"/admin/users/create/admin"} style={{width: "33%", float: "right"}}>Criar Administrador</Link>
                     </div>
                 </div>
             </div>
@@ -271,17 +340,17 @@ class Logs extends Component{
         xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_be/_admin/getLogs", true);
         xhttp.setRequestHeader("Content-type", "application/json");
 
-        var username = sessionStorage.getItem('sessionUsernameAdmin');
-        var token = sessionStorage.getItem('sessionTokenAdmin');
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () =>  {
-            if (xhttp.readyState == 4 && xhttp.status == 200) {
+            if (xhttp.readyState === 4 && xhttp.status === 200) {
                 console.log("Got logs");
-                const logs = JSON.parse(xhttp.response);
+                const logs = xhttp.response;
                 console.log("Response in function: ");
-                console.log(JSON.parse(xhttp.response));
-                this.setState({logs: logs.message});
+                console.log(logs);
+                this.setState({logs: logs});
             }
         };
     }
@@ -325,8 +394,8 @@ class Occurrences extends Component{
         xhttp.open("DELETE", "https://my-first-project-196314.appspot.com/rest/oM/delete/" + id, true);
         xhttp.setRequestHeader("Content-type", "application/json");
 
-        const username = sessionStorage.getItem('sessionUsernameAdmin');
-        const token = sessionStorage.getItem('sessionTokenAdmin');
+        const username = sessionStorage.getItem('sessionUsername');
+        const token = sessionStorage.getItem('sessionToken');
         const jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () => {
@@ -342,15 +411,19 @@ class Occurrences extends Component{
         }
     }
 
-    confirmOc(id){
+    confirmOc(id, flag){
+        if(flag === "solving" || flag === "solved"){
+            alert("Ocorrência já está a ser tratada");
+            return;
+        }
         console.log("removing occurrence with ID: " + id);
         let xhttp = new XMLHttpRequest();
 
         xhttp.open("PUT", "https://my-first-project-196314.appspot.com/rest/oM/confirm/" + id, true);
         xhttp.setRequestHeader("Content-type", "application/json");
 
-        const username = sessionStorage.getItem('sessionUsernameAdmin');
-        const token = sessionStorage.getItem('sessionTokenAdmin');
+        const username = sessionStorage.getItem('sessionUsername');
+        const token = sessionStorage.getItem('sessionToken');
         const jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () => {
@@ -397,6 +470,12 @@ class Occurrences extends Component{
         )
     };
 
+    confirmOcButton = (id, flag) => {
+      if(flag === "unconfirmed"){
+          return <button onClick={() => this.confirmOc(id, flag)}>Confirmar Ocorrência</button>;
+      }
+    };
+
     render(){
         return(
             <div className="AdminBox">
@@ -406,8 +485,10 @@ class Occurrences extends Component{
                             <OccurrencePreview key={occurrence.id} id={occurrence.id} title={occurrence.title} user={occurrence.user}
                                                description={occurrence.description}
                                                image={occurrence.mediaURI[0]}
+                                               flag={occurrence.flag}
+                                               creationDate={occurrence.creationDate} worker={occurrence.worker}
                             />
-                            <button onClick={() => this.confirmOc(occurrence.id)}>Confirmar Ocorrência</button>
+                            {this.confirmOcButton(occurrence.id, occurrence.flag)}
                             <button onClick={() => this.deleteOc(occurrence.id)}>Remover Ocorrência</button>
                         </div>
                     )
@@ -425,10 +506,14 @@ class CreateModeratorForm extends Component{
         xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_be/_admin/addModerator");
         xhttp.setRequestHeader("Content-type", "application/json");
 
-        var username = sessionStorage.getItem('sessionUsernameAdmin');
-        var token = sessionStorage.getItem('sessionTokenAdmin');
+        const userRegist = document.getElementById("username").value;
+
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
         var jSonObj = JSON.stringify({
-            "username": document.getElementById("username").value,
+            "username": userRegist,
+            "name": document.getElementById("name").value,
+            "email": document.getElementById("email").value,
             "password": document.getElementById("psw").value,
             "entity": document.getElementById("entity").value,
             "registerUsername": username,
@@ -438,7 +523,7 @@ class CreateModeratorForm extends Component{
         xhttp.onreadystatechange = () => {
             if(xhttp.readyState === 4){
                 if(xhttp.status === 200){
-                    alert("Moderador " + jSonObj.username + " registado. A redireccionar...");
+                    alert("Moderador " + userRegist + " registado. A redireccionar...");
                     this.props.history.goBack();
                 } else if(xhttp.status > 200) {
                     alert("Ocorreu um erro, verifique a informação e tente novamente.");
@@ -453,14 +538,18 @@ class CreateModeratorForm extends Component{
         return(
           <div>
               <p>Nome de Utilizador:</p>
-              <input id={"username"} type="text" placeholder="Nome de Utilizador"/>
+              <input id={"username"} type="text" placeholder="Utilizador"/>
+              <p>Nome:</p>
+              <input id={"name"} type={"text"} placeholder={"Nome"}/>
+              <p>Email</p>
+              <input id={"email"} type={"text"} placeholder={"name@mailservice.com"}/>
               <p>Palavra-passe:</p>
               <input id={"psw"} type="password"/>
               <p>Confirme a Palavra-passe</p>
               <input type="password"/>
               <p>Entidade:</p>
               <input id={"entity"} type="text"/>
-              <button onClick={() => this.sendModerator()}>Criar</button>
+              <button onClick={() => this.sendModerator()}>Criar Moderador</button>
           </div>
         );
     }
@@ -473,11 +562,15 @@ class CreateAdminForm extends Component{
         xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_be/_admin/addAdmin");
         xhttp.setRequestHeader("Content-type", "application/json");
 
-        var username = sessionStorage.getItem('sessionUsernameAdmin');
-        var token = sessionStorage.getItem('sessionTokenAdmin');
+        const userRegist = document.getElementById("username").value;
+
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
         var jSonObj = JSON.stringify({
-            "username": document.getElementById("username").value,
+            "username": userRegist,
             "password": document.getElementById("psw").value,
+            "name": document.getElementById("name").value,
+            "email": document.getElementById("email").value,
             "registerUsername": username,
             "tokenId": token
         });
@@ -485,7 +578,7 @@ class CreateAdminForm extends Component{
         xhttp.onreadystatechange = () => {
             if(xhttp.readyState === 4){
                 if(xhttp.status === 200){
-                    alert("Moderador " + jSonObj.username + " registado. A redireccionar...");
+                    alert("Administrador " + userRegist + " registado. A redireccionar...");
                     this.props.history.goBack();
                 } else if(xhttp.status > 200) {
                     alert("Ocorreu um erro, verifique a informação e tente novamente.");
@@ -499,12 +592,16 @@ class CreateAdminForm extends Component{
         return(
             <div>
                 <p>Nome de Utilizador:</p>
-                <input id={"username"} type="text" placeholder="Nome de Utilizador"/>
+                <input id={"username"} type="text" placeholder="Utilizador"/>
+                <p>Nome:</p>
+                <input id={"name"} type={"text"} placeholder={"Nome"}/>
+                <p>Email</p>
+                <input id={"email"} type={"text"} placeholder={"name@mailservice.com"}/>
                 <p>Palavra-passe:</p>
                 <input id={"psw"} type="password"/>
                 <p>Confirme a Palavra-passe</p>
                 <input type="password"/>
-                <button onClick={() => this.sendAdmin()}>Criar</button>
+                <button onClick={() => this.sendAdmin()}>Criar Administrador</button>
             </div>
         )
     }
@@ -514,15 +611,19 @@ class CreateWorkerForm extends Component{
 
     sendWorker() {
         let xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_be/_admin/addModerator");
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_be/_admin/addWorker");
         xhttp.setRequestHeader("Content-type", "application/json");
 
-        var username = sessionStorage.getItem('sessionUsernameAdmin');
-        var token = sessionStorage.getItem('sessionTokenAdmin');
+        const userRegist = document.getElementById("username").value;
+
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
         var jSonObj = JSON.stringify({
-            "username": document.getElementById("username").value,
+            "username": userRegist,
             "password": document.getElementById("psw").value,
             "entity": document.getElementById("entity").value,
+            "name": document.getElementById("name").value,
+            "email": document.getElementById("email").value,
             "registerUsername": username,
             "tokenId": token
         });
@@ -530,7 +631,7 @@ class CreateWorkerForm extends Component{
         xhttp.onreadystatechange = () => {
             if(xhttp.readyState === 4){
                 if(xhttp.status === 200){
-                    alert("Moderador " + jSonObj.username + " registado. A redireccionar...");
+                    alert("Trabalhador " + userRegist + " registado. A redireccionar...");
                     this.props.history.goBack();
                 } else if(xhttp.status > 200) {
                     alert("Ocorreu um erro, verifique a informação e tente novamente.");
@@ -540,20 +641,24 @@ class CreateWorkerForm extends Component{
         }
     }
 
+
     render(){
         return(
             <div>
-                <p>Nome de Utilizador:</p>
-                <input id={"username"} type="text" placeholder="Nome de Utilizador"/>
+                <p>Utilizador:</p>
+                <input id={"username"} type="text" placeholder="Utilizador"/>
+                <p>Nome:</p>
+                <input id={"name"} type={"text"} placeholder={"Nome"}/>
+                <p>Email</p>
+                <input id={"email"} type={"text"} placeholder={"name@mailservice.com"}/>
                 <p>Palavra-passe:</p>
                 <input id={"psw"} type="password"/>
                 <p>Confirme a Palavra-passe</p>
                 <input type="password"/>
                 <p>Entidade:</p>
                 <input id={"entity"} type="text"/>
-                <button onClick={() => this.sendWorker()}>Criar</button>
+                <button onClick={() => this.sendWorker()}>Criar Trabalhador</button>
             </div>
         );
     }
-
 }

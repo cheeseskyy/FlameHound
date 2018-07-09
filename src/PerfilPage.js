@@ -16,7 +16,9 @@ export class PerfilPage extends Component{
         this.state = {
             logo: "",
             occurrences: [],
-            info: {}
+            info: {},
+            stats:{},
+            workerInfo: {}
         }
     }
 
@@ -29,16 +31,41 @@ export class PerfilPage extends Component{
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () => {
-            if (xhttp.readyState === 4) {
-                if(xhttp.status === 200) {
-                    this.setState(
-                        {
-                            logo: this.state.logo,
-                            occurrences: JSON.parse(xhttp.response),
-                            info: this.state.info
-                        }
-                    )
-                }
+            if (xhttp.readyState === 4 && xhttp.status === 200) {
+                console.log("Got user Ocs");
+                this.setState(
+                    {
+                        logo: this.state.logo,
+                        occurrences: JSON.parse(xhttp.response),
+                        info: this.state.info,
+                        stats: this.state.stats,
+                        workerInfo: this.state.workerInfo
+                    }
+                )
+            }
+        };
+    }
+
+    getStats(){
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/user/getStats/" + this.props.id , true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if (xhttp.readyState === 4 && xhttp.status === 200) {
+                console.log("Got use stats");
+                this.setState(
+                    {
+                        logo: this.state.logo,
+                        occurrences: this.state.occurrences,
+                        info: this.state.info,
+                        stats: JSON.parse(xhttp.response),
+                        workerInfo: this.state.workerInfo
+                    }
+                )
             }
         };
     }
@@ -54,67 +81,75 @@ export class PerfilPage extends Component{
         xhttp.onreadystatechange = () => {
             if (xhttp.readyState === 4) {
                 if(xhttp.status === 200) {
-                    console.log("user info:");
-                    console.log(JSON.parse(xhttp.response));
+                    console.log("Got user info");
                     this.setState(
                         {
                             logo: this.state.logo,
                             occurrences: this.state.occurrences,
-                            info: JSON.parse(xhttp.response)
+                            info: JSON.parse(xhttp.response),
+                            stats: this.state.info,
+                            workerInfo: this.state.workerInfo
                         }
-                    )
-                } else if (xhttp.status === 404) {
-                    alert("Este utilizador não existe. A redireccionar...");
+                    );
+                    if (this.state.info.role === "WORKER") {
+                        this.getWorkerInfo();
+                    }
+                }
+                else if(xhttp.status === 404){
+                    alert("Este utilizador não existe, verifique o nome do utilizador e tente outra vez. A redireccionar...");
                     this.props.history.goBack();
                 }
             }
         };
     }
 
-    getStats(){
-        var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/user/getStats/" + this.props.id , true);
+    getWorkerInfo(){
+
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_bo/_worker/getWorkerInfo/" + this.props.id , true);
         xhttp.setRequestHeader("Content-type", "application/json");
+
         var username = sessionStorage.getItem('sessionUsername');
         var token = sessionStorage.getItem('sessionToken');
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
+
         xhttp.onreadystatechange = () => {
-            if (xhttp.readyState === 4) {
-                if(xhttp.status === 200) {
-                    console.log("user info:");
+            if(xhttp.readyState === 4){
+                if(xhttp.status === 200){
+                    console.log("Worker info received");
                     console.log(JSON.parse(xhttp.response));
                     this.setState(
                         {
                             logo: this.state.logo,
                             occurrences: this.state.occurrences,
-                            info: this.state.info
+                            info: this.state.info,
+                            stats: this.state.info,
+                            workerInfo: JSON.parse(xhttp.response)
                         }
                     )
-                } else if (xhttp.status === 404) {
-                    alert("Este utilizador não existe. A redireccionar...");
-                    this.props.history.goBack();
+                }
+                else{
+                    console.log("error: " + xhttp.status);
                 }
             }
-        };
+        }
+
+
     }
 
     componentDidMount(){
         //request Occurrences
         this.getOccurrences();
-        this.getInfo();
         this.getStats();
+        this.getInfo();
     }
 
-    isHimself = false;
+    isHimself = true;
 
     request = "/occurrency/getByUser/"; //{username}
 
     render(){
-
-        if(this.props.id === sessionStorage.getItem("sessionUsername"))
-            this.isHimself = true;
-
         return(
             <div className="perfilPage">
 
@@ -194,6 +229,10 @@ export class ProfileImage extends Component{
             }
         };
     }
+
+    workerOcs = () => {
+
+    };
 
     constructor(props){
         super(props);

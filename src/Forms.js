@@ -63,7 +63,7 @@ function saveOc() {
                     xhttp2.send(result);
                 };
                 xhttp2.onreadystatechange = function () {
-                    if (xhttp2.readyState == 4 && xhttp.status == 200) {
+                    if (xhttp2.readyState === 4 && xhttp.status === 200) {
                         console.log(JSON.parse(xhttp2.response));
                         uploadOc(JSON.parse(xhttp2.response), username);
                     }

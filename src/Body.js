@@ -8,7 +8,7 @@ import placeHolder from './images/placeholders/colegas.png';
 import './Body.css';
 import {OccurrenceForm} from "./Forms";
 import {withScriptjs, withGoogleMap, GoogleMap} from "react-google-maps";
-import EntityPage from "./EntityPage";
+import WorkerPage from "./WorkerPage";
 import {PerfilPage} from "./PerfilPage";
 import {CommentList} from "./Comments";
 import {OccurrencePage} from "./Occurrences";
@@ -100,10 +100,6 @@ const About = () =>
             <p> Deste modo promovemos uma nova ferramenta que entidades podem utilizar ou mesmo, no futuro,
                 promover.</p>
         </div>
-        <br/><br/><br/>
-        <div align="center">
-            <img src={placeHolder}/>
-        </div>
     </div>
 ;
 
@@ -130,16 +126,13 @@ class Body extends Component {
                     <Route path="/about" component={About}/>
                     <Route path="/contact" component={Contacts}/>
                     <Route path="/submitOccurrence" component={OccurrenceForm}/>
-                    <Route path="/EntityPage" render={(props) =>
-                        <EntityPage name = "Placeholder" description = "Placeholder is a company that holds places"/>
-                    }/>
-                    <Route path="/profile/:id" render={withRouter(
-                        ({match, history}) =>
-                        <PerfilPage id={match.params.id} history = {history} name = "Placeholder" />)
+                    <Route path="/profile/:id" render={({match}) =>
+                        <PerfilPage id={match.params.id} name = "Placeholder" />
                     }/>
                     <Route path="/occurrence/:id" render={({match}) =>
                         <OccurrencePage id={match.params.id}/>} />
-                    <Route path={"/event/:id"} />
+                    <Route path={"/workerProfile/:id"} render = {({match}) =>
+                        <WorkerPage id={match.params.id}/>} />
                     <Route path="/admin" component={AdminArea}/>
                     <Route path="/" component={Home}/>
                 </Switch>
