@@ -35,6 +35,7 @@
     float: left;
     padding: 0px;
     height: 68vh;
+    overflow-y: auto;
 }
 
 #minhasOcurrencias{

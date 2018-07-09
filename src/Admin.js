@@ -324,7 +324,7 @@ class Logs extends Component{
     constructor(props){
         super(props);
         this.state = {
-            logs: ""
+            logs: []
         }
 
     }
@@ -347,7 +347,7 @@ class Logs extends Component{
         xhttp.onreadystatechange = () =>  {
             if (xhttp.readyState === 4 && xhttp.status === 200) {
                 console.log("Got logs");
-                const logs = xhttp.response;
+                const logs = JSON.parse(xhttp.response);
                 console.log("Response in function: ");
                 console.log(logs);
                 this.setState({logs: logs});
@@ -367,7 +367,9 @@ class Logs extends Component{
         return(
             <div className="AdminBox" style={{backgroundColor:"white"}}>
                 <br/>
-                {this.state.logs}
+                {this.state.logs.map((log, i) => {
+                    return <p key={i}>{log}</p>
+                })}
             </div>
         )
     }

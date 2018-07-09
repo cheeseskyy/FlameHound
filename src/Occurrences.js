@@ -77,28 +77,43 @@ export class OccurrencePreview extends Component {
     }
 
     treatOc(){
-        if(this.props.tag === "confirmed"){
+        console.log("trying to treat oc with tag: " + this.props.flag);
+        if(this.props.flag === "confirmed"){
             this.tagOc();
-        } else if(this.props.tag === "solving"){
+        } else if(this.props.flag === "solving"){
             this.solveOc();
-        } else if(this.props.tag === "solved"){
+        } else if(this.props.flag === "solved"){
             alert("Ocorrência já resolvida");
         }
     }
 
     tagOc(){
+        console.log("Tagging Occurrence");
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_bo/_worker/tag/" + this.props.id, true);
+        xhttp.open("PUT", "https://my-first-project-196314.appspot.com/rest/_bo/_worker/tag/" + this.props.id, true);
         xhttp.setRequestHeader("Content-type", "application/json");
         var username = sessionStorage.getItem('sessionUsername');
         var token = sessionStorage.getItem('sessionToken');
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
 
+        xhttp.onreadystatechange = () => {
+            if(xhttp.readyState === 4){
+                if(xhttp.status === 200){
+                    console.log("Occurrence tag changed")
+                }
+                else{
+                    alert("Ocorreu um erro ao notificar o servidor, tente novamente mais tarde...");
+                    console.log("Error: " + xhttp.status);
+                }
+            }
+        }
+
 
     }
 
     solveOc(){
+        console.log("Solving Occurrence");
         var xhttp = new XMLHttpRequest();
         xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_bo/_worker/solve/" + this.props.id, true);
         xhttp.setRequestHeader("Content-type", "application/json");
@@ -107,6 +122,17 @@ export class OccurrencePreview extends Component {
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
 
+        xhttp.onreadystatechange = () => {
+            if(xhttp.readyState === 4){
+                if(xhttp.status === 200){
+                    console.log("Occurrence tag changed")
+                }
+                else{
+                    alert("Ocorreu um erro ao notificar o servidor, tente novamente mais tarde...");
+                    console.log("Error: " + xhttp.status);
+                }
+            }
+        }
     }
 
     componentDidMount(){
@@ -114,7 +140,8 @@ export class OccurrencePreview extends Component {
     }
 
     WorkerButton = () => {
-      if(sessionStorage.getItem("userRole") === "WORKER"){
+      if(sessionStorage.getItem("userRole") === "WORKER" && this.props.tag !== "unconfirmed") {
+
           return <button onClick={() => this.treatOc()}>Tratar</button>
       }
     };
@@ -188,7 +215,7 @@ export class OccurrencePreview extends Component {
                     <button onClick={() =>{this.reportOc()}}>
                         Denunciar
                     </button>
-                    {this.WorkerButton}
+                    {this.WorkerButton()}
 
                 </div>
             </div>

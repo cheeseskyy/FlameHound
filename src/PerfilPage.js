@@ -149,6 +149,19 @@ export class PerfilPage extends Component{
 
     request = "/occurrency/getByUser/"; //{username}
 
+    workerStats = () => {
+        if(sessionStorage.getItem("userRole") === "WORKER"){
+            return(
+                <div id={"workerStats"}>
+                    <h3 style={{textAlign: "center"}}>Estatísticas de Trabalhador:</h3>
+                    <p style={{paddingLeft: "5px"}}>Taxa de Aprovação: {this.state.workerInfo.approvalRate} </p>
+                    <p style={{paddingLeft: "5px"}}>Taxa de Desaprovação: {this.state.workerInfo.disapprovalRate} </p>
+                    <p style={{paddingLeft: "5px"}}>Ocorrências Tratadas: {this.state.workerInfo.occurrenciesTreated} </p>
+                </div>
+            )
+        }
+    };
+
     render(){
         return(
             <div className="perfilPage">
@@ -168,6 +181,14 @@ export class PerfilPage extends Component{
                     <p style={{paddingLeft: "5px"}}>Telefone:</p>
                     <p style={{paddingLeft: "5px"}}>CC:</p>
                     <p style={{paddingLeft: "5px"}}>NIF:</p>
+                    <div id={"stats"}>
+                        <h3 style={{textAlign: "center"}}>Estatísticas:</h3>
+                        <p style={{paddingLeft: "5px"}}>Votos Positivos: {this.state.stats.upvotes} </p>
+                        <p style={{paddingLeft: "5px"}}>Votos Negativos: {this.state.stats.downvotes} </p>
+                        <p style={{paddingLeft: "5px"}}>Ocorrências Criadas: {this.state.stats.occurrenciesPosted} </p>
+                        <p style={{paddingLeft: "5px"}}>Ocorrências Confirmadas: {this.state.stats.occurrenciesConfirmed} </p>
+                    </div>
+                    {this.workerStats()}
                 </div>
 
                 <div id="minhasOcurrencias">

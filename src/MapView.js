@@ -120,7 +120,7 @@ class MapView extends Component {
     }
 
     componentDidMount() {
-        let resp = this.getOc();
+        this.getOc();
     }
 
     render() {
