@@ -57,6 +57,7 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.AdminRegisterInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.WorkerInfo;
 
 @Path("/_bo/_worker")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -231,6 +232,39 @@ public class BackOfficeResource extends HttpServlet {
 		}
 	}
 	
+	@POST
+	@Path("/getWorkerInfo/{worker}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getWorkerInfos(SessionInfo session, @PathParam("worker") String worker) {
+		Response r = ComputationResource.validLogin(session);
+		if (r.getStatus() != Response.Status.OK.getStatusCode())
+			return r;
+		
+		Transaction txn = datastore.beginTransaction();
+		Key userKey = KeyFactory.createKey("UserWorker", worker);
+		
+		try {
+			Entity workerE = datastore.get(txn, userKey);
+			WorkerInfo info = getWorkerInfoObject(workerE);
+			txn.commit();
+			return Response.ok(g.toJson(info)).build();
+		}catch(EntityNotFoundException e) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private WorkerInfo getWorkerInfoObject(Entity workerE) {
+		return new WorkerInfo(
+				(String) workerE.getKey().getName(),
+				(String) workerE.getProperty("entity"),
+				(long) workerE.getProperty("approvalRate"),
+				(long) workerE.getProperty("disapprovalRate"),
+				(long) workerE.getProperty("ocurrenciesTreated"),
+				(List<String>) workerE.getProperty("occurrencies"));
+	}
+
 	/**
 	 * Management Methods:
 	 */
@@ -248,10 +282,10 @@ public class BackOfficeResource extends HttpServlet {
 				Entity occurrency = datastore.get(txn, ocKey);
 				LOG.info("Got occurrency");
 				occurrency.setProperty("flag", OccurrencyFlags.solving.toString());
+				occurrency.setProperty("worker", session.username);
 				datastore.put(txn, occurrency);
 				txn.commit();
 				LOG.info("Put in datastore");
-				return Response.ok().build();
 			} catch (EntityNotFoundException e) {
 				LOG.warning("Failed to locate ocurrency: " + ocID);
 				return Response.status(Status.NOT_FOUND).build();
@@ -261,6 +295,23 @@ public class BackOfficeResource extends HttpServlet {
 					return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 				}
 			}
+			Transaction txn2 = datastore.beginTransaction();
+			Key workerKey = KeyFactory.createKey("UserWorker", session.username);
+			try {
+				Entity worker = datastore.get(txn2, workerKey);
+				@SuppressWarnings("unchecked")
+				List<String> ocList = (List<String>) worker.getProperty("occurrencies");
+				if(ocList == null)
+					ocList = new ArrayList<String>();
+				ocList.add(ocID);
+				worker.setProperty("occurrencies", ocList);
+				datastore.put(txn2, worker);
+				txn2.commit();
+			}catch(EntityNotFoundException e) {
+				txn2.rollback();
+				return Response.status(Status.NOT_FOUND).build();
+			}
+			return Response.ok().build();
 		}
 		
 		@Path("/solve/{ocID}/{imageID}")
