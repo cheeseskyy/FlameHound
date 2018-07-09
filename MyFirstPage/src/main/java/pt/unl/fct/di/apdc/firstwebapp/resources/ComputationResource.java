@@ -3,6 +3,7 @@ package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +33,10 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
@@ -48,9 +53,10 @@ public class ComputationResource {
 	 * A logger object.
 	 */
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
-	private final Gson g = new Gson();
+	private static final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private static final DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
+	private static long validLogin = 0;;
 
 	public ComputationResource() {
 	} // nothing to be done here
@@ -58,18 +64,24 @@ public class ComputationResource {
 	@POST
 	@Path("/validLogin")
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public static Response validLogin(SessionInfo session) {
 		if (session.tokenId.equals("0")) {
 			LOG.warning("User is not logged in");
 			return Response.status(Status.FORBIDDEN).build();
 		}
+		if(System.currentTimeMillis() - validLogin  < 60000)
+			return Response.ok().build();
+			
 		Transaction txn = datastore.beginTransaction();
 		Transaction txn2 = datastore.beginTransaction();
 		Key userKey = KeyFactory.createKey("User", session.username);
+		String role;
 		try {
 			LOG.info("Attempt to get user: " + session.username);
 			Entity user = datastore.get(txn, userKey);
 			LOG.info("Got user");
+			role = (String)user.getProperty("role");
 			if (!user.getProperty("TokenKey").equals(session.tokenId)) {
 				LOG.info("Wrong token for user " + session.username);
 				txn.commit();
@@ -99,7 +111,8 @@ public class ComputationResource {
 			datastore.put(txn2, timeout);
 			txn.commit();
 			txn2.commit();
-			return Response.ok().build();
+			validLogin = System.currentTimeMillis();
+			return Response.ok(g.toJson(role)).build();
 		} catch (EntityNotFoundException e) {
 			LOG.warning("Failed to locate username: " + session.username);
 			txn.rollback();
@@ -128,27 +141,46 @@ public class ComputationResource {
 	}
 	
 	@GET
+	@Path("/solveLogs")
+	public static Response solveLogs() {
+		Query q = new Query("OperationLogs");
+		PreparedQuery pQ = datastore.prepare(q);
+		ArrayList<Entity> list = new ArrayList<Entity>(pQ.asList(FetchOptions.Builder.withDefaults()));
+		for(int i = 0; i<list.size(); i++) {
+			Entity log = list.get(i);
+			log.setProperty("date", System.currentTimeMillis() + i);
+			String text = (String)log.getProperty("logText");
+			if(text != null && text.contains("did"))
+				log.setProperty("logHash", "null");
+			else
+				log.setProperty("logText", "null");
+			datastore.put(log);
+		}
+		return Response.ok().build();
+	}
+	
+	@GET
 	@Path("/integrityLogs")
 	public static Response checkLogIntegrity(){
-		Transaction txn = datastore.beginTransaction();
-		Key adminLogs = KeyFactory.createKey("OperationLogs", "Logs");
-		Entity logs = null;
-		try {
-			logs = datastore.get(txn, adminLogs);
-		}catch(EntityNotFoundException e) {
-			
-		}
-		txn.commit();
-		String logText = (String) logs.getProperty("logText");
+		
+		Query q = new Query("OperationLogs").addSort("date", SortDirection.ASCENDING);
+		PreparedQuery pQ = datastore.prepare(q);
+		ArrayList<Entity> list = 
+				new ArrayList<Entity>(pQ.asList(FetchOptions.Builder.withDefaults()));
+		String newLine = "";
 		String hex = "";
-		String[] lineLogs = logText.split("\n");
-		for(int i = 0; i < lineLogs.length; i++) {
-			LOG.info(lineLogs[i]);
-			hex = DigestUtils.sha512Hex(hex+lineLogs[i]+"\n");
-			LOG.info(hex);
+		for(int i = 0; i < list.size(); i++) {
+			newLine = (String) list.get(i).getProperty("logText");
+			newLine.replaceAll("\n", "");
+			if(!newLine.equals("null")) {
+				LOG.info(newLine);
+				hex = DigestUtils.sha512Hex(hex+newLine);
+			}
+				
 		}
 		Transaction txn2 = datastore.beginTransaction();
 		Key adminLogsHash = KeyFactory.createKey("OperationLogs", "LogsHash");
+		Entity logs = null;
 		try {
 			logs = datastore.get(txn2, adminLogsHash);
 		}catch(EntityNotFoundException e) {

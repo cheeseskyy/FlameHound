@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
@@ -72,7 +73,7 @@ public class BackOfficeResource extends HttpServlet {
 	private static final Logger LOG = Logger.getLogger(BackOfficeResource.class.getName());
 	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-
+	
 	public BackOfficeResource() {
 	} // Nothing to be done here...
 
@@ -275,6 +276,9 @@ public class BackOfficeResource extends HttpServlet {
 		@Path("/tag/{ocID}")
 		@Consumes(MediaType.APPLICATION_JSON)
 		public Response tagOccurrency(@PathParam("ocID") String ocID, SessionInfo session) {
+			Response r = ComputationResource.validLogin(session);
+			if(r.getStatus() != 200 || !((String)r.getEntity()).contains("WORKER"))
+				return Response.status(Status.FORBIDDEN).build(); 
 			Transaction txn = datastore.beginTransaction();
 			Key ocKey = KeyFactory.createKey("Occurrency", ocID);
 			try {
@@ -346,7 +350,7 @@ public class BackOfficeResource extends HttpServlet {
 		@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response uploadFileDropbox(byte[] file, @PathParam("extension") String ext) {
-			String uuid = Utilities.generateID();
+			String uuid = UUID.randomUUID().toString();
 			Transaction txn = datastore.beginTransaction();
 			LOG.info("Uploading image");
 			try {

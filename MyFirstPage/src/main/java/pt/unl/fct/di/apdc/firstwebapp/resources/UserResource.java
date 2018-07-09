@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.attribute.UserPrincipalNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
@@ -79,12 +81,11 @@ public class UserResource extends HttpServlet {
 
 	private static DropBoxResource dbIntegration = new DropBoxResource();
 
-	private long lastUpdateEntity = 0;
-	private long lastUpdateStats = 0;
+	private long lastUpdateEntities = 0;
+	private long lastUpdateImages = 0;
 
-	private String username = null;
-	private Entity userEntity = null;
-	private UserStatsData userStats = null;
+	private ConcurrentHashMap<String, byte[]> imageCache = new ConcurrentHashMap<String, byte[]>();
+	private ConcurrentHashMap<String, Entity> entityCache = new ConcurrentHashMap<String, Entity>();
 
 	public UserResource() {
 	} // Nothing to be done here...
@@ -268,6 +269,9 @@ public class UserResource extends HttpServlet {
 			if (r.getStatus() != Response.Status.OK.getStatusCode())
 				return r;
 		}
+		if(imageCache.containsKey(username))
+			return Response.ok(imageCache.get(username)).build();
+		
 		String imageID = "";
 		Key profileKey = KeyFactory.createKey("ProfileImage", username);
 		Entity picture = datastore.get(profileKey);
@@ -285,6 +289,7 @@ public class UserResource extends HttpServlet {
 		try {
 			file = dbIntegration.getFile(name, ext);
 			LOG.info("Found file");
+			imageCache.put(username, file);
 			if (file == null)
 				return Response.status(Status.NOT_FOUND).build();
 		} catch (Exception e) {
@@ -400,12 +405,8 @@ public class UserResource extends HttpServlet {
 			datastore.put(txn2, timeout);
 			txn.commit();
 			txn2.commit();
-			if (this.username == null)
-				this.username = session.username;
-			if (this.userEntity == null || System.currentTimeMillis() - lastUpdateEntity < TTLE) {
-				this.userEntity = user;
-				lastUpdateEntity = System.currentTimeMillis();
-			}
+			if(!entityCache.containsKey(session.username) || System.currentTimeMillis() - lastUpdateEntities > TTLE)
+				entityCache.put(session.username, user);
 
 			return Response.ok(user).build();
 		} catch (EntityNotFoundException e) {
@@ -516,7 +517,7 @@ public class UserResource extends HttpServlet {
 		user.setProperty("user_pwd", DigestUtils.sha512Hex(info.password));
 		datastore.put(txn, user);
 		txn.commit();
-		userEntity = user;
+		entityCache.put(user.getKey().getName(), user);
 		return Response.ok().build();
 	}
 
@@ -545,12 +546,17 @@ public class UserResource extends HttpServlet {
 			return Response.ok(g.toJson(user)).build();
 		}
 		else {
+			
+			if(!entityCache.containsKey(username)) {
 			Key userKey = KeyFactory.createKey("User", username);
-			try {
-				userE = datastore.get(userKey);
-			} catch (EntityNotFoundException e) {
-				return Response.status(Status.NOT_FOUND).build();
-			}
+				try {
+					userE = datastore.get(userKey);
+				} catch (EntityNotFoundException e) {
+					return Response.status(Status.NOT_FOUND).build();
+				}
+			}else
+				userE = entityCache.get(username);
+			
 			String name = (String) userE.getProperty("user_name");
 			String uN = userE.getKey().toString();
 			uN = uN.substring(6, uN.length()-2);

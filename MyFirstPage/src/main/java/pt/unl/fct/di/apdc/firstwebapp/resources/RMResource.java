@@ -52,10 +52,9 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response getReports(@PathParam("repId") String repId, SessionInfo session) {
-			Response r = ut.validAdminLogin(new SessionInfo(session.username, session.tokenId));
-			LOG.info("Getting reports");
-			if(r.getStatus() != 200)
-				return Response.status(Status.FORBIDDEN).build(); 
+			Response r = ComputationResource.validLogin(session);
+			if(r.getStatus() != 200 || !((String) r.getEntity()).contains("ADMIN"))
+				return Response.status(Status.FORBIDDEN).build();
 			
 			if(System.currentTimeMillis() - TTL > lastUpdate)
 				updateCache();
@@ -83,9 +82,9 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response getReportsByReported(@PathParam("reportedUsername") String reportedUsername, SessionInfo session) {
-			Response r = ut.validAdminLogin(new SessionInfo(session.username, session.tokenId));
-			if(r.getStatus() != 200)
-				return Response.status(Status.FORBIDDEN).build(); 
+			Response r = ComputationResource.validLogin(session);
+			if(r.getStatus() != 200 || !((String) r.getEntity()).contains("ADMIN"))
+				return Response.status(Status.FORBIDDEN).build();
 			
 			if(reportedUsername == null)
 				return Response.status(Status.BAD_REQUEST).build();
@@ -108,9 +107,9 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response getReportsByReporter(@PathParam("reporterUsername") String reporterUsername, SessionInfo session) {
-			Response r = ut.validAdminLogin(new SessionInfo(session.username, session.tokenId));
-			if(r.getStatus() != 200)
-				return Response.status(Status.FORBIDDEN).build(); 
+			Response r = ComputationResource.validLogin(session);
+			if(r.getStatus() != 200 || !((String) r.getEntity()).contains("ADMIN"))
+				return Response.status(Status.FORBIDDEN).build();
 			
 			if(reporterUsername == null)
 				return Response.status(Status.BAD_REQUEST).build();
@@ -133,9 +132,9 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response getReportsByOccurrency(@PathParam("ocId") String ocId, SessionInfo session) {
-			Response r = ut.validAdminLogin(new SessionInfo(session.username, session.tokenId));
-			if(r.getStatus() != 200)
-				return Response.status(Status.FORBIDDEN).build(); 
+			Response r = ComputationResource.validLogin(session);
+			if(r.getStatus() != 200 || !((String) r.getEntity()).contains("ADMIN"))
+				return Response.status(Status.FORBIDDEN).build();
 			
 			if(ocId == null)
 				return Response.status(Status.BAD_REQUEST).build();
@@ -192,7 +191,10 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 		@DELETE
 		@Consumes(MediaType.APPLICATION_JSON)
 		public Response deleteReport(@PathParam("repID") String repID, SessionInfo session) {
-			if(ut.validAdminLogin(session).getStatus() == 200) {
+			Response r = ComputationResource.validLogin(session);
+			if(r.getStatus() != 200 || !((String) r.getEntity()).contains("ADMIN"))
+				return Response.status(Status.FORBIDDEN).build();
+			
 				listCache.remove(repID);
 				Transaction txn = datastore.beginTransaction();
 				LOG.info("Deleting report with id: " + repID);
@@ -202,8 +204,5 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 				LOG.info("Report Deleted");
 				IntegrityLogsResource.insertNewLog(LogOperation.Delete, new String[]{repID}, LogType.Report, session.username);
 				return Response.ok().build();
-			}
-			else
-				return Response.status(Status.FORBIDDEN).build();
 		}
 	}

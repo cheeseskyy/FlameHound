@@ -32,7 +32,8 @@ public class OMResource {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response confirmOccurrency(@PathParam("ocID") String ocID, SessionInfo session) {
-		if(ut.validAdminLogin(session).getStatus() == 200 || ut.validModeratorLogin(session).getStatus() == 200)
+		Response r = ComputationResource.validLogin(session);
+		if(r.getStatus() == 200 && ((String) r.getEntity()).contains("ADMIN"))
 			return OccurrencyManagement.confirmOccurrency(datastore, ocID, LOG, session);
 		else
 			return Response.status(Status.FORBIDDEN).build();
@@ -42,7 +43,8 @@ public class OMResource {
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteOccurrency(@PathParam("ocID") String ocID, SessionInfo session) {
-		if(ut.validAdminLogin(session).getStatus() == 200)
+		Response r = ComputationResource.validLogin(session);
+		if(r.getStatus() == 200 && ((String) r.getEntity()).contains("ADMIN"))
 			return OccurrencyManagement.deleteOccurrency(datastore, ocID, LOG, session);
 		else
 			return Response.status(Status.FORBIDDEN).build();
@@ -52,7 +54,8 @@ public class OMResource {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateOccurrency(@PathParam("ocID") String ocID, OccurrencyUpdateData info) {
-		if(ut.validAdminLogin(new SessionInfo(info.username, info.tokenId)).getStatus() == 200)
+		Response r = ComputationResource.validLogin(new SessionInfo(info.username, info.tokenId));
+		if(r.getStatus() == 200 && ((String) r.getEntity()).contains("ADMIN"))
 			return OccurrencyManagement.updateOccurrency(info, datastore, ocID, LOG);
 		else
 			return Response.status(Status.FORBIDDEN).build();
