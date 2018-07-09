@@ -49,13 +49,12 @@ export class CommentList extends Component{
         return(
             <div className="CommentList">
                 <div id="mainComment">
-                    <div id="authorLogo" >
+
                         <Link to={"/profile/" + this.props.user}><ProfileImage user={this.props.user}/></Link>
-                    </div>
-                    <div style = {{display: "inline", verticalAlign: "middle"}}>
+                    <div style = {{textAlign:"center"}}>
                          {this.props.description? this.props.description:"Main Comment Text"}
                     </div>
-                    <div id="commentButtons">
+                    <div id="commentButtons" style={{textAlign:"center"}}>
                         <button>+1</button>
                         <button>-1</button>
                         <button>report</button>
@@ -127,8 +126,8 @@ export class AddCommentBox extends Component{
 
     render(){
         return(
-            <div>
-                <input id={"newCommentInput"} type={"text"} onKeyPress={this.sendComment}/>
+            <div id="newComment" style={{textAlign:"center"}}>
+                <input id={"newCommentInput"} style={{padding:"20px 40px"}} type={"text"} onKeyPress={this.sendComment}/>
             </div>
         )
     }
