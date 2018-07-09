@@ -43,6 +43,7 @@ import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.gson.Gson;
 
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.RegisterData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 
 @Path("/utils")

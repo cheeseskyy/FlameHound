@@ -153,7 +153,7 @@ public class RegisterResource extends HttpServlet{
 			datastore.put(txn2, userStatsE);
 			txn2.commit();
 			
-			sendConfirmationEmail(data);
+			//sendConfirmationEmail(data);
 			return Response.ok().entity(g.toJson(new MessageData("Success"))).build();
 		} finally {
 			if (txn.isActive() ) {
