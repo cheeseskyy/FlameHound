@@ -1,0 +1,62 @@
+#entityTitle{
+
+}
+
+.EntityPage{
+    margin: auto;
+    background-color: white;
+    width: 855px;
+}
+
+#coverImage{
+    width: 851px;
+    height: 315px;
+    border: black solid 0.5px;
+}
+
+#nameTitle{
+    padding-left: 10px;
+    border-bottom: solid black 0.5px;
+}
+
+#entityDescription{
+    display: inline-block;
+    vertical-align: top;
+    width: 651px;
+    height: 200px;
+    border:solid black 0.5px;
+    border-left: none;
+}
+
+#entityLogo{
+    width: 200px;
+    height: 200px;
+    display: inline-block;
+    border: solid black 0.5px;
+    vertical-align: top;
+}
+
+#entityBody{
+    height: calc(100vh - (200px + 315px));
+    overflow: hidden;
+}
+
+#aboutUs{
+    height: 100%;
+}
+
+#statistics{
+    display: inline-block;
+    width: 200px;
+    height: 40vh;
+    float:left;
+    border: solid black 0.5px;
+}
+
+#treatedOccurrences{
+    display: inline-block;
+    border: solid black 0.5px;
+    width: 651px;
+    height: 100%;
+    overflow-y: scroll;
+}
