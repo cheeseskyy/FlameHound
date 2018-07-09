@@ -177,6 +177,7 @@ public class ViewCommentFragment extends Fragment {
     private void onPostExecute() {
         mComments.add(newCommentObj);
         commentListAdapter.notifyDataSetChanged();
+        Toast.makeText(getActivity(), "Comment: " + newCommentObj.getComment() + " added.", Toast.LENGTH_SHORT).show();
     }
 
     private void onCancelled(VolleyError error) {
