@@ -158,6 +158,8 @@ public class SearchBar extends AppCompatActivity {
                 String description;
                 String flag;
                 String address = "";
+                String worker;
+                String id;
                 JSONArray imageArray;
                 Geocoder geocoder = new Geocoder(getBaseContext(), Locale.getDefault());
 
@@ -169,7 +171,10 @@ public class SearchBar extends AppCompatActivity {
                 user = jsonObject.getString("user");
                 type = jsonObject.getString("type");
                 flag = jsonObject.getString("flag");
+                worker = jsonObject.getString("worker");
+                id = jsonObject.getString("id");
                 imageArray = jsonObject.getJSONArray("mediaURI");
+
                 List<Address> addresses = geocoder.getFromLocation(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]), 1);
 
                 if (addresses.size() > 0)
@@ -179,7 +184,7 @@ public class SearchBar extends AppCompatActivity {
                 for (int j = 0; j < imageArray.length(); j++)
                     images.add((String) imageArray.get(0));
 
-                occurrencys.add(new OcurrenceData(title, description, user, address, type, images, flag));
+                occurrencys.add(new OcurrenceData(title, description, user, address, type, images, flag, id, worker));
                 lstSource.add(title);
                 System.out.println(i);
             }
@@ -245,6 +250,11 @@ public class SearchBar extends AppCompatActivity {
                 intent.putExtra(OccurrenceDetailFragment.ARG_ITEM_ID, occurrencys.get(position).title);
                 intent.putExtra(OccurrenceDetailFragment.ARG_CONTENT, occurrencys.get(position).description);
                 intent.putExtra(OccurrenceDetailFragment.ARG_IMAGE, occurrencys.get(position).mediaURI.get(0));
+                intent.putExtra(OccurrenceDetailFragment.ARG_OWNER, occurrencys.get(position).user);
+                intent.putExtra(OccurrenceDetailFragment.ARG_ID, occurrencys.get(position).id);
+                intent.putExtra(OccurrenceDetailFragment.ARG_FLAG, occurrencys.get(position).flag.toString());
+                intent.putExtra(OccurrenceDetailFragment.ARG_TYPE , occurrencys.get(position).type.toString());
+                intent.putExtra(OccurrenceDetailFragment.ARG_WORKER, occurrencys.get(position).worker);
 
                 startActivity(intent);
             }

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -55,10 +57,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
+import typeClasses.OcurrenceData;
 import typeClasses.UniversalImageLoader;
 
 import static java.security.AccessController.getContext;
@@ -93,6 +99,7 @@ public class HomePage extends AppCompatActivity
     String[] ocurrencys = new String[20];
     String[] result = null;
     private Context mContext =HomePage.this;
+    private ArrayList<OcurrenceData> ocurrencysObjs;
 
 
     @Override
@@ -107,6 +114,7 @@ public class HomePage extends AppCompatActivity
         titles = new ArrayList<>();
         images = new ArrayList<>();
         descriptions = new ArrayList<>();
+        ocurrencysObjs = new ArrayList<>();
         markers = new HashMap<>();
         requestQueue = new RequestQueue(cache, network);
         requestQueue.start();
@@ -337,11 +345,16 @@ public class HomePage extends AppCompatActivity
         map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                int pos = markers.get(marker);
+                int position = markers.get(marker);
                 Intent intent = new Intent(getBaseContext(), OccurrenceDetailActivity.class);
-                intent.putExtra(OccurrenceDetailFragment.ARG_ITEM_ID, marker.getTitle());
-                intent.putExtra(OccurrenceDetailFragment.ARG_CONTENT, descriptions.get(pos));
-                intent.putExtra(OccurrenceDetailFragment.ARG_IMAGE,images.get(pos));
+                intent.putExtra(OccurrenceDetailFragment.ARG_ITEM_ID, ocurrencysObjs.get(position).title);
+                intent.putExtra(OccurrenceDetailFragment.ARG_CONTENT, ocurrencysObjs.get(position).description);
+                intent.putExtra(OccurrenceDetailFragment.ARG_IMAGE, ocurrencysObjs.get(position).mediaURI.get(0));
+                intent.putExtra(OccurrenceDetailFragment.ARG_OWNER, ocurrencysObjs.get(position).user);
+                intent.putExtra(OccurrenceDetailFragment.ARG_ID, ocurrencysObjs.get(position).id);
+                intent.putExtra(OccurrenceDetailFragment.ARG_FLAG, ocurrencysObjs.get(position).flag.toString());
+                intent.putExtra(OccurrenceDetailFragment.ARG_TYPE , ocurrencysObjs.get(position).type.toString());
+                intent.putExtra(OccurrenceDetailFragment.ARG_WORKER, ocurrencysObjs.get(position).worker);
 
                 startActivity(intent);
 
@@ -467,40 +480,62 @@ public class HomePage extends AppCompatActivity
     private void onPostExecute(JSONArray finalResponse) {
 
         for (int i = 0; i < finalResponse.length(); i++) {
-            String[] coord = null;
-            String title = null;
+            String[] coord;
+            String user;
+            String title;
+            String type;
             String description;
             String mediaURI = "";
+            String flag;
+            String address = "";
+            String worker;
+            String id;
+            JSONArray imageArray;
+            Geocoder geocoder = new Geocoder(getBaseContext(), Locale.getDefault());
             try {
-                JSONArray imageArray;
                 JSONObject jsonObject = finalResponse.getJSONObject(i);
                 ocurrencys[i] = finalResponse.getJSONObject(i).toString();
                 System.out.println(ocurrencys[i]);
                 coord = jsonObject.getString("location").split(",");
-
                 LatLng current = new LatLng(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]));
                 title = jsonObject.getString("title");
                 description = jsonObject.getString("description");
+                user = jsonObject.getString("user");
+                type = jsonObject.getString("type");
+                flag = jsonObject.getString("flag");
+                worker = jsonObject.getString("worker");
+                id = jsonObject.getString("id");
                 imageArray = jsonObject.getJSONArray("mediaURI");
 
-                mediaURI = ((String) imageArray.get(0));
-                System.out.println(mediaURI);
+                List<Address> addresses = geocoder.getFromLocation(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]), 1);
+
+                if (addresses.size() > 0)
+                    address = addresses.get(0).getAddressLine(0);
+
+                List<String> images = new ArrayList<>();
+                for (int j = 0; j < imageArray.length(); j++)
+                    images.add((String) imageArray.get(0));
+
+                ocurrencysObjs.add(new OcurrenceData(title, description, user, address, type, images, flag, id, worker));
+
+
 
                 latlngs.add(current);
                 titles.add(title);
                 descriptions.add(description);
-                images.add(mediaURI);
             } catch (JSONException e) {
                 onCancelled(e);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-        System.out.println(titles.size() + " " + latlngs.size());
+        System.out.println(titles.size() + " " + latlngs.size() + "" + ocurrencysObjs.size());
         for (int j = 0; j < latlngs.size(); j++) {
 
             LatLng newMarker = latlngs.get(j);
             MarkerOptions initialMarkerOptions = new MarkerOptions();
             initialMarkerOptions.position(newMarker);
-            initialMarkerOptions.title(titles.get(j));
+            initialMarkerOptions.title(ocurrencysObjs.get(j).title);
             Marker marker = map.addMarker(initialMarkerOptions);
             markers.put(marker, j);
             //map.animateCamera(CameraUpdateFactory.newLatLngZoom(newMarker, 10));
