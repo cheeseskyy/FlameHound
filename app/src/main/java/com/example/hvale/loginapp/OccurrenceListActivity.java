@@ -123,10 +123,15 @@ public class OccurrenceListActivity extends AppCompatActivity {
                     arguments.putString(OccurrenceDetailFragment.ARG_ITEM_ID, item.title);
                     arguments.putString(OccurrenceDetailFragment.ARG_CONTENT, item.description);
                     arguments.putString(OccurrenceDetailFragment.ARG_IMAGE, item.mediaURI.get(0));
+                    arguments.putString(OccurrenceDetailFragment.ARG_OWNER, item.user);
+                    arguments.putString(OccurrenceDetailFragment.ARG_ID, item.id);
+                    arguments.putString(OccurrenceDetailFragment.ARG_FLAG, item.flag.toString());
+                    arguments.putString(OccurrenceDetailFragment.ARG_TYPE , item.type.toString());
+                    arguments.putString(OccurrenceDetailFragment.ARG_WORKER, item.worker);
                     OccurrenceDetailFragment fragment = new OccurrenceDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.occurence_detail_container, fragment)
+                            .replace(R.id.occurence_detail_container, fragment).addToBackStack(String.valueOf((R.string.list_to_detail_fragment)))
                             .commit();
                 } else {
 
@@ -134,7 +139,12 @@ public class OccurrenceListActivity extends AppCompatActivity {
                     Intent intent = new Intent(context, OccurrenceDetailActivity.class);
                     intent.putExtra(OccurrenceDetailFragment.ARG_ITEM_ID, item.title);
                     intent.putExtra(OccurrenceDetailFragment.ARG_CONTENT, item.description);
+                    intent.putExtra(OccurrenceDetailFragment.ARG_OWNER,item.user);
                     intent.putExtra(OccurrenceDetailFragment.ARG_IMAGE,item.mediaURI.get(0));
+                    intent.putExtra(OccurrenceDetailFragment.ARG_ID,item.id);
+                    intent.putExtra(OccurrenceDetailFragment.ARG_FLAG, item.flag.toString());
+                    intent.putExtra(OccurrenceDetailFragment.ARG_TYPE,item.type.toString());
+                    intent.putExtra(OccurrenceDetailFragment.ARG_WORKER, item.worker);
 
                     context.startActivity(intent);
                 }
@@ -231,6 +241,8 @@ public class OccurrenceListActivity extends AppCompatActivity {
                 String description;
                 String flag;
                 String address = "";
+                String id;
+                String worker;
                 JSONArray imageArray;
                 Geocoder geocoder = new Geocoder(getBaseContext(), Locale.getDefault());
 
@@ -243,6 +255,8 @@ public class OccurrenceListActivity extends AppCompatActivity {
                 type = jsonObject.getString("type");
                 flag = jsonObject.getString("flag");
                 imageArray = jsonObject.getJSONArray("mediaURI");
+                id = jsonObject.getString("id");
+                worker= jsonObject.getString("worker");
                 List<Address> addresses = geocoder.getFromLocation(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]), 1);
 
                 if (addresses.size() > 0)
@@ -252,7 +266,7 @@ public class OccurrenceListActivity extends AppCompatActivity {
                 for (int j = 0; j < imageArray.length(); j++)
                     images.add((String) imageArray.get(0));
 
-                ocurrencys.add(new OcurrenceData(title, description, user, address, type, images, flag));
+                ocurrencys.add(new OcurrenceData(title, description, user, address, type, images, flag,id,worker));
 
             }
         } catch (JSONException e) {

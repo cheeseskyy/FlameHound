@@ -1,6 +1,11 @@
 package typeClasses;
 
-public class Comments {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.io.Serializable;
+
+public class Comments implements Serializable {
 
     private String comment;
     private String user;
@@ -32,4 +37,6 @@ public class Comments {
     public String getDate_created() {
         return date_created;
     }
-}
+
+    }
+

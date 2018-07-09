@@ -41,12 +41,18 @@
     <string name="prompt_username">Username</string>
     <string name="email_in_use">Email already in use.</string>
     <string name="unable_to_register">Register Failed</string>
-    <string name="userName_Email_used">Username or email already in use.</string>
-    <string name="title_activity_register">Sign Up</string>
-    <string name="title_occurence_list">Occurences</string>
-    <string name="title_occurence_detail">Occurence Detail</string>
-    <string name="invalid_username">Invalid Username</string>
-    <string name="required_params">Please fill all fields</string>
-    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="userName_Email_used" translatable="false">Username or email already in use.</string>
+    <string name="title_activity_register" translatable="false">Sign Up</string>
+    <string name="title_occurence_list" translatable="false">Occurences</string>
+    <string name="title_occurence_detail" translatable="false">Occurence Detail</string>
+    <string name="invalid_username" translatable="false">Invalid Username</string>
+    <string name="required_params" translatable="false">Please fill all fields</string>
+    <string name="title_activity_profile" translatable="false">ProfileActivity</string>
+    <string name="view_fragment_comments" translatable="false">View Comments</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="title_activity_comment" translatable="false">CommentActivity</string>
+    <string name="list_to_detail_fragment" translatable="false">occurencedetail fragment</string>
 
 </resources>

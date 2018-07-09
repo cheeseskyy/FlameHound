@@ -1,6 +1,6 @@
 package typeClasses;
 
     public enum OcurrencyFlags {
-        unconfirmed, confirmed, solving
+        unconfirmed, confirmed, solving,solved
     }
 
