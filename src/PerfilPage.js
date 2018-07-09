@@ -138,6 +138,8 @@ export class PerfilPage extends Component{
 
     }
 
+    isHimself = true;
+
     componentDidMount(){
         //request Occurrences
         this.getOccurrences();
@@ -145,7 +147,7 @@ export class PerfilPage extends Component{
         this.getInfo();
     }
 
-    isHimself = true;
+
 
     request = "/occurrency/getByUser/"; //{username}
 
@@ -162,7 +164,27 @@ export class PerfilPage extends Component{
         }
     };
 
+    workerOcs = () => {
+        if(this.state.info.role === "WORKER" && this.state.workerInfo.occurrencies){
+            return(<div>
+                <h3 style={{textAlign: "center"}}>Ocorrências tratadas: </h3>;
+                {
+                    this.state.workerInfo.occurrencies.map(occurrence => {
+                    return <OccurrencePreview key={""} id={occurrence.id} title={occurrence.title} user={occurrence.user}
+                    description={occurrence.description}
+                    image={occurrence.mediaURI}
+                    />
+                    })
+                }
+            </div>
+            )
+        }
+    }
+
     render(){
+
+        this.isHimself = (sessionStorage.getItem("sessionUsername") === this.props.id);
+
         return(
             <div className="perfilPage">
 
@@ -173,7 +195,7 @@ export class PerfilPage extends Component{
                 </div>
 
                 <div id="sobreMim">
-                    <h3 style={{textAlign: "center"}}>Info About Me! :) </h3>
+                    <h3 style={{textAlign: "center"}}>Sobre mim </h3>
                     <Link to={"/profile/changeProfile"}></Link>
                     <p style={{paddingLeft: "5px"}}>Nome: </p>
                     <p style={{paddingLeft: "5px"}}>Username:</p>
@@ -192,7 +214,7 @@ export class PerfilPage extends Component{
                 </div>
 
                 <div id="minhasOcurrencias">
-                    <h3 style={{textAlign: "center"}}>Minha Lista de Ocorrências </h3>
+                    <h3 style={{textAlign: "center"}}>Ocorrências Criadas: </h3>
                     <div id="occurrenceList">
 
                         {
@@ -204,9 +226,10 @@ export class PerfilPage extends Component{
 
                             })
                         }
-                        </div>
+                        {this.workerOcs()}
                     </div>
                 </div>
+            </div>
         );
     }
 }

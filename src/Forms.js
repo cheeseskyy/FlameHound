@@ -25,7 +25,9 @@ function getCodedAddress(xhttp, mediaURI, username) {
         "user": username,
         "location": JSON.stringify(sessionStorage.getItem("selectedLocation").substring(1)),
         "type": document.getElementById("type").value,
-        "mediaURI": [mediaURI]
+        "mediaURI": [mediaURI],
+        "array" : "false",
+        "flag": "unconfirmed"
     });
     sessionStorage.removeItem("selectedLocation");
     xhttp.send(jSonInfo);

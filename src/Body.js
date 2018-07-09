@@ -89,7 +89,7 @@ const About = () =>
         <br/>
 
         <div id="text">
-            <p> Somos uma equipa que ao longo de vários meses, aceitou o desafio de desafio de desenvolver um
+            <p> Somos uma equipa que ao longo de vários meses, aceitou o desafio de desenvolver um
                 site web com uma componente móvel para indicação das zonas a limpar com uma forte componente
                 social.</p>
             <p> Todos nós sabemos como os incêndios assolaram Portugal no ano de 2017, com um registo mortal
