@@ -184,6 +184,12 @@ class NavPanel extends Component {
         }
     }
 
+    logsLink= () => {
+        if(sessionStorage.getItem("userRole") === "ADMIN"){
+            return (<p><Link to={"/admin/logs"}>Registos</Link></p>)
+        }
+    };
+
     render() {
 
         const panel =
@@ -195,7 +201,7 @@ class NavPanel extends Component {
                                <p><Link to={"/admin/users"}>Utilizadores</Link></p>
                                <p><Link to={"/admin/occurrences"}>Ocorrências</Link></p>
                                <p><Link to={"/admin/reports"}>Denúncias</Link></p>
-                               <p><Link to={"/admin/logs"}>Registos</Link></p>
+                               {this.logsLink()}
                                <p><Link to="/" onClick={() =>
                                    this.logout()}>Logout </Link></p>
                            </div>

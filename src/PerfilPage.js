@@ -87,7 +87,7 @@ export class PerfilPage extends Component{
                             logo: this.state.logo,
                             occurrences: this.state.occurrences,
                             info: JSON.parse(xhttp.response),
-                            stats: this.state.info,
+                            stats: this.state.stats,
                             workerInfo: this.state.workerInfo
                         }
                     );
@@ -124,7 +124,7 @@ export class PerfilPage extends Component{
                             logo: this.state.logo,
                             occurrences: this.state.occurrences,
                             info: this.state.info,
-                            stats: this.state.info,
+                            stats: this.state.stats,
                             workerInfo: JSON.parse(xhttp.response)
                         }
                     )
@@ -150,7 +150,7 @@ export class PerfilPage extends Component{
     request = "/occurrency/getByUser/"; //{username}
 
     workerStats = () => {
-        if(sessionStorage.getItem("userRole") === "WORKER"){
+        if(this.state.info.role === "WORKER"){
             return(
                 <div id={"workerStats"}>
                     <h3 style={{textAlign: "center"}}>Estatísticas de Trabalhador:</h3>

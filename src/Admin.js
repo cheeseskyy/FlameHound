@@ -64,6 +64,14 @@ export class AdminArea extends Component{
         this.getRole();
     }
 
+    logsLink = () => {
+        if(sessionStorage.getItem("userRole") === "ADMIN"){
+            return (<Route path={"/admin/logs"}>
+                <Logs/>
+            </Route>)
+        }
+    };
+
     render(){
 
         this.verifyAdmin();
@@ -345,12 +353,18 @@ class Logs extends Component{
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () =>  {
-            if (xhttp.readyState === 4 && xhttp.status === 200) {
-                console.log("Got logs");
-                const logs = JSON.parse(xhttp.response);
-                console.log("Response in function: ");
-                console.log(logs);
-                this.setState({logs: logs});
+            if (xhttp.readyState === 4) {
+                if(xhttp.status === 200) {
+                    console.log("Got logs");
+                    const logs = JSON.parse(xhttp.response);
+                    console.log("Response in function: ");
+                    console.log(logs);
+                    this.setState({logs: logs});
+                }
+                else if(xhttp.status === 403){
+                    alert("Não tem permissão para aceder a esta página. A redireccionar...");
+                    this.props.history.goBack();
+                }
             }
         };
     }

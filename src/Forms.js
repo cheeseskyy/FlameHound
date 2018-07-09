@@ -7,7 +7,7 @@ function uploadOc(mediaURI, username) {
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/saveOccurrency", true);
     xhttp.setRequestHeader("Content-type", "application/json");
-    getCodedAddress(document.getElementById("location").value, xhttp, mediaURI, username);
+    getCodedAddress( xhttp, mediaURI, username);
     console.log("Sending Occurrence");
     xhttp.onreadystatechange = function () {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
@@ -16,7 +16,7 @@ function uploadOc(mediaURI, username) {
     };
 }
 
-function getCodedAddress(addr, xhttp, mediaURI, username) {
+function getCodedAddress(xhttp, mediaURI, username) {
     var list = [];
     //list.append(mediaURI);
     var jSonInfo = JSON.stringify({
@@ -27,6 +27,7 @@ function getCodedAddress(addr, xhttp, mediaURI, username) {
         "type": document.getElementById("type").value,
         "mediaURI": [mediaURI]
     });
+    sessionStorage.removeItem("selectedLocation");
     xhttp.send(jSonInfo);
 }
 

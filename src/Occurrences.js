@@ -115,7 +115,7 @@ export class OccurrencePreview extends Component {
     solveOc(){
         console.log("Solving Occurrence");
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_bo/_worker/solve/" + this.props.id, true);
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_bo/_worker/solve/" + this.props.id + "/noimage", true);
         xhttp.setRequestHeader("Content-type", "application/json");
         var username = sessionStorage.getItem('sessionUsername');
         var token = sessionStorage.getItem('sessionToken');
