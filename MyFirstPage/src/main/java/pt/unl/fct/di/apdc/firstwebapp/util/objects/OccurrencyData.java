@@ -13,6 +13,7 @@ public class OccurrencyData {
 	public String title;
 	public String description;
 	public OccurrencyFlags flag;
+	public String array;
 	
 	
 	public OccurrencyData() {

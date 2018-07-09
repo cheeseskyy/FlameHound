@@ -15,6 +15,7 @@ public class OccurrencyReadableData {
 	public String description;
 	public OccurrencyFlags flag;
 	public String worker;
+	public String array;
 	
 	public OccurrencyReadableData() {
 		
@@ -34,7 +35,7 @@ public class OccurrencyReadableData {
 	}
 	
 	public OccurrencyReadableData(String id, String title, String description, String user, String location,
-			String type, List<String> mediaURI, String flag, String worker) {
+			String type, List<String> mediaURI, String flag, String worker, String array) {
 		this.id = id;
 		this.title = title;
 		this.description = description;
@@ -44,6 +45,7 @@ public class OccurrencyReadableData {
 		this.mediaURI = mediaURI;
 		this.flag = OccurrencyFlags.valueOf(flag);
 		this.worker = worker;
+		this.array = array;
 	}
 
 

@@ -296,7 +296,11 @@ public class OccurrencyResource extends HttpServlet{
 			occurrency.setProperty("locationLong", coords[1].trim());
 			occurrency.setProperty("type", data.getType().toString());
 			occurrency.setProperty("creationTime", System.currentTimeMillis());
-			if(data.getMediaURI() != null && data.getMediaURI().size() > 0)
+			if(data.array == null || data.array.equals(""))
+				occurrency.setProperty("array", "false");
+			else
+				occurrency.setProperty("array", data.array);
+			if(data.getMediaURI() != null && data.getMediaURI().size() > 0 && !data.getMediaURI().get(0).equals(""))
 				occurrency.setProperty("imagesID", data.getMediaURI());
 			else {
 				List<String> mUri= data.mediaURI;
@@ -381,6 +385,30 @@ public class OccurrencyResource extends HttpServlet{
 		}
 	}
 		return Response.ok(g.toJson(uuid+"."+ext)).build();
+	}
+	
+	@POST
+	@Path("/saveOcCoords/{ocId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response saveOccurrencyCoordArray(String[] points, @PathParam("ocId") String ocId) {
+		Key ocCoordsKey = KeyFactory.createKey("OcurrencyCoordsArray", ocId);
+		Entity coords = new Entity(ocCoordsKey);
+		coords.setProperty("coords", points);
+		datastore.put(coords);
+		return Response.ok(new MessageData("OK")).build();
+	}
+	
+	@GET
+	@Path("/getOcCoords/{ocId}")
+	public Response getOccurrencyCoordArray(@PathParam("ocId") String ocId) {
+		Key ocCoordsKey = KeyFactory.createKey("OcurrencyCoordsArray", ocId);
+		try {
+			Entity ocCoords = datastore.get(ocCoordsKey);
+			String[] coords = (String[]) ocCoords.getProperty("coords");
+			return Response.ok(g.toJson(coords)).build();
+		}catch(EntityNotFoundException e) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
 	}
 	
 	@POST
@@ -489,7 +517,8 @@ public class OccurrencyResource extends HttpServlet{
 				(String)ocurrency.getProperty("type"),
 				(List<String>) ocurrency.getProperty("imagesID"),
 				(String) ocurrency.getProperty("flag"),
-				(String) ocurrency.getProperty("worker"));
+				(String) ocurrency.getProperty("worker"),
+				(String) ocurrency.getProperty("array"));
 		return oc;
 	}
 }
