@@ -318,7 +318,7 @@ public class UserResource extends HttpServlet {
 			occurrencyStats = updateStats(operation, occurrencyStats);
 			datastore.put(txn, occurrencyStats);
 			txn.commit();
-			return Response.ok().build();
+			return Response.ok(new MessageData("OK")).build();
 		} catch (EntityNotFoundException e) {
 			Entity occurrencyStats = new Entity(ocStatsKey);
 			occurrencyStats.setProperty("user", username);
@@ -327,7 +327,7 @@ public class UserResource extends HttpServlet {
 			occurrencyStats = updateStats(operation, occurrencyStats);
 			datastore.put(txn, occurrencyStats);
 			txn.commit();
-			return Response.ok().build();
+			return Response.ok(new MessageData("OK")).build();
 		} catch (Exception e) {
 			LOG.info(e.getMessage());
 			LOG.warning(e.getLocalizedMessage());
@@ -390,7 +390,7 @@ public class UserResource extends HttpServlet {
 
 			Key timeoutKey = KeyFactory.createKey("timeout", session.username);
 			LOG.info("Got timeoutKey");
-			Entity timeout = datastore.get(txn2, timeoutKey);
+			Entity timeout = datastore.get(timeoutKey);
 			LOG.info("Got Timeout");
 			long lastOp = (long) timeout.getProperty("lastOp");
 			LOG.info("timeout is Long");
@@ -406,7 +406,6 @@ public class UserResource extends HttpServlet {
 			}
 			LOG.info("Didn't time out");
 			timeout.setProperty("lastOp", System.currentTimeMillis());
-			datastore.put(txn2, timeout);
 			txn.commit();
 			txn2.commit();
 			if(!entityCache.containsKey(session.username) || System.currentTimeMillis() - lastUpdateEntities > TTLE)
@@ -546,7 +545,8 @@ public class UserResource extends HttpServlet {
 			String add = (String) userE.getProperty("address");
 			String nif = (String) userE.getProperty("nif");
 			String cc = (String) userE.getProperty("cc");
-			UserInfo user = new UserInfo(name,uN,email,hN,pN,add,nif,cc);
+			String role = (String) userE.getProperty("role");
+			UserInfo user = new UserInfo(name,uN,email,hN,pN,add,nif,cc, role);
 			return Response.ok(g.toJson(user)).build();
 		}
 		else {
@@ -570,7 +570,8 @@ public class UserResource extends HttpServlet {
 			String add = (String) userE.getProperty("address");
 			String nif = (String) userE.getProperty("nif");
 			String cc = (String) userE.getProperty("cc");
-			UserInfo user = new UserInfo(name,uN,email,hN,pN,add,nif,cc);
+			String role = (String) userE.getProperty("role");
+			UserInfo user = new UserInfo(name,uN,email,hN,pN,add,nif,cc, role);
 			return Response.ok(g.toJson(user)).build();
 		}
 	}

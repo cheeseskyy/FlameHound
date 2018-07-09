@@ -53,7 +53,8 @@ public class UMResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUsers(@PathParam("userId") String userId, SessionInfo session) {
 		Response r = ComputationResource.validLogin(session);
-		if(r.getStatus() != 200 || !((String) r.getEntity()).contains("ADMIN"))
+		if(r.getStatus() != 200 || (!((String) r.getEntity()).contains("ADMIN") 
+				&& !((String) r.getEntity()).contains("MODERATOR")))
 			return Response.status(Status.FORBIDDEN).build();
 		
 		if(System.currentTimeMillis() - TTL > lastUpdate)
@@ -99,7 +100,8 @@ public class UMResource {
 				(String)user.getProperty("phoneNumber"),
 				(String)user.getProperty("address"),
 				(String)user.getProperty("nif"),
-				(String)user.getProperty("cc")
+				(String)user.getProperty("cc"),
+				(String)user.getProperty("role")
 				);
 	}
 
@@ -107,9 +109,10 @@ public class UMResource {
 	@Path("/delete/{userId}")
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response deleteReport(@PathParam("userId") String userId, SessionInfo session) {
+	public Response deleteUser(@PathParam("userId") String userId, SessionInfo session) {
 		Response r = ComputationResource.validLogin(session);
-		if(r.getStatus() != 200 || !((String) r.getEntity()).contains("ADMIN"))
+		if(r.getStatus() != 200 || (!((String) r.getEntity()).contains("ADMIN") 
+				&& !((String) r.getEntity()).contains("MODERATOR")))
 			return Response.status(Status.FORBIDDEN).build();
 		
 			listCache.remove(userId);

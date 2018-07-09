@@ -31,7 +31,8 @@ public class OccurrencyManagement {
 			LOG.info("Attempt to get ocurrency: " + ocID);
 			Entity occurrency = datastore.get(txn, ocKey);
 			LOG.info("Got occurrency");
-			occurrency.setProperty("flag", OccurrencyFlags.confirmed.toString());
+			if(((String)occurrency.getProperty("flag")).equals("unconfirmed"))
+				occurrency.setProperty("flag", OccurrencyFlags.confirmed.toString());
 			datastore.put(txn, occurrency);
 			txn.commit();
 			LOG.info("Commited");

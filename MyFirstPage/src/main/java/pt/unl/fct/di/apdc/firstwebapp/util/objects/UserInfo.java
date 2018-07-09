@@ -11,13 +11,14 @@ public class UserInfo {
 	public String address;
 	public String nif;
 	public String cc;
+	public String role;
 	
 	public UserInfo() {
 
 	}
 
 	public UserInfo(String name, String username, String email, String homeNumber, String phoneNumber,
-			String address, String nif, String cc) {
+			String address, String nif, String cc, String role) {
 		this.name = name;
 		this.username = username;
 		this.email = email;
@@ -26,5 +27,6 @@ public class UserInfo {
 		this.address = address;
 		this.nif = nif;
 		this.cc = cc;
+		this.role = role;
 	}
 }

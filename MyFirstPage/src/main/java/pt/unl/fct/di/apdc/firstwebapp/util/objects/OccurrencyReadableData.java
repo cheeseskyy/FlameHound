@@ -33,7 +33,9 @@ public class OccurrencyReadableData {
 		this.worker = worker;
 	}
 	
-	public OccurrencyReadableData(String title, String description, String user, String location, String type, List<String> mediaURI, String flag, String worker) {
+	public OccurrencyReadableData(String id, String title, String description, String user, String location,
+			String type, List<String> mediaURI, String flag, String worker) {
+		this.id = id;
 		this.title = title;
 		this.description = description;
 		this.user = user;

@@ -488,6 +488,7 @@ public class OccurrencyResource extends HttpServlet{
 				coordinates,
 				(String)ocurrency.getProperty("type"),
 				(List<String>) ocurrency.getProperty("imagesID"),
+				(String) ocurrency.getProperty("flag"),
 				(String) ocurrency.getProperty("worker"));
 		return oc;
 	}

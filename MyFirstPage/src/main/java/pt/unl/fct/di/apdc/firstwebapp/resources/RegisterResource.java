@@ -126,7 +126,10 @@ public class RegisterResource extends HttpServlet{
 			Entity user = new Entity("User", data.username);
 			user.setProperty("user_name", data.name);
 			user.setProperty("email", data.email);
-			user.setProperty("role", data.role);
+			if(data.role == null || data.role.equals(""))
+				user.setProperty("role", "USER");
+			else
+				user.setProperty("role", data.role);
 			user.setProperty("homeNumber", data.homeNumber);
 			user.setProperty("phoneNumber", data.phoneNumber);
 			user.setProperty("address", data.address);

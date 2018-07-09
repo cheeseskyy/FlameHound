@@ -95,7 +95,7 @@ public class ComputationResource {
 
 			Key timeoutKey = KeyFactory.createKey("timeout", session.username);
 			LOG.info("Got timeoutKey");
-			Entity timeout = datastore.get(txn2, timeoutKey);
+			Entity timeout = datastore.get(timeoutKey);
 			LOG.info("Got Timeout");
 			long lastOp = (long) timeout.getProperty("lastOp");
 			LOG.info("timeout is Long");
@@ -111,7 +111,7 @@ public class ComputationResource {
 			}
 			LOG.info("Didn't time out");
 			timeout.setProperty("lastOp", System.currentTimeMillis());
-			datastore.put(txn2, timeout);
+			datastore.put(timeout);
 			txn.commit();
 			txn2.commit();
 			validLogin = System.currentTimeMillis();
@@ -141,25 +141,6 @@ public class ComputationResource {
 	public Response getCurrentTime() {
 		LOG.fine("Replying to date request.");
 		return Response.ok().entity(g.toJson(fmt.format(new Date()))).build();
-	}
-	
-	@GET
-	@Path("/solveLogs")
-	public static Response solveLogs() {
-		Query q = new Query("OperationLogs");
-		PreparedQuery pQ = datastore.prepare(q);
-		ArrayList<Entity> list = new ArrayList<Entity>(pQ.asList(FetchOptions.Builder.withDefaults()));
-		for(int i = 0; i<list.size(); i++) {
-			Entity log = list.get(i);
-			log.setProperty("date", System.currentTimeMillis() + i);
-			String text = (String)log.getProperty("logText");
-			if(text != null && text.contains("did"))
-				log.setProperty("logHash", "null");
-			else
-				log.setProperty("logText", "null");
-			datastore.put(log);
-		}
-		return Response.ok().build();
 	}
 	
 	@GET

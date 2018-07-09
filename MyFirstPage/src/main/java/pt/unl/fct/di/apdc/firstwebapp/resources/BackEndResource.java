@@ -1,8 +1,10 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -28,8 +30,11 @@ import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.api.datastore.Query.SortDirection;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import com.google.gson.Gson;
 
@@ -446,20 +451,26 @@ public class BackEndResource extends HttpServlet {
 		Response r = ComputationResource.validLogin(session);
 		if(r.getStatus() != 200 && !g.fromJson((String) r.getEntity(), String.class).equals("ADMIN"))
 			return r;
-		Transaction txn = datastore.beginTransaction();
-		Key adminLogs = KeyFactory.createKey("OperationLogs", "Logs");
-		String logText = null;
-		try {
-			Entity logs = datastore.get(txn, adminLogs);
-			logText = (String) logs.getProperty("logText");
-			txn.commit();
-		}catch(EntityNotFoundException e) {
-			return Response.status(Status.NOT_FOUND).build();
+		Query q = new Query("OperationLogs").addSort("date", SortDirection.ASCENDING);
+		PreparedQuery pQ = datastore.prepare(q);
+		ArrayList<Entity> list = 
+				new ArrayList<Entity>(pQ.asList(FetchOptions.Builder.withDefaults()));
+		String newLine = "";
+		LinkedList<String> logs = new LinkedList<String>();
+		for(int i = 0; i < list.size(); i++) {
+			newLine = (String) list.get(i).getProperty("logText");
+			if(!newLine.equals("null")) {
+				LOG.info(newLine);
+				logs.addLast(newLine);
+			}
+				
 		}
 		Response integrity = ComputationResource.checkLogIntegrity();
-		if(logText != null && integrity.getStatus() == 200)
-			return Response.ok(new MessageData(logText)).build();
-		else
-			return Response.ok(new MessageData("Logs have been tampered with!\n" + logText)).build();
+		if(logs.size() != 0 && integrity.getStatus() == 200)
+			return Response.ok(g.toJson(logs)).build();
+		else {
+			logs.addFirst("Logs have been tampered with!");
+			return Response.ok(g.toJson(logs)).build();
+		}
 	}
 }

@@ -7,8 +7,8 @@ import pt.unl.fct.di.apdc.firstwebapp.util.Enums.OccurrencyTypes;
 public class OccurrencyData {
 
 	public String user;
-	/*GeoLocation*/ public String location;
-	/*OccurrencyType*/public OccurrencyTypes type;
+	public String location;
+	public OccurrencyTypes type;
 	public List<String> mediaURI;
 	public String title;
 	public String description;

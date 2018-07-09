@@ -73,6 +73,8 @@ public class IntegrityLogsResource {
 		Key adminLogs = KeyFactory.createKey("OperationLogs", "Logs"+System.currentTimeMillis());
 		Entity logs = new Entity(adminLogs);
 		logs.setProperty("logText", newLog);
+		logs.setProperty("logHash", "null");
+		logs.setProperty("date", System.currentTimeMillis());
 		datastore.put(txn,logs);
 		txn.commit();
 
@@ -101,6 +103,8 @@ public class IntegrityLogsResource {
 		Key adminLogs = KeyFactory.createKey("OperationLogs", "Logs"+System.currentTimeMillis());
 		Entity logs = new Entity(adminLogs);
 		logs.setProperty("logText", newLog);
+		logs.setProperty("logHash", "null");
+		logs.setProperty("date", System.currentTimeMillis());
 		datastore.put(txn,logs);
 		txn.commit();
 
@@ -129,6 +133,8 @@ public class IntegrityLogsResource {
 		Key adminLogs = KeyFactory.createKey("OperationLogs", "Logs"+System.currentTimeMillis());
 		Entity logs = new Entity(adminLogs);
 		logs.setProperty("logText", newLog);
+		logs.setProperty("logHash", "null");
+		logs.setProperty("date", System.currentTimeMillis());
 		datastore.put(txn,logs);
 		txn.commit();
 
