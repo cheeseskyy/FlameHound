@@ -4,9 +4,8 @@
     android:layout_height="match_parent">
 
 
-
     <RelativeLayout
-        android:id="@+id/relLayout1"
+        android:id="@+id/commentToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -15,10 +14,10 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/relLayout2"
+        android:id="@+id/commentList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/relLayout1"
+        android:layout_below="@+id/newComment"
         android:layout_marginBottom="60dp">
 
 
@@ -29,11 +28,12 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/relLayout3"
+        android:id="@+id/newComment"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/white_grey_border_top">
+        android:layout_below="@id/commentToolbar"
+        android:background="@drawable/white_grey_border_top"
+        android:backgroundTint="@color/cast_expanded_controller_ad_label_background_color">
 
 
         <EditText
