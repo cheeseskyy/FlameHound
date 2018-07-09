@@ -1,12 +1,61 @@
 import React, {Component} from 'react';
-import "./EntityPage.css";
+import "./WorkerPage.css";
 import placeHolder1 from './images/placeholders/indo_fire_1.jpg';
 import placeHolder2 from './images/placeholders/IncendioCasa.jpg';
 import placeHolder3 from './images/placeholders/LixoFlorestas.jpg';
 import placeHolder4 from './images/placeholders/IncendioEstrada.jpg';
 import {OccurrencePreview} from "./Occurrences";
 
-class EntityPage extends Component{
+class WorkerPage extends Component{
+
+    componentDidMount(){
+        this.getWorkerInfo();
+    }
+
+    getOccurrences(){
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/getByUser/" + this.props.id , true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if (xhttp.readyState == 4 && xhttp.status == 200) {
+                this.setState(
+                    {
+                        logo: this.state.logo,
+                        occurrences: JSON.parse(xhttp.response),
+                        info: this.state.info,
+                        stats: this.state.stats
+                    }
+                )
+            }
+        };
+    }
+
+    getWorkerInfo(){
+
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_bo/_worker/" + this.props.id , true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+
+        xhttp.onreadystatechange = () => {
+            if(xhttp.readyState === 4){
+                if(xhttp.status === 200){
+                    console.log("Worker info received");
+                    console.log(JSON.parse(xhttp.response));
+                }
+            }
+        }
+
+
+    }
 
     render(){
         return(
@@ -51,4 +100,4 @@ class EntityPage extends Component{
     }
 }
 
-export default EntityPage;
+export default WorkerPage;

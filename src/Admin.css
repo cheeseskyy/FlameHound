@@ -32,12 +32,9 @@
 .User{
     border-top: black solid 1px;
     display: inline-block;
-    width: 33%;
+    width: 25%;
     height: 5%;
     background-color: white;
-}
-.LastEntry.User{
-    width:34%;
 }
 
 .RowEntry.LastEntry{

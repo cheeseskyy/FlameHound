@@ -6,6 +6,7 @@ import placeHolder4 from './images/placeholders/IncendioEstrada.jpg';
 import './Occurrences.css';
 import {CommentList} from "./Comments";
 import {Link} from 'react-router-dom';
+import WorkerPage from "./WorkerPage";
 
 
 export class OccurrenceList extends Component {
@@ -14,11 +15,11 @@ export class OccurrenceList extends Component {
 
     renderOccurrences() {
         return this.props.list.map((occurrence, i) => {
-            var extension = occurrence.mediaURI[0].split(".")[1];
             return <OccurrencePreview key={i} id={occurrence.id} title={occurrence.title} user={occurrence.user}
                                       description={occurrence.description}
                                       image={occurrence.mediaURI[0]}
-                                      randomProp={console.log("created occurrence " + occurrence.title)}/>
+                                      flag={occurrence.flag}
+                                      creationDate={occurrence.creationDate} worker={occurrence.worker}/>
         })
     }
 
@@ -75,8 +76,88 @@ export class OccurrencePreview extends Component {
         };
     }
 
+    treatOc(){
+        if(this.props.tag === "confirmed"){
+            this.tagOc();
+        } else if(this.props.tag === "solving"){
+            this.solveOc();
+        } else if(this.props.tag === "solved"){
+            alert("Ocorrência já resolvida");
+        }
+    }
+
+    tagOc(){
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_bo/_worker/tag/" + this.props.id, true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+
+
+    }
+
+    solveOc(){
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_bo/_worker/solve/" + this.props.id, true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+
+    }
+
     componentDidMount(){
         //this.getImage(this.props.image);
+    }
+
+    WorkerButton = () => {
+      if(sessionStorage.getItem("userRole") === "WORKER"){
+          return <button onClick={() => this.treatOc()}>Tratar</button>
+      }
+    };
+
+    sendVote(op){
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/user/vote/" + op + "/" + this.props.id, true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if(xhttp.readyState === 4){
+                if(xhttp.status === 200){
+                    console.log("Vote sent");
+                } else{
+                    alert("Ocorreu um erro ao votar nesta ocorrência, tente novamente mais tarde.");
+                    console.log("Vote error: " + xhttp.status);
+                }
+            }
+        }
+    }
+
+    reportOc(){
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/user/report/"+ this.props.user + "/" + this.props.id, true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+
+        xhttp.onreadystatechange = () => {
+            if(xhttp.readyState === 4){
+                if(xhttp.status === 200){
+                    console.log("Report sent");
+                } else{
+                    alert("Ocorreu um erro ao denunciar nesta ocorrência, tente novamente mais tarde.");
+                    console.log("Report error: " + xhttp.status);
+                }
+            }
+        }
     }
 
     render() {
@@ -92,18 +173,23 @@ export class OccurrencePreview extends Component {
                     <p> {this.props.user}</p>
                     <p> {this.props.description}</p>
                     <p> {this.props.location}</p>
+                    <p> {this.props.flag}</p>
+                    <p> {this.props.creationDate}</p>
+                    <p> {this.props.worker}</p>
                 </div>
                 </Link>
-                    <div id="occurrenceButtons">
-                    <button>
+                <div id="occurrenceButtons">
+                    <button onClick={() => this.sendVote("upvote")}>
                         +1
                     </button>
-                    <button>
+                    <button onClick={() => this.sendVote("downvote")}>
                         -1
                     </button>
-                    <button>
-                        flag
+                    <button onClick={() =>{this.reportOc()}}>
+                        Denunciar
                     </button>
+                    {this.WorkerButton}
+
                 </div>
             </div>
         );
@@ -162,7 +248,7 @@ export class OccurrencePage extends Component {
         xhttp.responseType ="arraybuffer";
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () => {
-            if (xhttp.readyState == 4 && xhttp.status == 200) {
+            if (xhttp.readyState === 4 && xhttp.status === 200) {
                 var arrayBufferView = new Uint8Array( xhttp.response );
                 var blob = new Blob( [ arrayBufferView ], { type: "image/" + extension} );
                 var urlCreator = window.URL || window.webkitURL;
