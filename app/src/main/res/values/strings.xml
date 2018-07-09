@@ -28,6 +28,8 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_regist_occurrence">A new Occurrence</string>
     <string name="register_button">Sign up</string>
+    <string name="edit_profile_fragment">Edit Profile</string>
+    <string name="sign_out_fragment">Sign Out</string>
 
     <string-array name="types_array">
         <item>light</item>

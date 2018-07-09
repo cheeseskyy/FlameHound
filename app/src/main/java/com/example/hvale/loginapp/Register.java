@@ -271,7 +271,7 @@ public class Register extends AppCompatActivity implements LoaderCallbacks<Curso
             jsonObjParam.put("confirmation", mPasswordConfirmation);
             JSONObject jsonObject = new JSONObject(jsonObjParam);
             setProgressBarVisibility(true);
-            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL_SERVER + "/RegisterData/v3", jsonObject, new Response.Listener<JSONObject>() {
+            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL_SERVER + "/register/v3", jsonObject, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     onPostExecute();

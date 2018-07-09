@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SearchBar">
+
+    <RelativeLayout
+        android:id="@+id/searchLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/searchToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorPrimary"/>
+
+    <com.miguelcatalan.materialsearchview.MaterialSearchView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/search_view"
+        app:searchBackground="@color/colorPrimary"
+        app:searchSuggestionBackground="@color/colorPrimary"
+        app:searchCloseIcon="@drawable/ic_action_navigation_close_inverted"
+        app:searchBackIcon="@drawable/ic_action_navigation_arrow_back_inverted"
+        app:searchSuggestionIcon="@drawable/ic_suggestion"
+        android:textColorHint="@color/white"
+        >
+
+    </com.miguelcatalan.materialsearchview.MaterialSearchView>
+
+    <ListView
+        android:id="@+id/searchListView"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/searchToolbar"
+        android:divider="@color/white"
+        android:dividerHeight="1dp">
+
+    </ListView>
+
+
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/searchListProgressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="8dp"
+        android:visibility="visible" />
+
+</RelativeLayout>

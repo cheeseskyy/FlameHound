@@ -80,6 +80,7 @@ public class HomePage extends AppCompatActivity
     private ImageView Draw;
     private ImageView Profile;
     private FrameLayout fram_map;
+    private ImageView Search;
     private boolean canMove = false;
     private int counter;
     private Projection projection;
@@ -126,6 +127,8 @@ public class HomePage extends AppCompatActivity
         Trending = findViewById(R.id.trending);
         Draw = findViewById(R.id.free_Draw);
         Profile = findViewById(R.id.myProfile);
+        Search = findViewById(R.id.toolbar_search);
+
 
         fram_map = findViewById(R.id.fram_map);
 
@@ -166,6 +169,14 @@ public class HomePage extends AppCompatActivity
 
                 }
                 return canMove;
+            }
+        });
+
+        Search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(HomePage.this, SearchBar.class);
+                startActivity(it);
             }
         });
 

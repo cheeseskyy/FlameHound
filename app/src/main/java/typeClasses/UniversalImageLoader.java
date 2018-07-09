@@ -15,10 +15,9 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.example.hvale.loginapp.R;
+import com.nostra13.universalimageloader.utils.DiskCacheUtils;
+import com.nostra13.universalimageloader.utils.MemoryCacheUtils;
 
-/**
- * Created by User on 6/4/2017.
- */
 
 public class UniversalImageLoader {
 
@@ -57,7 +56,8 @@ public class UniversalImageLoader {
      * @param append
      */
     public static void setImage(String imgURL, ImageView image, final ProgressBar mProgressBar, String append){
-
+        DiskCacheUtils.removeFromCache(imgURL, ImageLoader.getInstance().getDiskCache());
+        MemoryCacheUtils.removeFromCache(imgURL, ImageLoader.getInstance().getMemoryCache());
         ImageLoader imageLoader = ImageLoader.getInstance();
         imageLoader.displayImage(append + imgURL, image, new ImageLoadingListener() {
             @Override

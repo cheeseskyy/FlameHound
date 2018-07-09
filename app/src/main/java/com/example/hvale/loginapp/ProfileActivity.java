@@ -18,6 +18,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 
 import com.android.volley.ParseError;
@@ -26,35 +27,47 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.JsonIOException;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.utils.DiskCacheUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import typeClasses.GridImageAdapter;
 import typeClasses.UniversalImageLoader;
+import typeClasses.UserData;
 
-/**
- * Created by User on 5/28/2017.
- */
 
 public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = "ProfileActivity";
     private static final int NUM_GRIG_COLUMNS = 3;
+    private static final int RESULT_FROM_EDIT = 1;
     private static final String URL = "https://my-first-project-196314.appspot.com/rest/occurrency/getImageUri/";
     private static final String baseurl = "https://my-first-project-196314.appspot.com/rest/";
     private Context mContext = ProfileActivity.this;
-
+    public final List<UserData> userDataList = new LinkedList<>();
     private ProgressBar mProgressBar;
     private ImageView profilePhoto;
     private RelativeLayout profile;
     private String[] ocurrencys = new String[20];
     private ArrayList<String> urls;
     JSONArray finalResponse = null;
+    JSONObject statsFinalResponse = null;
+
+    private TextView profileName;
+    private TextView displayName;
+    private TextView displayAddress;
+    private TextView displayEmail;
+    private TextView nOcurr;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,6 +77,7 @@ public class ProfileActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate: started.");
         setupActivityWidgets();
         showProgress(true);
+        userStatsRest();
         doInBackGround();
         //showProgress(false);
         setupToolbar();
@@ -107,9 +121,19 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void setProfileImage(){
+
         Log.d(TAG, "setProfileImage: setting profile photo.");
-        String imgURL = "www.androidcentral.com/sites/androidcentral.com/files/styles/xlarge/public/article_images/2016/08/ac-lloyd.jpg?itok=bb72IeLf";
-        UniversalImageLoader.setImage(imgURL, profilePhoto, mProgressBar, "https://");
+        final String username = LogOutSingleton.getInstance(getApplicationContext()).getUsername();
+        String imgURL = baseurl + "user/getImageUri/" + username;
+        DiskCacheUtils.removeFromCache(imgURL, ImageLoader.getInstance().getDiskCache());
+        System.out.println(imgURL);
+        UniversalImageLoader.setImage(imgURL, profilePhoto, mProgressBar, "");
+        /*
+        ImageLoader imageLoader = ImageLoader.getInstance();
+        final String username = LogOutSingleton.getInstance(getApplicationContext()).getUsername();
+        String imgURL = baseurl + "user/getImageUri/" + username;
+        imageLoader.displayImage(imgURL, profilePhoto);
+        */
     }
 
     private void setupActivityWidgets(){
@@ -117,6 +141,20 @@ public class ProfileActivity extends AppCompatActivity {
         mProgressBar = (ProgressBar) findViewById(R.id.profileProgressBar);
         mProgressBar.setVisibility(View.VISIBLE);
         profilePhoto = (ImageView) findViewById(R.id.profile_photo);
+        profileName = findViewById(R.id.profileName);
+        displayName = findViewById(R.id.display_name);
+        displayAddress = findViewById(R.id.display_address);
+        displayEmail = findViewById(R.id.display_email);
+        nOcurr = (TextView) findViewById(R.id.occurrencysPost);
+
+    }
+    private void setupUserInfo() {
+        UserData user = userDataList.get(0);
+        profileName.setText(user.getUsername());
+        displayName.setText(user.getName());
+        displayAddress.setText(user.getAddress());
+        displayEmail.setText(user.getEmail());
+        nOcurr.setText(String.valueOf(urls.size()));
     }
 
     /**
@@ -127,17 +165,17 @@ public class ProfileActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ImageView profileMenu = (ImageView) findViewById(R.id.profileMenu);
-        /*
+
         profileMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "onClick: navigating to account settings.");
                 Intent intent = new Intent(mContext, AccountSettingsActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
             }
         });
-        */
     }
+
 
     private void doInBackGround() {
 
@@ -244,7 +282,75 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    private void userStatsRest() {
 
+        final JSONObject loginInfo = LogOutSingleton.getInstance(getApplicationContext()).getSessionId();
+        final String username = LogOutSingleton.getInstance(getApplicationContext()).getUsername();
+
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, baseurl + "user/getUserInfo/" + username, loginInfo, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                statsFinalResponse = response;
+                onPostExecuteUserInfo(statsFinalResponse);
+            }
+
+
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                onCancelled(error);
+            }
+        });
+
+        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonRequest);
+
+    }
+
+    private void onPostExecuteUserInfo(JSONObject finalResponse) {
+
+
+            String name;
+            String username;
+            String email;
+            String homeNumber;
+            String phoneNumber;
+            String address;
+            String nif;
+            String cc;
+
+             /*
+            {"name":"aloo name","username":"aloo","email":"aloo@","homeNumber":"","phoneNumber":"","address":"alooAdr","nif":"","cc":""}
+             */
+            try {
+                JSONObject jsonObject = finalResponse;
+                System.out.println(jsonObject);
+                name = jsonObject.getString("name");
+                username = jsonObject.getString("username");
+                email = jsonObject.getString("email");
+                homeNumber = jsonObject.getString("homeNumber");
+                phoneNumber= jsonObject.getString("phoneNumber");
+                address = jsonObject.getString("address");
+                nif =  jsonObject.getString("nif");
+                cc = jsonObject.getString("cc");
+
+                userDataList.add(new UserData(name, username, email, homeNumber, phoneNumber, address, nif, cc));
+                setupUserInfo();
+
+
+            } catch (JSONException e) {
+                onCancelled(e);
+            }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if (resultCode == RESULT_FROM_EDIT) {
+                setProfileImage();
+            }
+        }
+    }
 
 
 
