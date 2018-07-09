@@ -29,14 +29,72 @@ export class PerfilPage extends Component{
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () => {
-            if (xhttp.readyState == 4 && xhttp.status == 200) {
-                this.setState(
-                    {
-                        logo: this.state.logo,
-                        occurrences: JSON.parse(xhttp.response),
-                        info: this.state.info
-                    }
-                )
+            if (xhttp.readyState === 4) {
+                if(xhttp.status === 200) {
+                    this.setState(
+                        {
+                            logo: this.state.logo,
+                            occurrences: JSON.parse(xhttp.response),
+                            info: this.state.info
+                        }
+                    )
+                }
+            }
+        };
+    }
+
+    getInfo(){
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/user/getUserInfo/" + this.props.id , true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if (xhttp.readyState === 4) {
+                if(xhttp.status === 200) {
+                    console.log("user info:");
+                    console.log(JSON.parse(xhttp.response));
+                    this.setState(
+                        {
+                            logo: this.state.logo,
+                            occurrences: this.state.occurrences,
+                            info: JSON.parse(xhttp.response)
+                        }
+                    )
+                } else if (xhttp.status === 404) {
+                    alert("Este utilizador não existe. A redireccionar...");
+                    this.props.history.goBack();
+                }
+            }
+        };
+    }
+
+    getStats(){
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/user/getStats/" + this.props.id , true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if (xhttp.readyState === 4) {
+                if(xhttp.status === 200) {
+                    console.log("user info:");
+                    console.log(JSON.parse(xhttp.response));
+                    this.setState(
+                        {
+                            logo: this.state.logo,
+                            occurrences: this.state.occurrences,
+                            info: this.state.info
+                        }
+                    )
+                } else if (xhttp.status === 404) {
+                    alert("Este utilizador não existe. A redireccionar...");
+                    this.props.history.goBack();
+                }
             }
         };
     }
@@ -44,13 +102,19 @@ export class PerfilPage extends Component{
     componentDidMount(){
         //request Occurrences
         this.getOccurrences();
+        this.getInfo();
+        this.getStats();
     }
 
-    isHimself = true;
+    isHimself = false;
 
     request = "/occurrency/getByUser/"; //{username}
 
     render(){
+
+        if(this.props.id === sessionStorage.getItem("sessionUsername"))
+            this.isHimself = true;
+
         return(
             <div className="perfilPage">
 

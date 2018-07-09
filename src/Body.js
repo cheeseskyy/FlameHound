@@ -133,11 +133,13 @@ class Body extends Component {
                     <Route path="/EntityPage" render={(props) =>
                         <EntityPage name = "Placeholder" description = "Placeholder is a company that holds places"/>
                     }/>
-                    <Route path="/profile/:id" render={({match}) =>
-                        <PerfilPage id={match.params.id} name = "Placeholder" />
+                    <Route path="/profile/:id" render={withRouter(
+                        ({match, history}) =>
+                        <PerfilPage id={match.params.id} history = {history} name = "Placeholder" />)
                     }/>
                     <Route path="/occurrence/:id" render={({match}) =>
                         <OccurrencePage id={match.params.id}/>} />
+                    <Route path={"/event/:id"} />
                     <Route path="/admin" component={AdminArea}/>
                     <Route path="/" component={Home}/>
                 </Switch>

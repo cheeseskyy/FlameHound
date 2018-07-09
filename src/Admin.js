@@ -140,9 +140,9 @@ class Report extends Component{
     render(){
         return(
             <div className="AdminBox">
-                {this.state.reports.map(report => {
+                {this.state.reports.map((report, i) => {
                     return(
-                        <div className={"TableEntry"}>
+                        <div key={i} className={"TableEntry"}>
                             <div className={"EntryInfo Report"}>{report.reportId}</div>
                             <div className={"EntryInfo Report"}>{report.reporter}</div>
                             <div className={"EntryInfo Report"}>{report.reported}</div>
@@ -185,10 +185,10 @@ class Users extends Component{
         xhttp.onreadystatechange = () => {
             if (xhttp.readyState === 4) {
                 if(xhttp.status === 200){
-                    alert("Ocorrência removida com sucesso");
+                    alert("Utlizador removido com sucesso");
                 } else{
                     console.log("deleteOC error: " + xhttp.status);
-                    alert("Ocorreu um erro a remover a ocorrência, tente novamente mais tarde");
+                    alert("Ocorreu um erro a remover o utilizador, tente novamente mais tarde");
                 }
 
             }
@@ -242,6 +242,7 @@ class Users extends Component{
                     <div>
                         <Link to={"/admin/users/create/moderator"} style={{width: "50%"}}>Criar Moderador</Link>
                         <Link to={"/admin/users/create/admin"} style={{width: "50%", float: "right"}}>Criar Administrador</Link>
+                        <Link to={"/admin/users/create/worker"}>Criar Trabalhador</Link>
                     </div>
                 </div>
             </div>
@@ -507,4 +508,52 @@ class CreateAdminForm extends Component{
             </div>
         )
     }
+}
+
+class CreateWorkerForm extends Component{
+
+    sendWorker() {
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_be/_admin/addModerator");
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        var username = sessionStorage.getItem('sessionUsernameAdmin');
+        var token = sessionStorage.getItem('sessionTokenAdmin');
+        var jSonObj = JSON.stringify({
+            "username": document.getElementById("username").value,
+            "password": document.getElementById("psw").value,
+            "entity": document.getElementById("entity").value,
+            "registerUsername": username,
+            "tokenId": token
+        });
+        xhttp.send(jSonObj);
+        xhttp.onreadystatechange = () => {
+            if(xhttp.readyState === 4){
+                if(xhttp.status === 200){
+                    alert("Moderador " + jSonObj.username + " registado. A redireccionar...");
+                    this.props.history.goBack();
+                } else if(xhttp.status > 200) {
+                    alert("Ocorreu um erro, verifique a informação e tente novamente.");
+                    console.log("Error: " + xhttp.status);
+                }
+            }
+        }
+    }
+
+    render(){
+        return(
+            <div>
+                <p>Nome de Utilizador:</p>
+                <input id={"username"} type="text" placeholder="Nome de Utilizador"/>
+                <p>Palavra-passe:</p>
+                <input id={"psw"} type="password"/>
+                <p>Confirme a Palavra-passe</p>
+                <input type="password"/>
+                <p>Entidade:</p>
+                <input id={"entity"} type="text"/>
+                <button onClick={() => this.sendWorker()}>Criar</button>
+            </div>
+        );
+    }
+
 }
