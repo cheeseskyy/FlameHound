@@ -449,7 +449,7 @@ public class BackEndResource extends HttpServlet {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getLogs(SessionInfo session) {
 		Response r = ComputationResource.validLogin(session);
-		if(r.getStatus() != 200 && !g.fromJson((String) r.getEntity(), String.class).equals("ADMIN"))
+		if(r.getStatus() != 200 || !g.fromJson((String) r.getEntity(), String.class).equals("ADMIN"))
 			return r;
 		Query q = new Query("OperationLogs").addSort("date", SortDirection.ASCENDING);
 		PreparedQuery pQ = datastore.prepare(q);
