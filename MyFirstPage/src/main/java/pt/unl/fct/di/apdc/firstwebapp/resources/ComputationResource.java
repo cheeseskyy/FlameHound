@@ -70,8 +70,6 @@ public class ComputationResource {
 			LOG.warning("User is not logged in");
 			return Response.status(Status.FORBIDDEN).build();
 		}
-		if(System.currentTimeMillis() - validLogin  < 60000)
-			return Response.ok().build();
 			
 		Transaction txn = datastore.beginTransaction();
 		Transaction txn2 = datastore.beginTransaction();
@@ -82,6 +80,11 @@ public class ComputationResource {
 			Entity user = datastore.get(txn, userKey);
 			LOG.info("Got user");
 			role = (String)user.getProperty("role");
+			if(System.currentTimeMillis() - validLogin  < 60000) {
+				txn.commit();
+				txn2.commit();
+				return Response.ok(g.toJson(role)).build();
+			}
 			if (!user.getProperty("TokenKey").equals(session.tokenId)) {
 				LOG.info("Wrong token for user " + session.username);
 				txn.commit();

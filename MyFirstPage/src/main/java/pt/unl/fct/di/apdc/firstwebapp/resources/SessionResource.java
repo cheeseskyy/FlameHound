@@ -53,7 +53,7 @@ public class SessionResource extends HttpServlet{
 		try {
 		Entity user = datastore.get(userKey);
 		user.setProperty("TokenKey","");
-		user.setProperty("TokeCreationDate", "");
+		user.setProperty("TokenCreationDate", "");
 		user.setProperty("TokenExpirationDate","");
 		
 		datastore.put(txn,user);

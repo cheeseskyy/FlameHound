@@ -163,7 +163,7 @@ public class UserResource extends HttpServlet {
 		user = (Entity) r.getEntity();
 
 		if (operation.equals("upvote")) {
-			Key likedOcKey = KeyFactory.createKey(user.getKey(), "likedOc", user.getKey().getName());
+			Key likedOcKey = KeyFactory.createKey(user.getKey(), "LikedOc", user.getKey().getName());
 
 			Transaction txn = datastore.beginTransaction();
 			try {
@@ -171,28 +171,28 @@ public class UserResource extends HttpServlet {
 
 				@SuppressWarnings("unchecked")
 				List<String> likedOcList = (ArrayList<String>) likedOcs.getProperty("occurrencies");
-
+				
+				if(!likedOcList.contains(ocID))
 				likedOcList.add(ocID);
-
+				else {
+					txn.commit();
+					return Response.status(Status.CONFLICT).build();
+				}
+				
 				likedOcs.setProperty("occurrencies", likedOcList);
-
+				datastore.put(txn, likedOcs);
 				txn.commit();
 			} catch (EntityNotFoundException e) {
 				List<String> likedOcList = new ArrayList<String>();
 				likedOcList.add(ocID);
 				Entity likedOcs = new Entity(likedOcKey);
-				likedOcs.setProperty("ocurrencies", likedOcList);
+				likedOcs.setProperty("occurrencies", likedOcList);
 
 				datastore.put(txn, likedOcs);
 				txn.commit();
 			} catch (Exception e) {
 				LOG.warning(e.getMessage());
 				return Response.status(Status.FORBIDDEN).build();
-			} finally {
-				if (txn.isActive()) {
-					txn.rollback();
-					return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-				}
 			}
 		}
 		return updateRelatedStats(ocID, operation);
@@ -271,7 +271,6 @@ public class UserResource extends HttpServlet {
 		}
 		if(imageCache.containsKey(username))
 			return Response.ok(imageCache.get(username)).build();
-		
 		String imageID = "";
 		Key profileKey = KeyFactory.createKey("ProfileImage", username);
 		Entity picture = datastore.get(profileKey);
@@ -319,33 +318,38 @@ public class UserResource extends HttpServlet {
 			occurrencyStats = updateStats(operation, occurrencyStats);
 			datastore.put(txn, occurrencyStats);
 			txn.commit();
+			return Response.ok().build();
 		} catch (EntityNotFoundException e) {
 			Entity occurrencyStats = new Entity(ocStatsKey);
 			occurrencyStats.setProperty("user", username);
-			occurrencyStats.setProperty("upvotes", 0);
-			occurrencyStats.setProperty("downvotes", 0);
+			occurrencyStats.setProperty("upvotes", (long) 0);
+			occurrencyStats.setProperty("downvotes",(long) 0);
 			occurrencyStats = updateStats(operation, occurrencyStats);
+			datastore.put(txn, occurrencyStats);
 			txn.commit();
+			return Response.ok().build();
 		} catch (Exception e) {
 			LOG.info(e.getMessage());
+			LOG.warning(e.getLocalizedMessage());
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		} finally {
 			if (txn.isActive() || txn2.isActive()) {
 				LOG.info("Transactions still active");
-				txn.rollback();
-				txn2.rollback();
+				txn.commit();
+				txn2.commit();
 				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
 		}
-		return Response.ok().build();
 	}
 
 	private Entity updateStats(String operation, Entity occurrencyStats) {
+		LOG.info("here");
+		LOG.info(operation);
 		if (operation.equals("upvote"))
 			occurrencyStats.setProperty("upvotes", (long) occurrencyStats.getProperty("upvotes") + 1);
 		if (operation.equals("downvote"))
-			occurrencyStats.setProperty("upvotes", (long) occurrencyStats.getProperty("downvotes") + 1);
-
+			occurrencyStats.setProperty("downvotes", (long) occurrencyStats.getProperty("downvotes") + 1);
+		LOG.info("Here2");
 		return occurrencyStats;
 	}
 

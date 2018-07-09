@@ -51,7 +51,7 @@ public class IntegrityLogsResource {
 		Key adminLogsHash = KeyFactory.createKey("OperationLogs", "LogsHash");
 		try {
 			Entity logsHash = datastore.get(txn2, adminLogsHash);
-			logsHash.setProperty("logHash", DigestUtils.sha512Hex((String)logs.getProperty("logHash") + newLog));
+			logsHash.setProperty("logHash", DigestUtils.sha512Hex(((String)logsHash.getProperty("logHash")).trim() + newLog));
 			logsHash.setProperty("logText", "null");
 			logsHash.setProperty("date", System.currentTimeMillis());
 			datastore.put(txn2, logsHash);
@@ -69,7 +69,7 @@ public class IntegrityLogsResource {
 		Transaction txn = datastore.beginTransaction();
 		Transaction txn2 = datastore.beginTransaction();
 		String newLog = String.format("User %s did a %s operation on Report %s in %s",
-				username, operation.toString(), args[0], (new Date()).toString());
+				username, operation.toString(), args[0], (new Date()).toString()).trim();
 		Key adminLogs = KeyFactory.createKey("OperationLogs", "Logs"+System.currentTimeMillis());
 		Entity logs = new Entity(adminLogs);
 		logs.setProperty("logText", newLog);
@@ -79,7 +79,7 @@ public class IntegrityLogsResource {
 		Key adminLogsHash = KeyFactory.createKey("OperationLogs", "LogsHash");
 		try {
 			Entity logsHash = datastore.get(txn2, adminLogsHash);
-			logsHash.setProperty("logHash", DigestUtils.sha512Hex((String)logs.getProperty("logHash") + newLog));
+			logsHash.setProperty("logHash", DigestUtils.sha512Hex(((String)logsHash.getProperty("logHash")).trim() + newLog));
 			logsHash.setProperty("logText", "null");
 			logsHash.setProperty("date", System.currentTimeMillis());
 			datastore.put(txn2, logsHash);
@@ -97,7 +97,7 @@ public class IntegrityLogsResource {
 		Transaction txn = datastore.beginTransaction();
 		Transaction txn2 = datastore.beginTransaction();
 		String newLog = String.format("User %s did a %s operation on User %s in %s",
-				username, operation.toString(), args[0], (new Date()).toString());
+				username, operation.toString(), args[0], (new Date()).toString()).trim();
 		Key adminLogs = KeyFactory.createKey("OperationLogs", "Logs"+System.currentTimeMillis());
 		Entity logs = new Entity(adminLogs);
 		logs.setProperty("logText", newLog);
@@ -107,7 +107,7 @@ public class IntegrityLogsResource {
 		Key adminLogsHash = KeyFactory.createKey("OperationLogs", "LogsHash");
 		try {
 			Entity logsHash = datastore.get(txn2, adminLogsHash);
-			logsHash.setProperty("logHash", DigestUtils.sha512Hex((String)logs.getProperty("logHash") + newLog));
+			logsHash.setProperty("logHash", DigestUtils.sha512Hex(((String)logsHash.getProperty("logHash")).trim() + newLog));
 			logsHash.setProperty("logText", "null");
 			logsHash.setProperty("date", System.currentTimeMillis());
 			datastore.put(txn2, logsHash);
@@ -125,7 +125,7 @@ public class IntegrityLogsResource {
 		Transaction txn = datastore.beginTransaction();
 		Transaction txn2 = datastore.beginTransaction();
 		String newLog = String.format("User %s did a %s operation on Occurrency %s in %s",
-				username, operation.toString(), args[0], (new Date()).toString());
+				username, operation.toString(), args[0], (new Date()).toString()).trim();
 		Key adminLogs = KeyFactory.createKey("OperationLogs", "Logs"+System.currentTimeMillis());
 		Entity logs = new Entity(adminLogs);
 		logs.setProperty("logText", newLog);
@@ -135,7 +135,7 @@ public class IntegrityLogsResource {
 		Key adminLogsHash = KeyFactory.createKey("OperationLogs", "LogsHash");
 		try {
 			Entity logsHash = datastore.get(txn2, adminLogsHash);
-			logsHash.setProperty("logHash", DigestUtils.sha512Hex((String)logs.getProperty("logHash") + newLog));
+			logsHash.setProperty("logHash", DigestUtils.sha512Hex(((String)logsHash.getProperty("logHash")).trim() + newLog));
 			logsHash.setProperty("logText", "null");
 			logsHash.setProperty("date", System.currentTimeMillis());
 			datastore.put(txn2, logsHash);

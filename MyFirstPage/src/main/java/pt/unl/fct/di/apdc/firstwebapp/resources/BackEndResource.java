@@ -74,7 +74,7 @@ public class BackEndResource extends HttpServlet {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addNewAdmin(AdminRegisterInfo info) {
 		Response r = ComputationResource.validLogin(new SessionInfo(info.registerUsername, info.tokenId));
-		if(r.getStatus() != 200 || !((String)r.getEntity()).contains("ADMIN"))
+		if(r.getStatus() != 200 && !((String)r.getEntity()).contains("ADMIN"))
 			return Response.status(Status.FORBIDDEN).build(); 
 		LOG.fine("Attempt to register admin: " + info.username);
 		if(info.username == null || info.password == null)
@@ -109,7 +109,7 @@ public class BackEndResource extends HttpServlet {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addNewModerator(ModeratorRegisterInfo info) {
 		Response r = ComputationResource.validLogin(new SessionInfo(info.registerUsername, info.tokenId));
-		if(r.getStatus() != 200 || !((String)r.getEntity()).contains("ADMIN"))
+		if(r.getStatus() != 200 && !((String)r.getEntity()).contains("ADMIN"))
 			return Response.status(Status.FORBIDDEN).build(); 
 		LOG.fine("Attempt to register moderator: " + info.username);
 		if(info.username == null || info.password == null || info.entity == null)
@@ -146,7 +146,9 @@ public class BackEndResource extends HttpServlet {
 	public Response addNewWorker(WorkerRegisterInfo info) {
 		
 		Response r1 = ComputationResource.validLogin(new SessionInfo(info.registerUsername, info.tokenId));
-		if(r1.getStatus() != 200 || !((String) r1.getEntity()).contains("ADMIN")|| !((String) r1.getEntity()).contains("MODERATOR")) {
+		LOG.info((String) r1.getEntity());
+		if(r1.getStatus() != 200 && !((String) r1.getEntity()).contains("ADMIN") && !((String) r1.getEntity()).contains("MODERATOR")) {
+			return Response.status(Status.FORBIDDEN).build();
 		}
 		
 		LOG.fine("Attempt to register worker: " + info.username);
@@ -171,7 +173,7 @@ public class BackEndResource extends HttpServlet {
 			LOG.info("Worker registered " + info.username);
 			txn.commit();
 			IntegrityLogsResource.insertNewLog(LogOperation.ADD, new String[]{"addWorker with username: ", info.username}, LogType.Other, info.registerUsername);
-			RegisterResource.registerUserV3(new RegisterData(info.name, info.username, info.email, "ADMIN", "","","","","",info.password, info.password));
+			RegisterResource.registerUserV3(new RegisterData(info.name, info.username, info.email, "WORKER", "","","","","",info.password, info.password));
 			return Response.ok().build();
 		} finally {
 			if (txn.isActive() ) {
@@ -215,7 +217,7 @@ public class BackEndResource extends HttpServlet {
 			try {
 				Entity user = datastore.get(txn, userKey);
 				user.setProperty("TokenKey","");
-				user.setProperty("TokeCreationDate", "");
+				user.setProperty("TokenCreationDate", "");
 				user.setProperty("TokenExpirationDate","");
 				
 				datastore.put(txn,user);
@@ -442,7 +444,7 @@ public class BackEndResource extends HttpServlet {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getLogs(SessionInfo session) {
 		Response r = ComputationResource.validLogin(session);
-		if(r.getStatus() != 200 || !g.fromJson((String) r.getEntity(), String.class).equals("ADMIN"))
+		if(r.getStatus() != 200 && !g.fromJson((String) r.getEntity(), String.class).equals("ADMIN"))
 			return r;
 		Transaction txn = datastore.beginTransaction();
 		Key adminLogs = KeyFactory.createKey("OperationLogs", "Logs");
