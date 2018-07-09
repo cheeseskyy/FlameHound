@@ -64,11 +64,10 @@ class MapView extends Component {
     isLoggedIn() {
         console.log("checking for login");
         let xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "rest/utils/validLogin", true);
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/utils/validLogin", true);
         xhttp.setRequestHeader("Content-type", "application/json");
         let username = sessionStorage.getItem('sessionUsername');
         let token = sessionStorage.getItem('sessionToken');
-        console.log("username: " + username + "token: " + token);
         let jsonObj = JSON.stringify({
             'username': username,
             'tokenId': token

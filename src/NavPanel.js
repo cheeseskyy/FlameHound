@@ -11,10 +11,46 @@ const RegisterForm = withRouter(RegForm);
 const navPanelState = ["REGULAR", "REGISTER", "LOGIN", "ADMIN_LOGIN"];
 
 class NavPanel extends Component {
-    isLoggedIn = false;
+
+    isLoggedIn;
 
     log() {
         console.log("clicked");
+    }
+
+    validLogIn() {
+        console.log("checking for login");
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/utils/validLogin", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        let username = sessionStorage.getItem('sessionUsername');
+        let token = sessionStorage.getItem('sessionToken');
+        let jsonObj = JSON.stringify({
+            'username': username,
+            'tokenId': token
+        });
+        xhttp.send(jsonObj);
+        xhttp.onreadystatechange = () => {
+            if (xhttp.readyState === 4) {
+                if (xhttp.status === 200) {
+                    console.log("user is logged in");
+                    this.isLoggedIn = true;
+                    this.forceUpdate();
+                } else if (xhttp.status === 403 || xhttp.status === 500) {
+                    console.log("user is not logged in");
+                    sessionStorage.removeItem('sessionUsername');
+                    sessionStorage.removeItem('sessionToken');
+                } else{
+                    console.log("user validLogin went wrong, status: " + xhttp.status);
+                }
+            }
+
+        };
+    }
+
+    componentDidMount(){
+        this.isLoggedIn = false;
+        this.validLogIn();
     }
 
     getRole(){

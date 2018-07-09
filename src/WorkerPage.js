@@ -51,6 +51,9 @@ class WorkerPage extends Component{
                     console.log("Worker info received");
                     console.log(JSON.parse(xhttp.response));
                 }
+                else{
+                    console.log("")
+                }
             }
         }
 

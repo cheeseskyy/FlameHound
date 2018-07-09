@@ -291,6 +291,13 @@ class Users extends Component{
     };
 
     render(){
+
+        const moderatorLink = () => {
+            if(sessionStorage.getItem("userRole") === "ADMIN"){
+                return <Link to={"/admin/users/create/moderator"} style={{width: "33%", float: "center"}}>Criar Moderador</Link>;
+            }
+        };
+
         return(
             <div style={{height: "100%"}}>
                 <div className="AdminBox">
@@ -302,8 +309,8 @@ class Users extends Component{
                         )
                     })}
                     <div>
-                        <Link to={"/admin/users/create/moderator"} style={{width: "33%", float: "left"}}>Criar Moderador</Link>
-                        <Link to={"/admin/users/create/worker"} style={{width: "34%", float: "center"}}>Criar Trabalhador</Link>
+                        <Link to={"/admin/users/create/worker"} style={{width: "34%", float: "left"}}>Criar Trabalhador</Link>
+                        {moderatorLink()}
                         <Link to={"/admin/users/create/admin"} style={{width: "33%", float: "right"}}>Criar Administrador</Link>
                     </div>
                 </div>
@@ -340,10 +347,10 @@ class Logs extends Component{
         xhttp.onreadystatechange = () =>  {
             if (xhttp.readyState === 4 && xhttp.status === 200) {
                 console.log("Got logs");
-                const logs = JSON.parse(xhttp.response);
+                const logs = xhttp.response;
                 console.log("Response in function: ");
-                console.log(JSON.parse(xhttp.response));
-                this.setState({logs: logs.message});
+                console.log(logs);
+                this.setState({logs: logs});
             }
         };
     }
@@ -463,6 +470,12 @@ class Occurrences extends Component{
         )
     };
 
+    confirmOcButton = (id, flag) => {
+      if(flag === "unconfirmed"){
+          return <button onClick={() => this.confirmOc(id, flag)}>Confirmar Ocorrência</button>;
+      }
+    };
+
     render(){
         return(
             <div className="AdminBox">
@@ -472,8 +485,10 @@ class Occurrences extends Component{
                             <OccurrencePreview key={occurrence.id} id={occurrence.id} title={occurrence.title} user={occurrence.user}
                                                description={occurrence.description}
                                                image={occurrence.mediaURI[0]}
+                                               flag={occurrence.flag}
+                                               creationDate={occurrence.creationDate} worker={occurrence.worker}
                             />
-                            <button onClick={() => this.confirmOc(occurrence.id, occurrence.flag)}>Confirmar Ocorrência</button>
+                            {this.confirmOcButton(occurrence.id, occurrence.flag)}
                             <button onClick={() => this.deleteOc(occurrence.id)}>Remover Ocorrência</button>
                         </div>
                     )

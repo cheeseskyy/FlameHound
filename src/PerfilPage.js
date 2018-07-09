@@ -17,7 +17,8 @@ export class PerfilPage extends Component{
             logo: "",
             occurrences: [],
             info: {},
-            stats:{}
+            stats:{},
+            workerInfo: {}
         }
     }
 
@@ -30,13 +31,15 @@ export class PerfilPage extends Component{
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () => {
-            if (xhttp.readyState == 4 && xhttp.status == 200) {
+            if (xhttp.readyState === 4 && xhttp.status === 200) {
+                console.log("Got user Ocs");
                 this.setState(
                     {
                         logo: this.state.logo,
                         occurrences: JSON.parse(xhttp.response),
                         info: this.state.info,
-                        stats: this.state.stats
+                        stats: this.state.stats,
+                        workerInfo: this.state.workerInfo
                     }
                 )
             }
@@ -45,20 +48,22 @@ export class PerfilPage extends Component{
 
     getStats(){
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/getStats/" + this.props.id , true);
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/user/getStats/" + this.props.id , true);
         xhttp.setRequestHeader("Content-type", "application/json");
         var username = sessionStorage.getItem('sessionUsername');
         var token = sessionStorage.getItem('sessionToken');
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () => {
-            if (xhttp.readyState == 4 && xhttp.status == 200) {
+            if (xhttp.readyState === 4 && xhttp.status === 200) {
+                console.log("Got use stats");
                 this.setState(
                     {
                         logo: this.state.logo,
                         occurrences: this.state.occurrences,
                         info: this.state.info,
-                        stats: JSON.parse(xhttp.response)
+                        stats: JSON.parse(xhttp.response),
+                        workerInfo: this.state.workerInfo
                     }
                 )
             }
@@ -67,24 +72,70 @@ export class PerfilPage extends Component{
 
     getInfo(){
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/occurrency/getUserInfo/" + this.props.id , true);
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/user/getUserInfo/" + this.props.id , true);
         xhttp.setRequestHeader("Content-type", "application/json");
         var username = sessionStorage.getItem('sessionUsername');
         var token = sessionStorage.getItem('sessionToken');
         var jSonObj = JSON.stringify({"username": username, "tokenId": token});
         xhttp.send(jSonObj);
         xhttp.onreadystatechange = () => {
-            if (xhttp.readyState === 4 && xhttp.status === 200) {
-                this.setState(
-                    {
-                        logo: this.state.logo,
-                        occurrences: this.state.occurrences,
-                        info: JSON.parse(xhttp.response),
-                        stats: this.state.info
+            if (xhttp.readyState === 4) {
+                if(xhttp.status === 200) {
+                    console.log("Got user info");
+                    this.setState(
+                        {
+                            logo: this.state.logo,
+                            occurrences: this.state.occurrences,
+                            info: JSON.parse(xhttp.response),
+                            stats: this.state.info,
+                            workerInfo: this.state.workerInfo
+                        }
+                    );
+                    if (this.state.info.role === "WORKER") {
+                        this.getWorkerInfo();
                     }
-                )
+                }
+                else if(xhttp.status === 404){
+                    alert("Este utilizador não existe, verifique o nome do utilizador e tente outra vez. A redireccionar...");
+                    this.props.history.goBack();
+                }
             }
         };
+    }
+
+    getWorkerInfo(){
+
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "https://my-first-project-196314.appspot.com/rest/_bo/_worker/getWorkerInfo/" + this.props.id , true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+
+        var username = sessionStorage.getItem('sessionUsername');
+        var token = sessionStorage.getItem('sessionToken');
+        var jSonObj = JSON.stringify({"username": username, "tokenId": token});
+        xhttp.send(jSonObj);
+
+        xhttp.onreadystatechange = () => {
+            if(xhttp.readyState === 4){
+                if(xhttp.status === 200){
+                    console.log("Worker info received");
+                    console.log(JSON.parse(xhttp.response));
+                    this.setState(
+                        {
+                            logo: this.state.logo,
+                            occurrences: this.state.occurrences,
+                            info: this.state.info,
+                            stats: this.state.info,
+                            workerInfo: JSON.parse(xhttp.response)
+                        }
+                    )
+                }
+                else{
+                    console.log("error: " + xhttp.status);
+                }
+            }
+        }
+
+
     }
 
     componentDidMount(){
@@ -178,6 +229,10 @@ export class ProfileImage extends Component{
             }
         };
     }
+
+    workerOcs = () => {
+
+    };
 
     constructor(props){
         super(props);
