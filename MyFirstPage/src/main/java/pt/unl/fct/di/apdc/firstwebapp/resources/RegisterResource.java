@@ -85,7 +85,7 @@ public class RegisterResource extends HttpServlet{
 			+ "%s \n"
 			+ "Cumprimentos,\n"
 			+ "FlameHound Team";
-	private final Gson g = new Gson();
+	private final static Gson g = new Gson();
 	
 	public RegisterResource() { } //Nothing to be done here...
 
@@ -100,7 +100,7 @@ public class RegisterResource extends HttpServlet{
 	@Path("/v3")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public Response registerUserV3(RegisterData data) {
+	public static Response registerUserV3(RegisterData data) {
 		LOG.info("Attempt to register user: " + data.username);
 		String valid = data.validRegistration();
 		if(!valid.equals("ok")) {
@@ -159,7 +159,7 @@ public class RegisterResource extends HttpServlet{
 		}
 	}
 	
-	public void sendConfirmationEmail(RegisterData data){
+	public static void sendConfirmationEmail(RegisterData data){
 	    Properties prop = new Properties();
 	    Session session = Session.getDefaultInstance(prop,null);
 	    try{    

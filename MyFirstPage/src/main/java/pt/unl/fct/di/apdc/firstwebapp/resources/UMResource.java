@@ -52,9 +52,9 @@ public class UMResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUsers(@PathParam("userId") String userId, SessionInfo session) {
-		Response r = ut.validAdminLogin(new SessionInfo(session.username, session.tokenId));
-		if(r.getStatus() != 200)
-			return Response.status(Status.FORBIDDEN).build(); 
+		Response r = ComputationResource.validLogin(session);
+		if(r.getStatus() != 200 || !((String) r.getEntity()).contains("ADMIN"))
+			return Response.status(Status.FORBIDDEN).build();
 		
 		if(System.currentTimeMillis() - TTL > lastUpdate)
 			updateCache();
@@ -108,7 +108,10 @@ public class UMResource {
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteReport(@PathParam("userId") String userId, SessionInfo session) {
-		if(ut.validAdminLogin(session).getStatus() == 200) {
+		Response r = ComputationResource.validLogin(session);
+		if(r.getStatus() != 200 || !((String) r.getEntity()).contains("ADMIN"))
+			return Response.status(Status.FORBIDDEN).build();
+		
 			listCache.remove(userId);
 			Transaction txn = datastore.beginTransaction();
 			LOG.info("Deleting user with id: " + userId);
@@ -119,9 +122,6 @@ public class UMResource {
 			IntegrityLogsResource.insertNewLog(LogOperation.Delete, new String[]{userId}, LogType.User, session.username);
 			updateCache();
 			return Response.ok().build();
-		}
-		else
-			return Response.status(Status.FORBIDDEN).build();
 	}
 
 }

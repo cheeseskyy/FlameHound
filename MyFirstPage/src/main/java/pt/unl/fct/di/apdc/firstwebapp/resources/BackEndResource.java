@@ -41,6 +41,7 @@ import pt.unl.fct.di.apdc.firstwebapp.util.objects.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.LoginData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.MessageData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.ModeratorRegisterInfo;
+import pt.unl.fct.di.apdc.firstwebapp.util.objects.RegisterData;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.SessionInfo;
 import pt.unl.fct.di.apdc.firstwebapp.util.objects.WorkerRegisterInfo;
 
@@ -57,7 +58,7 @@ public class BackEndResource extends HttpServlet {
 	private static final Logger LOG = Logger.getLogger(BackEndResource.class.getName());
 	private final Gson g = new Gson();
 	private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-
+	public long validLogin = 0;
 	public BackEndResource() {
 	} // Nothing to be done here...
 
@@ -72,8 +73,8 @@ public class BackEndResource extends HttpServlet {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addNewAdmin(AdminRegisterInfo info) {
-		Response r = validAdminLogin(new SessionInfo(info.registerUsername, info.tokenId));
-		if(r.getStatus() != 200)
+		Response r = ComputationResource.validLogin(new SessionInfo(info.registerUsername, info.tokenId));
+		if(r.getStatus() != 200 || !((String)r.getEntity()).contains("ADMIN"))
 			return Response.status(Status.FORBIDDEN).build(); 
 		LOG.fine("Attempt to register admin: " + info.username);
 		if(info.username == null || info.password == null)
@@ -87,12 +88,12 @@ public class BackEndResource extends HttpServlet {
 			return Response.status(Status.CONFLICT).entity("Username").build(); 
 		} catch (EntityNotFoundException e) {
 			Entity user = new Entity("UserAdmin", info.username);
-			user.setProperty("password", DigestUtils.sha512Hex(info.password));
 			user.setProperty("adminPermission", info.registerUsername);
 			user.setProperty("creationTime", new Date());
 			datastore.put(txn,user);
 			LOG.info("Admin registered " + info.username);
 			txn.commit();
+			RegisterResource.registerUserV3(new RegisterData(info.name, info.username, info.email, "ADMIN", "","","","","",info.password, info.password));
 			IntegrityLogsResource.insertNewLog(LogOperation.ADD, new String[]{"addAdmin with username: ", info.username}, LogType.Other, info.registerUsername);
 			return Response.ok().build();
 		} finally {
@@ -107,8 +108,8 @@ public class BackEndResource extends HttpServlet {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addNewModerator(ModeratorRegisterInfo info) {
-		Response r = validAdminLogin(new SessionInfo(info.registerUsername, info.tokenId));
-		if(r.getStatus() != 200)
+		Response r = ComputationResource.validLogin(new SessionInfo(info.registerUsername, info.tokenId));
+		if(r.getStatus() != 200 || !((String)r.getEntity()).contains("ADMIN"))
 			return Response.status(Status.FORBIDDEN).build(); 
 		LOG.fine("Attempt to register moderator: " + info.username);
 		if(info.username == null || info.password == null || info.entity == null)
@@ -122,7 +123,6 @@ public class BackEndResource extends HttpServlet {
 			return Response.status(Status.CONFLICT).entity("Username").build(); 
 		} catch (EntityNotFoundException e) {
 			Entity user = new Entity("UserModerator", info.username);
-			user.setProperty("password", DigestUtils.sha512Hex(info.password));
 			user.setProperty("adminPermission", info.registerUsername);
 			user.setProperty("creationTime", new Date());
 			user.setProperty("entity", info.entity);
@@ -130,6 +130,7 @@ public class BackEndResource extends HttpServlet {
 			LOG.info("Moderator registered " + info.username);
 			txn.commit();
 			IntegrityLogsResource.insertNewLog(LogOperation.ADD, new String[]{"addMod with username: ", info.username}, LogType.Other, info.registerUsername);
+			RegisterResource.registerUserV3(new RegisterData(info.name, info.username, info.email, "MODERATOR", "","","","","",info.password, info.password));
 			return Response.ok().build();
 		} finally {
 			if (txn.isActive() ) {
@@ -144,11 +145,8 @@ public class BackEndResource extends HttpServlet {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addNewWorker(WorkerRegisterInfo info) {
 		
-		Response r1 = validAdminLogin(new SessionInfo(info.registerUsername, info.tokenId));
-		if(r1.getStatus() != 200) {
-			Response r2 = validModeratorLogin(new SessionInfo(info.registerUsername, info.tokenId));
-			if(r2.getStatus() != 200)
-				return Response.status(Status.FORBIDDEN).build(); 
+		Response r1 = ComputationResource.validLogin(new SessionInfo(info.registerUsername, info.tokenId));
+		if(r1.getStatus() != 200 || !((String) r1.getEntity()).contains("ADMIN")|| !((String) r1.getEntity()).contains("MODERATOR")) {
 		}
 		
 		LOG.fine("Attempt to register worker: " + info.username);
@@ -163,7 +161,6 @@ public class BackEndResource extends HttpServlet {
 			return Response.status(Status.CONFLICT).entity("Username").build(); 
 		} catch (EntityNotFoundException e) {
 			Entity user = new Entity("UserWorker", info.username);
-			user.setProperty("password", DigestUtils.sha512Hex(info.password));
 			user.setProperty("ocurrenciesTreated", 0);
 			user.setProperty("approvalRate", 0);
 			user.setProperty("disapprovalRate", 0);
@@ -174,107 +171,11 @@ public class BackEndResource extends HttpServlet {
 			LOG.info("Worker registered " + info.username);
 			txn.commit();
 			IntegrityLogsResource.insertNewLog(LogOperation.ADD, new String[]{"addWorker with username: ", info.username}, LogType.Other, info.registerUsername);
+			RegisterResource.registerUserV3(new RegisterData(info.name, info.username, info.email, "ADMIN", "","","","","",info.password, info.password));
 			return Response.ok().build();
 		} finally {
 			if (txn.isActive() ) {
 				txn.rollback();
-			}
-		}
-	}
-	
-	@POST
-	@Path("/validAdminLogin")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response validAdminLogin(SessionInfo session) {
-		if(session.tokenId.equals("0")) {
-			LOG.warning("User is not logged in");
-			return Response.status(Status.FORBIDDEN).build();
-		}
-		Transaction txn = datastore.beginTransaction();
-		Key adminUserKey = KeyFactory.createKey("UserAdmin", session.username);
-		try {
-			LOG.info("Attempt to get user: " + session.username);
-			Entity user = datastore.get(adminUserKey);
-			if(!user.getProperty("TokenKey").equals(session.tokenId))
-				return Response.status(Status.FORBIDDEN).build();
-			Key timeoutKey = KeyFactory.createKey("timeout", session.username);
-			Transaction txn2 = datastore.beginTransaction();
-			Entity timeout = datastore.get(txn2, timeoutKey);
-			long lastOp = (long) timeout.getProperty("lastOp");
-			if(System.currentTimeMillis() - lastOp > 5*60*1000) {
-				LOG.info("Expired");
-				user.setProperty("TokenExpirationDate", "");
-				user.setProperty("TokenCreationDate", "");
-				user.setProperty("TokenKey", 0);
-				datastore.put(txn, user);
-				txn.commit();
-				txn2.commit();
-				return Response.status(Status.FORBIDDEN).build();
-			}
-			timeout.setProperty("lastOp", System.currentTimeMillis());
-			datastore.put(txn2, timeout);
-			txn.commit();
-			txn2.commit();
-			return Response.ok().build();
-		}catch (EntityNotFoundException e) {
-			LOG.warning("Failed to locate username: " + session.username);
-			txn.rollback();
-			return Response.status(Status.FORBIDDEN).build();
-		} finally {
-			if (txn.isActive()) {
-				txn.rollback();
-				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-			}
-		}
-	}
-	
-	@POST
-	@Path("/validModLogin")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response validModeratorLogin(SessionInfo session) {
-		if(session.tokenId.equals("0")) {
-			LOG.warning("User is not logged in");
-			return Response.status(Status.FORBIDDEN).build();
-		}
-		Transaction txn = datastore.beginTransaction();
-		Key userKey = KeyFactory.createKey("User", session.username);
-		try {
-			LOG.info("Attempt to get user: " + session.username);
-			Entity userN = datastore.get(userKey);
-			if(!userN.getProperty("role").equals(UserRoles.MODERATOR.toString()))
-				return Response.status(Status.FORBIDDEN).build();
-			LOG.info("Got user");
-			Key modUserKey = KeyFactory.createKey("UserModerator", session.username);
-			Entity user = datastore.get(modUserKey);
-			if(!user.getProperty("TokenKey").equals(session.tokenId))
-				return Response.status(Status.FORBIDDEN).build();
-			Key timeoutKey = KeyFactory.createKey("timeout", session.username);
-			txn.commit();
-			Transaction txn2 = datastore.beginTransaction();
-			Entity timeout = datastore.get(txn2, timeoutKey);
-			long lastOp = (long) timeout.getProperty("lastOp");
-			if(System.currentTimeMillis() - lastOp > 5*60*1000) {
-				user.setProperty("TokenExpirationDate", "");
-				user.setProperty("TokenCreationDate", "");
-				user.setProperty("TokenKey", 0);
-				datastore.put(txn2, user);
-				txn.commit();
-				txn2.commit();
-				return Response.status(Status.FORBIDDEN).build();
-			}
-			timeout.setProperty("lastOp", System.currentTimeMillis());
-			datastore.put(txn2, timeout);
-			txn.commit();
-			txn2.commit();
-			return Response.ok().build();
-		}catch (EntityNotFoundException e) {
-			LOG.warning("Failed to locate username: " + session.username);
-			txn.rollback();
-			return Response.status(Status.FORBIDDEN).build();
-		} finally {
-			if (txn.isActive()) {
-				txn.rollback();
-				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 			}
 		}
 	}
@@ -298,13 +199,9 @@ public class BackEndResource extends HttpServlet {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public Response doLogin(SessionInfo session) {
-		Response r = validAdminLogin(session);
-		if(r.getStatus() == 200)
-			return Response.ok("ADMIN").build();
-		else
-			if(r.getStatus() == 404)
-				if (validModeratorLogin(session).getStatus() == 200)
-					return Response.ok("MODERATOR").build();
+		if(System.currentTimeMillis() - validLogin < 60000)
+			return Response.ok().build();
+		Response r = ComputationResource.validLogin(session);
 		return r;
 	}
 	
@@ -544,8 +441,8 @@ public class BackEndResource extends HttpServlet {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getLogs(SessionInfo session) {
-		Response r = validAdminLogin(session);
-		if(r.getStatus() != 200)
+		Response r = ComputationResource.validLogin(session);
+		if(r.getStatus() != 200 || !g.fromJson((String) r.getEntity(), String.class).equals("ADMIN"))
 			return r;
 		Transaction txn = datastore.beginTransaction();
 		Key adminLogs = KeyFactory.createKey("OperationLogs", "Logs");

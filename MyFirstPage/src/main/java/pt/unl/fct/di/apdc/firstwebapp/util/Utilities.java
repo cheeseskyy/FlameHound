@@ -16,13 +16,4 @@ public class Utilities {
 	public static String generateID() {
 		return UUID.randomUUID().toString();
 	}
-	
-	public Response validAdminLogin(SessionInfo session) {
-		return be.validAdminLogin(session);
-	}
-	
-	public Response validModeratorLogin(SessionInfo session) {
-		return be.validModeratorLogin(session);
-	}
-
 }
