@@ -1,0 +1,52 @@
+<merge xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/ocurrence_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/cast_expanded_controller_ad_container_white_stripe_color">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/downVote"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/upVote"
+                android:src="@drawable/ic_down_arrow" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/downVote"
+                android:layout_alignStart="@id/downVote"
+                android:text="DownVote" />
+
+            <ImageView
+                android:id="@+id/upVote"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/ic_up_arrow" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/upVote"
+                android:layout_alignStart="@id/upVote"
+                android:text="UpVote" />
+
+        </RelativeLayout>
+
+
+    </android.support.v7.widget.Toolbar>
+
+
+
+</merge>
+

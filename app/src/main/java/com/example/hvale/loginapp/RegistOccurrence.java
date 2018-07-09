@@ -45,7 +45,6 @@ import static android.R.layout.simple_spinner_item;
 
 public class RegistOccurrence extends AppCompatActivity implements View.OnClickListener {
 
-    /*VERSAO COM A FINAL -------------_>>>>>>>>>>*/
     private static final String URL_SERVER = "https://my-first-project-196314.appspot.com/rest";
     private static final int RESULT_LOAD_IMAGE = 1;
 
@@ -188,7 +187,7 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
             focusView.requestFocus();
         } else {
             //showProgress(true);
-            OcurrenceData data = new OcurrenceData(title, description, username, location, type, mediaURI);
+            OccurrenceDataRegister data = new OccurrenceDataRegister(title, description, username, location, type, mediaURI);
             mAuth = new RegisterOcurrenceTask(data);
             mAuth.doInBackground();
         }
@@ -198,9 +197,9 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
 
     public class RegisterOcurrenceTask {
 
-        private OcurrenceData ocurrenceData;
+        private OccurrenceDataRegister ocurrenceData;
 
-        RegisterOcurrenceTask(OcurrenceData data) {
+        RegisterOcurrenceTask(OccurrenceDataRegister data) {
             ocurrenceData = data;
         }
 

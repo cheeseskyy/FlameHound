@@ -49,6 +49,10 @@ class LogOutSingleton {
     public String getUsername(){
         return username;
     }
+
+    public String getLoginToken(){
+        return loginToken;
+    }
     
     public void logOut(){
         loginToken = "0";
