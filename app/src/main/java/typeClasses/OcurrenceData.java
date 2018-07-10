@@ -1,5 +1,6 @@
 package typeClasses;
 
+import android.app.SearchManager;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
@@ -7,7 +8,7 @@ import java.util.List;
 
 public class OcurrenceData {
 
-    private static final int FIVE = 5;
+    private static final int SEVEN = 7;
     public String user;
     public String location;
     public String id;
@@ -61,7 +62,7 @@ public class OcurrenceData {
 
 
     public String[] getOcuInfo() {
-        String[] ocuInfo = new String[FIVE + mediaURI.size()];
+        String[] ocuInfo = new String[SEVEN];
         String tempLocation;
         ocuInfo[0] = title;
         ocuInfo[1] = description;
@@ -71,12 +72,8 @@ public class OcurrenceData {
         tempLocation = location.replace(")", "");
         ocuInfo[3] = tempLocation;
         ocuInfo[4] = type.toString();
-        for (String image : mediaURI) {
-            int i = 5;
-            ocuInfo[i] = image;
-            i++;
-        }
-        ocuInfo[FIVE + mediaURI.size() - 1] = flag.toString();
+        ocuInfo[5] = mediaURI.get(0);
+        ocuInfo[6] = flag.toString();
         return ocuInfo;
     }
 }

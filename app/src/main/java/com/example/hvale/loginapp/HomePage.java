@@ -258,7 +258,14 @@ public class HomePage extends AppCompatActivity
         polylineOptions.color(TRANSPARENT);
         */
         canMove = false;
+
+
+        Intent it = new Intent(HomePage.this, RegistOccurrence.class);
+        it.putExtra("Loc", valuesToDraw.get(0));
+        it.putExtra("Array", valuesToDraw);
+        startActivityForResult(it, 1);
         valuesToDraw.clear();
+
 
     }
 
@@ -365,7 +372,8 @@ public class HomePage extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
+        String address = "";
+        Geocoder geocoder = new Geocoder(getBaseContext(), Locale.getDefault());
         if (requestCode == 1) {
             if (resultCode == RegistOccurrence.RESULT_OK) {
                 String[] result = data.getStringArrayExtra("result");
@@ -383,11 +391,26 @@ public class HomePage extends AppCompatActivity
                LatLng point = new LatLng(x,y);
                markerOptions.position(point);
 
-                map.addMarker(markerOptions);
+
+                List<Address> addresses = null;
+                try {
+                    addresses = geocoder.getFromLocation(x, y, 1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if (addresses.size() > 0)
+                    address = addresses.get(0).getAddressLine(0);
+
+
+                Marker marker = map.addMarker(markerOptions);
+                List<String> images = new ArrayList<>();
+                images.add(result[6]);
 
                 latlngs.add(point);
+                ocurrencysObjs.add(new OcurrenceData(result[0], result[1], result[2], address, result[4], images, result[5], "", ""));
                 titles.add(Brutepoint[1]);
-
+                markers.put(marker,markers.size());
 
             }
             if (resultCode == RegistOccurrence.RESULT_CANCELED) {

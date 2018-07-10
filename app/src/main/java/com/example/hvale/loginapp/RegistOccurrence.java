@@ -26,6 +26,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ByteArrayPool;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -56,6 +57,10 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
     private EditText mDescriptionView;
     private Spinner mTypeView;
     private List<String> mImage;
+    private boolean isDraw = false;
+    private String latLogArray = null;
+    private ArrayList<LatLng> array;
+    private String id;
 
 
     @Override
@@ -69,6 +74,13 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
             Log.d("location", loc);
             mLocationView = findViewById(R.id.location);
             mLocationView.setText(loc);
+            ArrayList<LatLng> drawPoints;
+            if((p.getParcelableArrayList("Array")) != null) {
+                drawPoints = p.getParcelableArrayList("Array");
+                isDraw = true;
+                array = drawPoints;
+
+            }
           /*  inputLoc.setHintEnabled(true);
             inputLoc.setHint(loc);
             inputLoc.setHintAnimationEnabled(true);*/
@@ -177,6 +189,7 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
         String location = mLocationView.getText().toString();
         String description = mDescriptionView.getText().toString();
         String type = (String) mTypeView.getSelectedItem();
+        String drawString = "false";
         List<String> mediaURI = mImage;
         String username = LogOutSingleton.getInstance(getApplicationContext()).getUsername();
         boolean cancel;
@@ -187,7 +200,14 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
             focusView.requestFocus();
         } else {
             //showProgress(true);
-            OccurrenceDataRegister data = new OccurrenceDataRegister(title, description, username, location, type, mediaURI);
+            if(isDraw) {
+                drawString = "true";
+                location = array.get(0).toString().replace("lat/lng: (","");
+                 int index = location.lastIndexOf(")");
+                 location = location.substring(0,index);
+                 System.out.println(location);
+            }
+            OccurrenceDataRegister data = new OccurrenceDataRegister(title, description, username, location, type, mediaURI, drawString);
             mAuth = new RegisterOcurrenceTask(data);
             mAuth.doInBackground();
         }
@@ -218,7 +238,7 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL_SERVER + "/occurrency/saveOccurrency", jsonObject, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    onPostExecute();
+                    onPostExecute(response);
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -231,7 +251,14 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
             setProgressBarVisibility(false);
         }
 
-        private void onPostExecute() {
+        private void onPostExecute(JSONObject response) {
+            try {
+                String ocuID = response.getString("message");
+                id = ocuID;
+                sendArray(true);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             mAuth = null;
             //   showProgress(false);
             String[] result;
@@ -253,6 +280,30 @@ public class RegistOccurrence extends AppCompatActivity implements View.OnClickL
             }
         }
 
+        private void sendArray(boolean check) {
+            Gson gson = new Gson();
+            JSONObject jsonObject = null;
+            try {
+                jsonObject = new JSONObject(gson.toJson(array));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            setProgressBarVisibility(true);
+            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL_SERVER + "/occurrency/saveOcCoords/" + id, jsonObject, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    error.printStackTrace();
+                    onCancelled(error);
+                }
+            });
+            VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonRequest);
+            setProgressBarVisibility(false);
+        }
     }
 }
 
