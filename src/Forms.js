@@ -228,9 +228,8 @@ export class LoginForm extends Component {
 
                     <input type="password" placeholder="Enter Password" name="psw" style={{width: "95%"}} id="pw" required></input><br/>
 
-                    <button type="submit" onClick={() => this.login()}>Login</button><br/>
-
                     <label> <input type="checkbox" id="rememberMe" name="remember"></input>Remember me</label><br/>
+                    <button type="submit" onClick={() => this.login()}>Login</button><br/>
                     <button onClick={this.props.resetForms}>Back</button>
 
                     <p id="errorMessage"/>

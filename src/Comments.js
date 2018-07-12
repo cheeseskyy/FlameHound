@@ -117,9 +117,14 @@ export class AddCommentBox extends Component{
         });
         console.log("Sending Comment");
         xhttp.send(jsonObj);
-        xhttp.onreadystatechange = function () {
+        xhttp.onreadystatechange = () => {
             if(xhttp.readyState === 4){
                 console.log("Comment response status = " + xhttp.status);
+                if(xhttp.status === 200){
+                    document.getElementById("newCommentInput").value = "";
+                    alert("Comentário guardado.");
+                    this.forceUpdate();
+                }
             }
         };
     };

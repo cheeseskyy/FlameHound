@@ -179,7 +179,7 @@ export class PerfilPage extends Component{
             </div>
             )
         }
-    }
+    };
 
     render(){
 
@@ -197,12 +197,9 @@ export class PerfilPage extends Component{
                 <div id="sobreMim">
                     <h3 style={{textAlign: "center"}}>Sobre mim </h3>
                     <Link to={"/profile/changeProfile"}></Link>
-                    <p style={{paddingLeft: "5px"}}>Nome: </p>
-                    <p style={{paddingLeft: "5px"}}>Username:</p>
-                    <p style={{paddingLeft: "5px"}}>Morada:</p>
-                    <p style={{paddingLeft: "5px"}}>Telefone:</p>
-                    <p style={{paddingLeft: "5px"}}>CC:</p>
-                    <p style={{paddingLeft: "5px"}}>NIF:</p>
+                    <p style={{paddingLeft: "5px"}}>Nome: {this.state.info.name}</p>
+                    <p style={{paddingLeft: "5px"}}>Username: {this.state.info.username}</p>
+
                     <div id={"stats"}>
                         <h3 style={{textAlign: "center"}}>Estatísticas:</h3>
                         <p style={{paddingLeft: "5px"}}>Votos Positivos: {this.state.stats.upvotes} </p>

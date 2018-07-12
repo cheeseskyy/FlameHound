@@ -158,6 +158,9 @@ export class OccurrencePreview extends Component {
             if(xhttp.readyState === 4){
                 if(xhttp.status === 200){
                     console.log("Vote sent");
+                    alert("Voto guardado");
+                } else if(xhttp.status === 409){
+                    alert("Já votou nesta ocorrência.");
                 } else{
                     alert("Ocorreu um erro ao votar nesta ocorrência, tente novamente mais tarde.");
                     console.log("Vote error: " + xhttp.status);
@@ -179,6 +182,7 @@ export class OccurrencePreview extends Component {
             if(xhttp.readyState === 4){
                 if(xhttp.status === 200){
                     console.log("Report sent");
+                    alert("Denúncia enviada com successo");
                 } else{
                     alert("Ocorreu um erro ao denunciar nesta ocorrência, tente novamente mais tarde.");
                     console.log("Report error: " + xhttp.status);

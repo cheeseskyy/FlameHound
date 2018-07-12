@@ -211,11 +211,8 @@ class Report extends Component{
                 {this.state.reports.map(report => {
                     return(
                         <div className={"TableEntry"}>
-                            <div className={"EntryInfo Report"}>{report.reportId}</div>
-                            <div className={"EntryInfo Report"}>{report.reporter}</div>
-                            <div className={"EntryInfo Report"}>{report.reported}</div>
-                            <div className={"EntryInfo Report"}>{report.description}</div>
-                            <div className={"EntryInfo Report"}>{report.ocID}</div>
+                            <p> {report.reportId}: {report.reporterInfo} reported occurrence <Link to={"/occurrence/"+report.ocID}>{report.ocID}</Link>  from {report.reportedInfo}.</p>
+                            <p>{report.description}</p>
                             <button onClick={() => this.deleteOc(report.ocID)}>Apagar Ocorrência</button>
                             <button>Rejeitar report</button>
                         </div>
@@ -446,6 +443,7 @@ class Occurrences extends Component{
             if (xhttp.readyState === 4) {
                 if(xhttp.status === 200){
                     alert("Ocorrência confirmada com sucesso");
+                    this.forceUpdate();
                 } else{
                     console.log("deleteOC error: " + xhttp.status);
                     alert("Ocorreu um erro a confirmar a ocorrência, tente novamente mais tarde");
